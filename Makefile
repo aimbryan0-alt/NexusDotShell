@@ -1,6 +1,6 @@
 QS ?= quickshell
 
-.PHONY: install-desktop run run-detach stop lint
+.PHONY: install-desktop run run-detach stop lint gpu-probe-benchmark
 
 DATA_HOME := $(if $(strip $(XDG_DATA_HOME)),$(XDG_DATA_HOME),$(HOME)/.local/share)
 APP_ID := com.myquickshell.shell
@@ -34,3 +34,6 @@ FILES := $(shell find . -name '*.qml' -not -path './.git/*')
 
 lint:
 	qmllint -I . shell.qml $(FILES)
+
+gpu-probe-benchmark:
+	python3 tools/gpu-probe/benchmark.py

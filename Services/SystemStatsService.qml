@@ -71,10 +71,22 @@ Singleton {
   function refreshGpu() {
     if (!gpuProbe.running) {
       gpuProbe.command = ["bash", "-c", root.gpuProbeScript, "myquickshell-gpu",
-        root.overviewActive ? "1" : "0"]
+        root.overviewActive ? "1" : "0",
+        root.gpuFdinfoCPath, root.gpuFdinfoHaskellPath, root.gpuFdinfoAwkPath]
       gpuProbe.running = true
     }
   }
+
+  readonly property string gpuFdinfoCPath:
+    Quickshell.shellDir + "/tools/gpu-probe/build/gpu-fdinfo-c"
+  readonly property string gpuFdinfoHaskellPath:
+    Quickshell.shellDir + "/tools/gpu-probe/build/gpu-fdinfo-haskell"
+  readonly property string gpuFdinfoAwkPath:
+    Quickshell.shellDir + "/tools/gpu-probe/legacy.awk"
+  readonly property string systemStatsCPath:
+    Quickshell.shellDir + "/tools/system-stats/build/system-stats-c"
+  readonly property string systemStatsLegacyPath:
+    Quickshell.shellDir + "/tools/system-stats/legacy.sh"
 
   readonly property string gpuProbeScript:
     "if command -v nvidia-smi >/dev/null 2>&1; then " +
@@ -104,11 +116,14 @@ Singleton {
         "nvidia-smi --query-compute-apps=gpu_uuid,pid,used_memory --format=csv,noheader,nounits 2>/dev/null | awk -F, 'NF >= 3 {gsub(/^[ \\t]+|[ \\t]+$/, \"\", $1); gsub(/^[ \\t]+|[ \\t]+$/, \"\", $2); gsub(/^[ \\t]+|[ \\t]+$/, \"\", $3); print \"NAPP|\" $1 \"|\" $2 \"|\" $3}'; " +
       "fi; " +
     "fi; " +
-    "find /proc/[0-9]*/fdinfo -maxdepth 1 -type f -print 2>/dev/null | awk ' " +
-      "function emit() { if (driver != \"\" && pdev != \"\" && (engine > 0 || shared > 0 || device_mem > 0)) { id = client != \"\" ? client : fd; key = pid SUBSEP pdev SUBSEP driver SUBSEP id; if (engine > engines[key]) engines[key] = engine; if (shared > shared_kb[key]) shared_kb[key] = shared; if (device_mem > device_kb[key]) device_kb[key] = device_mem } } " +
-      "{ split($0, path, \"/\"); pid = path[3]; fd = path[5]; driver = \"\"; pdev = \"\"; client = \"\"; engine = 0; shared = 0; device_mem = 0; filename = $0; while ((getline line < filename) > 0) { count = split(line, fields, /[ \\t]+/); name = fields[1]; if (name == \"drm-driver:\") driver = fields[2]; else if (name == \"drm-pdev:\") pdev = fields[2]; else if (name == \"drm-client-id:\") client = fields[2]; else if (name ~ /^drm-engine-[^:]+:/ && fields[2] ~ /^[0-9]+$/) engine += fields[2]; else if (name ~ /^drm-total-system[^:]*:/) { amount = fields[2] + 0; if (fields[3] == \"MiB\") amount *= 1024; else if (fields[3] == \"GiB\") amount *= 1048576; shared += amount } else if (name ~ /^drm-total-(vram|local)[^:]*:/) { amount = fields[2] + 0; if (fields[3] == \"MiB\") amount *= 1024; else if (fields[3] == \"GiB\") amount *= 1048576; device_mem += amount } } close(filename); emit() } " +
-      "END { for (key in engines) { split(key, parts, SUBSEP); printf \"ENGINE|%s|%s|%s|%s|%.0f|%.0f|%.0f\\n\", parts[1], parts[2], parts[3], parts[4], engines[key], shared_kb[key], device_kb[key] } } " +
-    "'"
+    "run_fdinfo() { " +
+      "if [ -x \"$2\" ]; then if output=$(\"$2\"); then printf '%s\\n' \"$output\"; return 0; fi; fi; " +
+      "if command -v find >/dev/null 2>&1 && command -v awk >/dev/null 2>&1 && [ -r \"$4\" ]; then " +
+        "if output=$(set -o pipefail; find /proc/[0-9]*/fdinfo -maxdepth 1 -type f -print 2>/dev/null | awk -f \"$4\"); then printf '%s\\n' \"$output\"; return 0; fi; " +
+      "fi; " +
+      "if [ -x \"$3\" ]; then if output=$(\"$3\"); then printf '%s\\n' \"$output\"; return 0; fi; fi; " +
+      "printf 'ERROR|DRM fdinfo scanner unavailable\\n'; return 1; " +
+    "}; run_fdinfo \"$@\""
 
   function parseCsvFields(line) {
     const fields = []
@@ -509,17 +524,11 @@ Singleton {
     id: statsProc
     command: [
       "bash", "-c",
-      "awk '/^cpu([0-9]+)? / {printf \"CPU %s\", $1; for (i=2; i<=NF; i++) printf \" %s\", $i; print \"\"}' /proc/stat; " +
-      "awk '/^(MemTotal|MemAvailable|MemFree|Buffers|Cached|SReclaimable|Shmem|SwapTotal|SwapFree):/ {print \"MEM\", $1, $2}' /proc/meminfo; " +
-      "awk -F ': *' '/^(model name|Hardware|Processor)[[:space:]]*:/ && !model {print \"MODEL\", $2; model=1} /^processor[[:space:]]*:/ {cores++} END {print \"CORES\", cores}' /proc/cpuinfo; " +
-      "temp=; " +
-      "for preferred in x86_pkg_temp TCPU_PCI TCPU; do " +
-      "for z in /sys/class/thermal/thermal_zone*/; do " +
-      "[ -r \"$z/type\" ] && [ \"$(cat \"$z/type\")\" = \"$preferred\" ] || continue; " +
-      "value=$(cat \"$z/temp\" 2>/dev/null); " +
-      "case \"$value\" in ''|*[!0-9]*) continue;; esac; " +
-      "if [ \"$value\" -ge 20000 ] && [ \"$value\" -le 120000 ]; then temp=$((value / 1000)); break 2; fi; " +
-      "done; done; echo \"TEMP ${temp:-0}\""
+      "if [ -x \"$1\" ]; then " +
+        "if output=$(\"$1\"); then printf '%s\\n' \"$output\"; exit 0; fi; " +
+      "fi; " +
+      ". \"$2\"",
+      "myquickshell-stats", root.systemStatsCPath, root.systemStatsLegacyPath
     ]
     stdout: StdioCollector {
       waitForEnd: true
@@ -552,7 +561,8 @@ Singleton {
 
   property Process gpuProbe: Process {
     id: gpuProbe
-    command: ["bash", "-c", root.gpuProbeScript, "myquickshell-gpu", "0"]
+    command: ["bash", "-c", root.gpuProbeScript, "myquickshell-gpu", "0",
+      root.gpuFdinfoCPath, root.gpuFdinfoHaskellPath, root.gpuFdinfoAwkPath]
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: root.handleGpuProbe(text)

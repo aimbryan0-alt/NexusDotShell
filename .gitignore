@@ -2,3 +2,8 @@
 *.qslog
 file:*
 *.txt
+/nob
+/nob.old
+/tools/gpu-probe/build/
+/tools/system-stats/build/
+/build/

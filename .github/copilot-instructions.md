@@ -4,14 +4,21 @@
 
 This project is a Quickshell desktop shell, not a conventional app with a test runner.
 
-- Run the shell in the foreground: `make run`
-- Run it detached: `make run-detach`
-- Stop the detached instance: `make stop`
-- Lint the QML project: `make lint`
+- Build the native CPU/memory and GPU collectors: `./nob build`
+- Run the shell in the foreground: `./nob run`
+- Run it detached: `./nob run-detach`
+- Stop the detached instance: `./nob stop`
+- Lint the QML project: `./nob lint`
 - Direct shell start: `quickshell -p .` or `quickshell -p . -d` (run
-  `make install-desktop` first so desktop portals can resolve the app ID)
+  `./nob install-desktop` first so desktop portals can resolve the app ID)
 
-`make lint` is the repo's validation command. It runs `qmllint -I . shell.qml $(find . -name '*.qml' -not -path './.git/*')` and is the closest thing to a project-wide check.
+Bootstrap the build driver once with `cc -o nob nob.c`; it rebuilds itself when
+`nob.c` or `nob.h` changes. The Makefile remains available as a legacy interface;
+new development and validation should use `nob`.
+
+`./nob lint` is the repo's validation command. It runs `qmllint -I . shell.qml`
+and all project QML files, excluding `.git`; this is the closest thing to a
+project-wide check.
 
 There is no automated unit test suite in this repo. For a focused validation of a single file, use the same QML linter approach directly, for example:
 

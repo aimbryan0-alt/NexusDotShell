@@ -84,8 +84,24 @@ relative (`:set nu relativenumber`).
 
 ## Runtime dependencies
 
-- **Required:** Quickshell 0.3.1 or newer with Qt 6, and a Wayland compositor
+- **Required:** Quickshell 0.3.1 or newer with Qt 6 (including the
+  `quickshell` and `qs` command-line tools), and a Wayland compositor
   supporting `wlr-layer-shell`.
+- **System statistics and GPU telemetry:** Bash runs the telemetry probes. The
+  CPU and memory probe prefers its compiled C helper and falls back to the
+  shell/awk collector. The DRM fdinfo scanner prefers its compiled C helper;
+  if unavailable or failing, it falls back to shell/awk, then the optional
+  compiled Haskell implementation. Build the C helpers with a C compiler and
+  `./nob build`; GHC is optional and only needed to build the final GPU fallback.
+  The shell/awk fallbacks require `awk`, and the GPU fallback also requires
+  `find`. `nvidia-smi` is optional and supplies additional NVIDIA telemetry;
+  without it, DRM/sysfs metrics remain available where exposed by the driver.
+  Direct Quickshell launch without building uses the shell/awk fallbacks. GPU
+  metrics remain limited to data exposed by each driver.
+- **Build and validation tools:** A C compiler (`cc`) is required to bootstrap
+  `nob` and build the primary CPU/memory and GPU helpers. `qmllint` is required
+  for `./nob lint`. GHC is optional for normal builds; without it, the Haskell
+  GPU fallback is not built.
 - **Hyprland integration:** `hyprctl` is used for workspace state and related
   compositor actions; those widgets are unavailable outside Hyprland. The
   Alt+Tab switcher uses Hyprland's dynamic Lua binding API and Quickshell's
@@ -241,14 +257,16 @@ Copyright (C) 2026 mmj2023
 ## Running
 
 ```sh
-make run        # foreground
-make run-detach # background (daemonized)
+cc -o nob nob.c # bootstrap the C build driver once
+./nob run       # foreground
+./nob run-detach # background (daemonized)
 ```
 
-These targets register the shell's desktop entry under
-`$XDG_DATA_HOME/applications` (or `~/.local/share/applications`) so desktop
-portals can resolve its application ID. Run `make install-desktop` separately
-if you launch the shell directly.
+The `nob run` commands build the GPU helpers and register the shell's desktop
+entry under `$XDG_DATA_HOME/applications` (or `~/.local/share/applications`) so
+desktop portals can resolve its application ID. Run `./nob install-desktop`
+separately if you launch the shell directly. The Makefile remains available as
+a legacy interface and requires `make`.
 
 or directly:
 
@@ -256,6 +274,18 @@ or directly:
 quickshell -p .            # foreground
 quickshell -p . -d         # daemonized
 ```
+
+## GPU collector comparison (developer-only)
+
+`./nob gpu-probe-benchmark` builds temporary C and Haskell versions of the DRM
+fdinfo scanner and compares them with the shell/awk fallback. It checks fixture
+parity, then reports live scan timing; it requires Python 3, a C compiler, GHC,
+Bash, `find`, and `awk`. These tools are needed only to run the comparison;
+GHC is optional for normal operation.
+
+`./nob system-stats-benchmark` compares the C CPU/memory collector with its
+shell/awk fallback, verifies exact output parity on a fixture, and reports live
+scan timings. It requires Python 3, a C compiler, Bash, and `awk`.
 
 ## QML modules
 
