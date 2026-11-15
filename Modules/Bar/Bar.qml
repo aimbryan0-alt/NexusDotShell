@@ -40,18 +40,30 @@ Item {
     readonly property bool backgroundEnabled: root.barTransparency !== 0
     readonly property var hyprlandMonitor: Hyprland.monitorFor(barWindow.screen)
     readonly property var specialWorkspace: barWindow.hyprlandMonitor?.lastIpcObject?.specialWorkspace
+    readonly property var specialWorkspaceState: {
+      const monitor = barWindow.hyprlandMonitor
+      const special = barWindow.specialWorkspace
+      if (!monitor || !special || special.id === 0)
+        return null
+      return (Hyprland.workspaces?.values || []).find(workspace =>
+        workspace.name === special.name
+          && workspace.monitor?.name === monitor.name) || null
+    }
+    readonly property bool specialWorkspaceFullscreen: {
+      const workspace = barWindow.specialWorkspaceState
+      return !!workspace?.hasFullscreen
+    }
     readonly property bool specialWorkspaceOverFullscreen: {
       const special = barWindow.specialWorkspace
       const monitor = barWindow.hyprlandMonitor
-      const activeToplevel = Hyprland.activeToplevel
-      if (!monitor || !special || !activeToplevel || !activeToplevel.workspace)
+      if (!monitor || !special || special.id === 0
+          || !special.name.startsWith("special:"))
         return false
-      return !!monitor
-        && !!monitor.activeWorkspace?.hasFullscreen
-        && special.id !== 0
-        && special.name.startsWith("special:")
-        && (activeToplevel.workspace.name !== special.name || !activeToplevel.workspace.hasFullscreen)
+      return !!monitor.activeWorkspace?.hasFullscreen
+        && !barWindow.specialWorkspaceFullscreen
     }
+    readonly property bool regularWorkspaceFullscreen:
+      !!barWindow.hyprlandMonitor?.activeWorkspace?.hasFullscreen
 
     anchors {
       top: true
@@ -59,6 +71,7 @@ Item {
       right: true
     }
 
+    visible: !barWindow.specialWorkspaceFullscreen
     implicitHeight: Theme.barHeight + Theme.space2() * 2
     color: barWindow.backgroundEnabled
       ? Theme.withAlpha(Theme.surfaceContainer, 1)
@@ -67,7 +80,9 @@ Item {
     exclusionMode: ExclusionMode.Auto
     WlrLayershell.namespace: "mybar"
     WlrLayershell.layer: barWindow.specialWorkspaceOverFullscreen
-      ? WlrLayer.Overlay : WlrLayer.Top
+      ? WlrLayer.Overlay
+      : (barWindow.regularWorkspaceFullscreen
+        ? WlrLayer.Bottom : WlrLayer.Top)
 
     BackgroundEffect.blurRegion: SettingsData.barBlurEnabled ? barBlurRegion : null
 

@@ -716,6 +716,14 @@ Singleton {
     }
   }
 
+  Connections {
+    target: Hyprland
+    function onRawEvent(event) {
+      if (event.name === "configreloaded")
+        Qt.callLater(root.forceLoadKeybindings)
+    }
+  }
+
   Component.onCompleted: {
     root.rememberActiveWindow()
     root.forceLoadKeybindings()

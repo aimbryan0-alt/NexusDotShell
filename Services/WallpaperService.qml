@@ -1745,6 +1745,8 @@ Singleton {
       return
     }
 
+    if (force)
+      root.unbindShortcut(shortcut)
     root.bindShortcut(shortcut)
     root.activeShortcut = shortcut
   }
