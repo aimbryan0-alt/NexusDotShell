@@ -138,7 +138,7 @@ Item {
           Repeater {
             model: [
               { label: "Bar background", enabled: barWindow.backgroundEnabled, setting: "background" },
-              { label: "Blur behind bar", enabled: SettingsData.barBlurEnabled, setting: "blur" }
+              { label: "Blur behind bar and overlays", enabled: SettingsData.barBlurEnabled, setting: "blur" }
             ]
 
             delegate: Item {

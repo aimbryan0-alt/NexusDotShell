@@ -77,6 +77,16 @@ PanelWindow {
   WlrLayershell.keyboardFocus: root.chooserOpen
     ? WlrKeyboardFocus.None : WlrKeyboardFocus.Exclusive
 
+  BackgroundEffect.blurRegion: SettingsData.barBlurEnabled ? overlayBlurRegion : null
+
+  Region {
+    id: overlayBlurRegion
+    x: 0
+    y: 0
+    width: root.width
+    height: root.height
+  }
+
   Timer {
     id: gifAnimationDelay
     interval: 100

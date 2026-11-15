@@ -834,6 +834,16 @@ BasePill {
     implicitWidth: Math.min(root.expanded ? 960 : 480, Math.max(1, screenWidth - 16))
     implicitHeight: Math.max(1, screenHeight - (root.barWindow ? root.barWindow.height : 0) - 16)
 
+    BackgroundEffect.blurRegion: SettingsData.barBlurEnabled ? notesBlurRegion : null
+
+    Region {
+      id: notesBlurRegion
+      x: 0
+      y: 0
+      width: notesPopup.width
+      height: notesPopup.height
+    }
+
     Rectangle {
       anchors.fill: parent
       radius: Theme.cornerRadius

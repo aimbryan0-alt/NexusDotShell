@@ -32,6 +32,16 @@ Item {
       WlrLayershell.keyboardFocus: visible
         ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
+      BackgroundEffect.blurRegion: SettingsData.barBlurEnabled ? switcherBlurRegion : null
+
+      Region {
+        id: switcherBlurRegion
+        x: switcherCard.x
+        y: switcherCard.y
+        width: switcherCard.width
+        height: switcherCard.height
+      }
+
       Item {
         id: overlay
         anchors.fill: parent
