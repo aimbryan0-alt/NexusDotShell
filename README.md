@@ -96,8 +96,9 @@ relative (`:set nu relativenumber`).
   The shell/awk fallbacks require `awk`, and the GPU fallback also requires
   `find`. `nvidia-smi` is optional and supplies additional NVIDIA telemetry;
   without it, DRM/sysfs metrics remain available where exposed by the driver.
-  Direct Quickshell launch without building uses the shell/awk fallbacks. GPU
-  metrics remain limited to data exposed by each driver.
+  A direct launch prompts to build the C helpers if either is missing; declining
+  keeps the shell/awk fallbacks active for that session. GPU metrics remain
+  limited to data exposed by each driver.
 - **Build and validation tools:** A C compiler (`cc`) is required to bootstrap
   `nob` and build the primary CPU/memory and GPU helpers. `qmllint` is required
   for `./nob lint`. GHC is optional for normal builds; without it, the Haskell
@@ -262,11 +263,15 @@ cc -o nob nob.c # bootstrap the C build driver once
 ./nob run-detach # background (daemonized)
 ```
 
-The `nob run` commands build the GPU helpers and register the shell's desktop
-entry under `$XDG_DATA_HOME/applications` (or `~/.local/share/applications`) so
-desktop portals can resolve its application ID. Run `./nob install-desktop`
-separately if you launch the shell directly. The Makefile remains available as
-a legacy interface and requires `make`.
+The `nob run` commands build the native CPU/memory and GPU helpers and register
+the shell's desktop entry under `$XDG_DATA_HOME/applications` (or
+`~/.local/share/applications`) so desktop portals can resolve its application
+ID. Run `./nob install-desktop` separately if you launch the shell directly.
+The Makefile remains available as a legacy interface and requires `make`.
+
+Launching the shell directly also prompts to build missing native helpers.
+Choose **Not now** to continue with the shell/awk fallbacks; the prompt will
+appear again on a later launch until the helpers are built.
 
 or directly:
 

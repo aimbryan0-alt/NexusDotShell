@@ -5,6 +5,7 @@ singleton MatugenService 1.0 MatugenService.qml
 singleton LyricsService 1.0 LyricsService.qml
 singleton NotesService 1.0 NotesService.qml
 singleton SystemStatsService 1.0 SystemStatsService.qml
+singleton NativeBuildService 1.0 NativeBuildService.qml
 singleton SettingsPanelService 1.0 SettingsPanelService.qml
 singleton TrayService 1.0 TrayService.qml
 singleton WindowSwitcherService 1.0 WindowSwitcherService.qml

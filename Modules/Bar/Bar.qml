@@ -72,6 +72,8 @@ Item {
     }
 
     visible: !barWindow.specialWorkspaceFullscreen
+      && (!barWindow.regularWorkspaceFullscreen
+        || barWindow.specialWorkspaceOverFullscreen)
     implicitHeight: Theme.barHeight + Theme.space2() * 2
     color: barWindow.backgroundEnabled
       ? Theme.withAlpha(Theme.surfaceContainer, 1)
@@ -189,6 +191,113 @@ Item {
             }
           }
 
+        }
+      }
+    }
+
+    PopupWindow {
+      id: nativeBuildPrompt
+      anchor.window: barWindow
+      anchor.rect.x: Math.max(Theme.spaceS, Math.min(
+        barWindow.width - implicitWidth - Theme.spaceS,
+        (barWindow.width - implicitWidth) / 2
+      ))
+      anchor.rect.y: barWindow.height + Theme.spaceXS
+      visible: barWindow.visible
+        && barWindow.screen === Quickshell.screens[0]
+        && NativeBuildService.promptVisible
+      grabFocus: true
+      color: "transparent"
+      surfaceFormat.opaque: false
+      implicitWidth: 380
+      implicitHeight: nativeBuildContent.implicitHeight + Theme.spaceM * 2
+
+      Rectangle {
+        anchors.fill: parent
+        radius: Theme.cornerRadius
+        color: Theme.surfaceContainer
+        border.width: 1
+        border.color: Theme.withAlpha(Theme.outlineVariant, 0.6)
+
+        Column {
+          id: nativeBuildContent
+          anchors.fill: parent
+          anchors.margins: Theme.spaceM
+          spacing: Theme.spaceS
+
+          Text {
+            width: parent.width
+            text: "Build native collectors?"
+            color: Theme.surfaceText
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeMedium
+            font.bold: true
+          }
+
+          Text {
+            width: parent.width
+            text: NativeBuildService.buildError
+              || "Build the optimized CPU, memory, and GPU collectors now? The shell remains usable with fallback collectors if you skip."
+            color: Theme.surfaceText
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeSmall
+            wrapMode: Text.Wrap
+          }
+
+          Row {
+            anchors.right: parent.right
+            spacing: Theme.spaceS
+            height: Theme.spaceXL + Theme.spaceS
+
+            Rectangle {
+              width: buildButtonLabel.implicitWidth + Theme.spaceM * 2
+              height: parent.height
+              radius: Theme.cornerRadius
+              color: Theme.primary
+              opacity: NativeBuildService.buildRunning ? 0.5 : 1
+
+              Text {
+                id: buildButtonLabel
+                anchors.centerIn: parent
+                text: NativeBuildService.buildRunning ? "Building..."
+                  : (NativeBuildService.buildError ? "Retry" : "Build")
+                color: Theme.primaryText
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSizeSmall
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                enabled: !NativeBuildService.buildRunning
+                cursorShape: Qt.PointingHandCursor
+                onClicked: NativeBuildService.buildHelpers()
+              }
+            }
+
+            Rectangle {
+              width: dismissButtonLabel.implicitWidth + Theme.spaceM * 2
+              height: parent.height
+              radius: Theme.cornerRadius
+              color: Theme.surfaceContainerHigh
+              opacity: NativeBuildService.buildRunning ? 0.5 : 1
+
+              Text {
+                id: dismissButtonLabel
+                anchors.centerIn: parent
+                text: "Not now"
+                color: Theme.surfaceText
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSizeSmall
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                enabled: !NativeBuildService.buildRunning
+                cursorShape: Qt.PointingHandCursor
+                onClicked: NativeBuildService.dismissPrompt()
+              }
+            }
+          }
         }
       }
     }

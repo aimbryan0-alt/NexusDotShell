@@ -3,10 +3,11 @@
 Personal workspace behavior and live-Hyprland safety requirements are
 versioned in `~/dotfiles/agent-guidance/AGENTS.md`. Read that file and its
 `myquickshell-bar-and-notes` skill before changing bar layering, special
-workspaces, fullscreen behavior, or Notes. In particular, keep the bar below
-ordinary fullscreen windows; raise it only on a monitor where a visible
-special workspace overlays a fullscreen regular workspace, and hide it when a
-window on that special workspace is fullscreen. Documented, low-risk
+workspaces, fullscreen behavior, or Notes. Hide the bar per monitor for
+ordinary fullscreen windows. When a special workspace is visible over a
+fullscreen regular workspace on the same monitor, show the bar above the
+fullscreen content; hide it if a window on the special workspace is
+fullscreen. Documented, low-risk
 read-only `hyprctl` queries may be run when useful after verifying their
 syntax offline. Ask before any state-changing live action or any query/action
 whose risk or effect is uncertain, including reloads, dispatches, runtime Lua
