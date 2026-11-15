@@ -43,6 +43,7 @@ Singleton {
 
   property var _prevCpuCounters: ({})
   property var _prevGpuEngineCounters: ({})
+  property var _prevGpuIdleCounters: ({})
   property real _gpuSampleTime: 0
   property string _diskSignature: ""
 
@@ -95,21 +96,19 @@ Singleton {
       "used=$(cat \"$card/device/mem_info_vram_used\" 2>/dev/null); total=$(cat \"$card/device/mem_info_vram_total\" 2>/dev/null); " +
       "case \"$used\" in ''|*[!0-9]*) used=-1;; esac; case \"$total\" in ''|*[!0-9]*) total=-1;; esac; " +
       "printf 'DRM|%s|%s|%s|%s|%s|%s|%s|%s\\n' \"$pci\" \"$vendor\" \"$driver\" \"$name\" \"$busy\" \"$used\" \"$total\" \"${card##*card}\"; " +
+      "if [ \"$driver\" = i915 ]; then idle=$(cat \"$card/gt/gt0/rc6_residency_ms\" \"$card/power/rc6_residency_ms\" 2>/dev/null | head -1); case \"$idle\" in ''|*[!0-9]*) idle=;; esac; [ -n \"$idle\" ] && printf 'RC6|%s|%s\\n' \"$pci\" \"$idle\"; fi; " +
     "done; " +
     "if [ \"$1\" = 1 ]; then " +
       "if command -v nvidia-smi >/dev/null 2>&1; then " +
         "nvidia-smi pmon -c 1 -s um 2>/dev/null | awk '$1 ~ /^[0-9]+$/ && $2 ~ /^[0-9]+$/ {print \"PMON|\" $1 \"|\" $2 \"|\" $4 \"|\" $5}'; " +
         "nvidia-smi --query-compute-apps=gpu_uuid,pid,used_memory --format=csv,noheader,nounits 2>/dev/null | awk -F, 'NF >= 3 {gsub(/^[ \\t]+|[ \\t]+$/, \"\", $1); gsub(/^[ \\t]+|[ \\t]+$/, \"\", $2); gsub(/^[ \\t]+|[ \\t]+$/, \"\", $3); print \"NAPP|\" $1 \"|\" $2 \"|\" $3}'; " +
       "fi; " +
-      "find /proc/[0-9]*/fdinfo -maxdepth 1 -type f -exec awk ' " +
-        "function emit() { if (driver != \"\" && pdev != \"\" && (engine > 0 || vram > 0)) printf \"ENGINE|%s|%s|%s|%.0f|%.0f\\n\", pid, pdev, driver, engine, vram; driver = \"\"; pdev = \"\"; engine = 0; vram = 0 } " +
-        "FNR == 1 { emit(); split(FILENAME, path, \"/\"); pid = path[3] } " +
-        "/^drm-driver:/ { driver = $2 } /^drm-pdev:/ { pdev = $2 } " +
-        "/^drm-engine-[^:]+:/ { if ($2 ~ /^[0-9]+$/) engine += $2 } " +
-        "/^drm-resident-vram[^:]*:/ { amount = $2 + 0; if ($3 == \"MiB\") amount *= 1024; else if ($3 == \"GiB\") amount *= 1048576; vram += amount } " +
-        "END { emit() } " +
-      "' {} + 2>/dev/null || true; " +
-    "fi"
+    "fi; " +
+    "find /proc/[0-9]*/fdinfo -maxdepth 1 -type f -print 2>/dev/null | awk ' " +
+      "function emit() { if (driver != \"\" && pdev != \"\" && (engine > 0 || shared > 0 || device_mem > 0)) { id = client != \"\" ? client : fd; key = pid SUBSEP pdev SUBSEP driver SUBSEP id; if (engine > engines[key]) engines[key] = engine; if (shared > shared_kb[key]) shared_kb[key] = shared; if (device_mem > device_kb[key]) device_kb[key] = device_mem } } " +
+      "{ split($0, path, \"/\"); pid = path[3]; fd = path[5]; driver = \"\"; pdev = \"\"; client = \"\"; engine = 0; shared = 0; device_mem = 0; filename = $0; while ((getline line < filename) > 0) { count = split(line, fields, /[ \\t]+/); name = fields[1]; if (name == \"drm-driver:\") driver = fields[2]; else if (name == \"drm-pdev:\") pdev = fields[2]; else if (name == \"drm-client-id:\") client = fields[2]; else if (name ~ /^drm-engine-[^:]+:/ && fields[2] ~ /^[0-9]+$/) engine += fields[2]; else if (name ~ /^drm-total-system[^:]*:/) { amount = fields[2] + 0; if (fields[3] == \"MiB\") amount *= 1024; else if (fields[3] == \"GiB\") amount *= 1048576; shared += amount } else if (name ~ /^drm-total-(vram|local)[^:]*:/) { amount = fields[2] + 0; if (fields[3] == \"MiB\") amount *= 1024; else if (fields[3] == \"GiB\") amount *= 1048576; device_mem += amount } } close(filename); emit() } " +
+      "END { for (key in engines) { split(key, parts, SUBSEP); printf \"ENGINE|%s|%s|%s|%s|%.0f|%.0f|%.0f\\n\", parts[1], parts[2], parts[3], parts[4], engines[key], shared_kb[key], device_kb[key] } } " +
+    "'"
 
   function parseCsvFields(line) {
     const fields = []
@@ -154,6 +153,10 @@ Singleton {
     const processGpuDevicesByPid = ({})
     const processGpuMemoryByPid = ({})
     const engineCounters = ({})
+    const gpuIdleCounters = ({})
+    const sharedMemoryByPci = ({})
+    const localMemoryByPci = ({})
+    const gpuMemorySeen = ({})
     const pmonSamples = []
 
     for (const line of String(output).split(/\r?\n/)) {
@@ -178,6 +181,7 @@ Singleton {
           vendor: fields[2] === "0x8086" ? "Intel"
             : (fields[2] === "0x1002" ? "AMD"
             : (fields[2] === "0x10de" ? "NVIDIA" : qsTr("Other"))),
+          memoryType: fields[2] === "0x8086" ? "shared" : "vram",
           utilization: root.finiteGpuNumber(fields[5]),
           memoryUsage: -1,
           memoryTotal: -1,
@@ -212,6 +216,7 @@ Singleton {
             nvidiaIndex: root.finiteGpuNumber(fields[0]),
             uuid: fields[1],
             name: fields[2], driver: "nvidia", vendor: "NVIDIA",
+            memoryType: "vram",
             utilization: -1, memoryUsage: -1, memoryTotal: -1, memoryPercent: -1,
             memoryControllerUtilization: -1,
             temperature: -1, power: -1, utilizationSource: "NVIDIA driver"
@@ -225,6 +230,7 @@ Singleton {
         gpu.name = fields[2] || gpu.name
         gpu.driver = "nvidia"
         gpu.vendor = "NVIDIA"
+        gpu.memoryType = "vram"
         gpu.utilization = root.finiteGpuNumber(fields[4])
         gpu.memoryControllerUtilization = root.finiteGpuNumber(fields[5])
         gpu.memoryUsage = root.finiteGpuNumber(fields[6])
@@ -255,21 +261,30 @@ Singleton {
         }
         if (gpu && Number.isInteger(pid) && memoryMB >= 0)
           processGpuMemoryByPid[pid] = (processGpuMemoryByPid[pid] || 0) + memoryMB
+      } else if (line.startsWith("RC6|")) {
+        const fields = line.split("|")
+        const pci = root.normalizedPciAddress(fields[1])
+        const idleMilliseconds = Number(fields[2])
+        if (pci && Number.isFinite(idleMilliseconds))
+          gpuIdleCounters[pci] = idleMilliseconds
       } else if (line.startsWith("ENGINE|")) {
         const fields = line.split("|")
         const pid = Number(fields[1])
         const pci = root.normalizedPciAddress(fields[2])
-        const counter = Number(fields[4])
-        const vramKB = Number(fields[5])
-        if (Number.isInteger(pid) && pci && Number.isFinite(counter)) {
-          const key = pid + "|" + pci
+        const client = fields[4]
+        const counter = Number(fields[5])
+        const sharedKB = Number(fields[6])
+        const localKB = Number(fields[7])
+        if (Number.isInteger(pid) && pci && client && Number.isFinite(counter)) {
+          const key = pid + "|" + pci + "|" + client
           if (!processGpuDevicesByPid[pid])
             processGpuDevicesByPid[pid] = ({})
           processGpuDevicesByPid[pid][pci] = true
-          if (!engineCounters[key])
-            engineCounters[key] = { engine: 0, vramKB: 0 }
-          engineCounters[key].engine += counter
-          engineCounters[key].vramKB += Number.isFinite(vramKB) ? vramKB : 0
+          engineCounters[key] = {
+            engine: counter,
+            sharedKB: Number.isFinite(sharedKB) ? sharedKB : 0,
+            localKB: Number.isFinite(localKB) ? localKB : 0
+          }
         }
       }
     }
@@ -287,15 +302,57 @@ Singleton {
         const usage = Math.min(100, Math.max(0, (current - previous) / elapsed * 100))
         if (!processGpuByPid[pid])
           processGpuByPid[pid] = ({})
-        processGpuByPid[pid][pci] = usage
+        processGpuByPid[pid][pci] = (processGpuByPid[pid][pci] || 0) + usage
       }
       const [pid, pci] = key.split("|")
-      if (engineCounters[key].vramKB > 0) {
+      const gpu = gpuByPci[pci]
+      const sharedKB = engineCounters[key].sharedKB
+      const localKB = engineCounters[key].localKB
+      if (gpu && gpu.vendor === "Intel") {
+        gpuMemorySeen[pci] = true
+        sharedMemoryByPci[pci] = (sharedMemoryByPci[pci] || 0) + sharedKB
+        localMemoryByPci[pci] = (localMemoryByPci[pci] || 0) + localKB
+      }
+      if (sharedKB + localKB > 0 && (!gpu || gpu.vendor !== "NVIDIA")) {
         processGpuMemoryByPid[pid] = (processGpuMemoryByPid[pid] || 0)
-          + engineCounters[key].vramKB / 1024
+          + (sharedKB + localKB) / 1024
       }
     }
     root._prevGpuEngineCounters = nextEngineCounters
+
+    const nextGpuIdleCounters = ({})
+    for (const pci in gpuIdleCounters) {
+      const current = gpuIdleCounters[pci]
+      const previous = root._prevGpuIdleCounters[pci]
+      nextGpuIdleCounters[pci] = current
+      if (previous === undefined || elapsed <= 0 || current < previous)
+        continue
+      const idlePercent = (current - previous) * 1000000 / elapsed * 100
+      const gpu = gpuByPci[pci]
+      let hasEngineUsage = false
+      for (const pid in processGpuByPid) {
+        if (processGpuByPid[pid][pci] !== undefined) {
+          hasEngineUsage = true
+          break
+        }
+      }
+      if (gpu && gpu.vendor === "Intel" && gpu.utilization < 0 && !hasEngineUsage) {
+        gpu.utilization = Math.max(0, Math.min(100, 100 - idlePercent))
+        gpu.utilizationSource = "i915 RC6 residency"
+      }
+    }
+    root._prevGpuIdleCounters = nextGpuIdleCounters
+
+    for (const gpu of gpus) {
+      if (gpu.vendor !== "Intel" || !gpuMemorySeen[gpu.pciAddress])
+        continue
+      const sharedKB = sharedMemoryByPci[gpu.pciAddress] || 0
+      const localKB = localMemoryByPci[gpu.pciAddress] || 0
+      gpu.memoryType = localKB > 0 ? "vram" : "shared"
+      gpu.memoryUsage = (localKB > 0 ? localKB : sharedKB) / 1024
+      gpu.memoryTotal = -1
+      gpu.memoryPercent = -1
+    }
 
     for (const sample of pmonSamples) {
       if (sample.utilization < 0)

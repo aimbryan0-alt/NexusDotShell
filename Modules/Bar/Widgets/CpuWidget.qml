@@ -272,7 +272,11 @@ BasePill {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: modelData.memoryPercent >= 0
                   ? "VRAM " + Math.round(modelData.memoryPercent) + "%"
-                  : "VRAM —"
+                  : modelData.memoryType === "shared"
+                    ? (modelData.memoryUsage >= 0
+                      ? qsTr("SH %1M").arg(Math.round(modelData.memoryUsage))
+                      : qsTr("SH —"))
+                    : "VRAM —"
                 color: Theme.widgetInactiveIconColor
                 font.family: Theme.monoFontFamily
                 font.pixelSize: Math.max(9, Math.round(root.textSize() * 0.7))
@@ -284,7 +288,11 @@ BasePill {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: modelData.memoryUsage >= 0 && modelData.memoryTotal > 0
                   ? Math.round(modelData.memoryUsage) + "/" + Math.round(modelData.memoryTotal) + " MiB"
-                  : qsTr("VRAM —")
+                  : modelData.memoryUsage >= 0
+                    ? (modelData.memoryType === "shared"
+                      ? qsTr("%1 MiB shared").arg(Math.round(modelData.memoryUsage))
+                      : qsTr("%1 MiB VRAM").arg(Math.round(modelData.memoryUsage)))
+                    : modelData.memoryType === "shared" ? qsTr("Shared —") : qsTr("VRAM —")
                 color: Theme.widgetInactiveIconColor
                 font.family: Theme.monoFontFamily
                 font.pixelSize: Math.max(9, Math.round(root.textSize() * 0.55))
@@ -310,7 +318,13 @@ BasePill {
                   ? qsTr("%1 / %2 MiB VRAM")
                     .arg(Math.round(modelData.memoryUsage))
                     .arg(Math.round(modelData.memoryTotal))
-                  : qsTr("VRAM unavailable")
+                  : modelData.memoryUsage >= 0
+                    ? (modelData.memoryType === "shared"
+                      ? qsTr("%1 MiB shared GPU memory").arg(Math.round(modelData.memoryUsage))
+                      : qsTr("%1 MiB VRAM").arg(Math.round(modelData.memoryUsage)))
+                    : modelData.memoryType === "shared"
+                      ? qsTr("Shared GPU memory unavailable")
+                      : qsTr("VRAM unavailable")
                 root.showGpuTooltip(parent,
                   modelData.name + " · "
                     + (modelData.utilization >= 0
@@ -584,7 +598,7 @@ BasePill {
                   spacing: 6
 
                   Text {
-                    text: qsTr("VRAM")
+                    text: modelData.memoryType === "shared" ? qsTr("Shared RAM") : qsTr("VRAM")
                     color: Theme.widgetTextColor
                     font.pixelSize: 10
                     font.weight: Font.Medium
@@ -595,7 +609,9 @@ BasePill {
                     text: modelData.memoryPercent >= 0
                       ? gpuOverviewPage.memoryText(modelData.memoryUsage)
                         + " / " + gpuOverviewPage.memoryText(modelData.memoryTotal)
-                      : qsTr("Unavailable")
+                      : modelData.memoryUsage >= 0
+                        ? gpuOverviewPage.memoryText(modelData.memoryUsage)
+                        : qsTr("Unavailable")
                     color: Theme.widgetTextColor
                     font.family: Theme.monoFontFamily
                     font.pixelSize: 10
@@ -1291,7 +1307,7 @@ BasePill {
             { "field": "cpu", "label": qsTr("CPU"), "width": 42 },
             { "field": "memoryKB", "label": qsTr("MEMORY"), "width": 46 },
             { "field": "gpuUsage", "label": qsTr("GPU"), "width": 38 },
-            { "field": "gpuMemoryMB", "label": qsTr("VRAM"), "width": 46 },
+            { "field": "gpuMemoryMB", "label": qsTr("GPU MEM"), "width": 46 },
             { "field": "pid", "label": qsTr("PID"), "width": 38 },
             { "field": "", "label": qsTr("ACTIONS"), "width": 66 }
           ]

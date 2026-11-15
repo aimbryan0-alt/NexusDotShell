@@ -6,17 +6,23 @@ versioned in `~/dotfiles/agent-guidance/AGENTS.md`. Read that file and its
 workspaces, fullscreen behavior, or Notes. In particular, keep the bar below
 ordinary fullscreen windows; raise it only on a monitor where a visible
 special workspace overlays a fullscreen regular workspace, and hide it when a
-window on that special workspace is fullscreen. Never run
-`hyprctl` or perform a live compositor action without the user's explicit
-permission for that specific action.
+window on that special workspace is fullscreen. Documented, low-risk
+read-only `hyprctl` queries may be run when useful after verifying their
+syntax offline. Ask before any state-changing live action or any query/action
+whose risk or effect is uncertain, including reloads, dispatches, runtime Lua
+evaluation, and tests that affect windows or focus. If the current prompt
+explicitly requests a particular live query or probe, that authorizes the
+scoped read-only operation; do not ask again or extend it to unrelated probes.
 
 Hyprland on this host uses Lua-based configuration and control APIs. Do not
 apply old dispatcher/config syntax from older versions; find the current
 version's Lua API and signatures from offline documentation/source because
 they may change. Do not probe APIs or enumerate/introspect C-backed objects
-against the live compositor: this kind of exploration has crashed Hyprland.
-Avoid live path-finding; if truly necessary, ask permission for the exact
-action before doing it.
+against the live compositor unless the current prompt explicitly requests that
+specific probe; this kind of exploration has crashed Hyprland. Prefer offline
+research, but use safe, documented read-only queries when runtime evidence is
+needed. Ask before higher-risk or uncertain actions unless the current prompt
+explicitly requests that specific read-only probe.
 
 All AI coding agents working in this repository must follow these shared UI
 theming and spacing rules, in addition to any tool-specific instructions.

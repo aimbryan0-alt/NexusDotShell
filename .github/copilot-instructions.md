@@ -37,7 +37,9 @@ The important architecture constraint is to keep compositor-specific logic and s
   popup anchor coordinates.
 - For Hyprland work, follow the Lua API and strict live-session safety
   requirements in `AGENTS.md` and `~/dotfiles/agent-guidance/`. Do not use
-  deprecated pre-Lua syntax or discover APIs by probing the live compositor.
+  deprecated pre-Lua syntax or probe the live compositor by default. A direct
+  user request for a specific live query/probe authorizes that scoped
+  read-only operation; do not ask again or expand it to unrelated probes.
 - Prefer `pragma Singleton` for shared state. Global state is intentionally centralized in the `Common` and `Services` singletons instead of scattered across widgets.
 - Use `Theme.*` tokens instead of hardcoded colors or spacing values. The design relies on Material 3 token names such as `surfaceContainer`, `primary`, `onSurface`, and the color helpers in `Theme.qml`.
 - Persist settings through `SettingsData.qml`, not by creating ad hoc config properties in UI files. New configuration keys belong in the declarative spec in `Common/Settings/SettingsSpec.js` and are surfaced via `SettingsData.qml`.
