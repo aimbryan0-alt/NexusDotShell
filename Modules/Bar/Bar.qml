@@ -82,9 +82,7 @@ Item {
     exclusionMode: ExclusionMode.Auto
     WlrLayershell.namespace: "mybar"
     WlrLayershell.layer: barWindow.specialWorkspaceOverFullscreen
-      ? WlrLayer.Overlay
-      : (barWindow.regularWorkspaceFullscreen
-        ? WlrLayer.Bottom : WlrLayer.Top)
+      ? WlrLayer.Overlay : WlrLayer.Top
 
     BackgroundEffect.blurRegion: SettingsData.barBlurEnabled ? barBlurRegion : null
 
