@@ -7,9 +7,9 @@ import Quickshell.Hyprland
 // Compositor-agnostic workspace state.
 //
 // The bar binds to this one interface instead of reaching into any specific
-// compositor. The current implementation shells out to hyprctl (Hyprland), the
-// same approach the Omarchy shell relies on, and yields data through a small
-// sink-shaped surface:
+// compositor. On Hyprland, state comes from Quickshell's native model and IPC
+// events, avoiding a recurring hyprctl polling process. The service yields data
+// through a small sink-shaped surface:
 //   workspaceIds   - every workspace id present in the layout (sorted)
 //   occupiedIds    - workspaces that currently have a window open
 //   activeWorkspaceId(name) - active workspace id for a monitor, by name
@@ -24,7 +24,7 @@ QtObject {
   property var workspaceIds: []
   property var occupiedIds: []
 
-  // Active workspace id per monitor name, refreshed from hyprctl.
+  // Active workspace id per monitor name, refreshed from Quickshell's model.
   property var activeByMonitor: ({})
   property var activeNameByMonitor: ({})
   readonly property string desktop: (Quickshell.env("XDG_CURRENT_DESKTOP") || Quickshell.env("DESKTOP_SESSION") || "").toLowerCase()
@@ -124,7 +124,18 @@ QtObject {
   }
 
   // Refresh workspace state from Quickshell's native Hyprland model.
-  // This is event-driven: no recurring hyprctl process is spawned.
+  // Refresh requests are debounced so event bursts do not trigger IPC bursts.
+  property bool pendingWorkspaceRefresh: false
+  property bool pendingMonitorRefresh: false
+  property bool pendingToplevelRefresh: false
+
+  function requestRefresh(workspaces, monitors, toplevels) {
+    pendingWorkspaceRefresh = pendingWorkspaceRefresh || workspaces
+    pendingMonitorRefresh = pendingMonitorRefresh || monitors
+    pendingToplevelRefresh = pendingToplevelRefresh || toplevels
+    refreshTimer.restart()
+  }
+
   function refreshAll() {
     if (root.backend !== "hyprland") {
       workspaceIds = []
@@ -134,10 +145,28 @@ QtObject {
       return
     }
 
-    Hyprland.refreshWorkspaces()
-    Hyprland.refreshMonitors()
-    Hyprland.refreshToplevels()
-    refreshTimer.restart()
+    requestRefresh(true, true, true)
+  }
+
+  function performRefresh() {
+    if (root.backend !== "hyprland")
+      return
+
+    const refreshWorkspaces = pendingWorkspaceRefresh
+    const refreshMonitors = pendingMonitorRefresh
+    const refreshToplevels = pendingToplevelRefresh
+    pendingWorkspaceRefresh = false
+    pendingMonitorRefresh = false
+    pendingToplevelRefresh = false
+
+    if (refreshWorkspaces)
+      Hyprland.refreshWorkspaces()
+    if (refreshMonitors)
+      Hyprland.refreshMonitors()
+    if (refreshToplevels)
+      Hyprland.refreshToplevels()
+
+    settleTimer.restart()
   }
 
   function syncFromHyprland() {
@@ -184,7 +213,6 @@ QtObject {
     activeNameByMonitor = namesByMonitor
   }
 
-
   function switchTo(id) {
     if (!id)
       return
@@ -218,6 +246,7 @@ QtObject {
         "destroyworkspace", "destroyworkspacev2",
         "moveworkspace", "moveworkspacev2",
         "renameworkspace", "focusedmon",
+        "activespecial", "activespecialv2",
         "monitoradded", "monitorremoved",
         "configreloaded"
       ]
@@ -227,29 +256,31 @@ QtObject {
       ]
 
       if (workspaceEvents.indexOf(name) !== -1) {
-        Hyprland.refreshWorkspaces()
-        Hyprland.refreshMonitors()
-        Hyprland.refreshToplevels()
-        refreshTimer.restart()
+        root.requestRefresh(true, true, true)
       } else if (windowEvents.indexOf(name) !== -1) {
-        Hyprland.refreshToplevels()
-        refreshTimer.restart()
+        root.requestRefresh(false, false, true)
       }
     }
   }
-
 
   property Process switchProc: Process {
     id: switchProc
     command: ["hyprctl", "dispatch", "workspace"]
   }
 
-
   Component.onCompleted: root.refreshAll()
 
   // Coalesce bursts of compositor events into one UI-state refresh.
   property Timer refreshTimer: Timer {
     id: refreshTimer
+    interval: 60
+    repeat: false
+    onTriggered: root.performRefresh()
+  }
+
+  // Let the asynchronous native model updates settle before reading them.
+  property Timer settleTimer: Timer {
+    id: settleTimer
     interval: 60
     repeat: false
     onTriggered: root.syncFromHyprland()
