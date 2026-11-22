@@ -731,16 +731,20 @@ Singleton {
     onTriggered: root.refreshProcesses()
   }
 
+  // GPU attribution scans process fdinfo, so keep bar-only sampling modest.
+  // The detailed overview gets a faster cadence while it is actually open.
   property Timer gpuPollTimer: Timer {
-    interval: root.overviewActive ? 2000 : 5000
+    interval: root.overviewActive ? 2000 : 15000
     repeat: true
     running: true
     triggeredOnStart: true
     onTriggered: root.refreshGpu()
   }
 
+  // Disk topology changes infrequently; DiskWidget also requests a fresh
+  // sample immediately when its details panel is opened.
   property Timer diskPollTimer: Timer {
-    interval: 5000
+    interval: 30000
     repeat: true
     running: true
     triggeredOnStart: true
