@@ -184,6 +184,26 @@ QtObject {
     activeNameByMonitor = namesByMonitor
   }
 
+
+  function switchTo(id) {
+    if (!id)
+      return
+    switchProc.command = switchCommand(id)
+    switchProc.running = true
+  }
+
+  function switchCommand(id) {
+    const workspace = String(id)
+    switch (root.backend) {
+    case "niri": return ["niri", "msg", "action", "focus-workspace", workspace]
+    case "mango": return ["mmsg", "-d", "workspace", workspace]
+    case "dwl": return ["dwlmsg", "-s", "view", workspace]
+    case "labwc": return ["wlrctl", "window", "switch-to-workspace", workspace]
+    // Hyprland 0.56+ exposes dispatchers through its Lua API.
+    default: return ["hyprctl", "dispatch", "hl.dsp.focus({ workspace = " + workspace + " })"]
+    }
+  }
+
   Connections {
     target: Hyprland
 
@@ -217,6 +237,13 @@ QtObject {
       }
     }
   }
+
+
+  property Process switchProc: Process {
+    id: switchProc
+    command: ["hyprctl", "dispatch", "workspace"]
+  }
+
 
   Component.onCompleted: root.refreshAll()
 
