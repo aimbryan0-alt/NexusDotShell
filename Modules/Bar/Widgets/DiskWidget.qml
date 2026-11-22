@@ -300,6 +300,7 @@ BasePill {
       detailsTimer.stop()
       return
     }
+    SystemStatsService.refreshDisk()
     root.detailsOpen = true
     detailsTimer.restart()
   }
