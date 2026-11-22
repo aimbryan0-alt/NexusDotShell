@@ -123,100 +123,108 @@ QtObject {
     return /^\d+$/.test(text) ? text : root.luaString(text)
   }
 
+  // Refresh workspace state from Quickshell's native Hyprland model.
+  // This is event-driven: no recurring hyprctl process is spawned.
   function refreshAll() {
-    listProc.running = true
-    monitorsProc.running = true
-  }
-
-  property Process listProc: Process {
-    id: listProc
-    command: ["hyprctl", "-j", "workspaces"]
-    stdout: StdioCollector {
-      waitForEnd: true
-      onStreamFinished: root.handleWorkspaces(text)
+    if (root.backend !== "hyprland") {
+      workspaceIds = []
+      occupiedIds = []
+      activeByMonitor = ({})
+      activeNameByMonitor = ({})
+      return
     }
+
+    Hyprland.refreshWorkspaces()
+    Hyprland.refreshMonitors()
+    Hyprland.refreshToplevels()
+    refreshTimer.restart()
   }
 
-  function handleWorkspaces(raw) {
-    var ids = []
-    var occupied = []
-    try {
-      var arr = JSON.parse(String(raw || ""))
-      if (Array.isArray(arr)) {
-        for (var i = 0; i < arr.length; i++) {
-          var w = arr[i]
-          if (w.id === undefined || w.id < 1) continue
-          if (ids.indexOf(w.id) === -1) ids.push(w.id)
-          occupied.push(w.id)
-        }
-      }
-    } catch (e) { }
-    ids.sort(function(a, b) { return a - b })
+  function syncFromHyprland() {
+    if (root.backend !== "hyprland")
+      return
+
+    const ids = []
+    const occupied = []
+    const workspaces = Hyprland.workspaces?.values || []
+
+    for (const workspace of workspaces) {
+      const id = Number(workspace.id)
+      if (!Number.isInteger(id) || id < 1)
+        continue
+
+      if (ids.indexOf(id) === -1)
+        ids.push(id)
+
+      const windows = workspace.toplevels?.values || []
+      if (windows.length > 0)
+        occupied.push(id)
+    }
+
+    ids.sort((a, b) => a - b)
+    occupied.sort((a, b) => a - b)
     workspaceIds = ids
     occupiedIds = occupied
-  }
 
-  property Process monitorsProc: Process {
-    id: monitorsProc
-    command: ["hyprctl", "-j", "monitors"]
-    stdout: StdioCollector {
-      waitForEnd: true
-      onStreamFinished: root.handleMonitors(text)
+    const byMonitor = ({})
+    const namesByMonitor = ({})
+    const monitors = Hyprland.monitors?.values || []
+
+    for (const monitor of monitors) {
+      const name = String(monitor.name || "")
+      const active = monitor.activeWorkspace
+      if (!name)
+        continue
+
+      byMonitor[name] = active ? Number(active.id) : 0
+      namesByMonitor[name] = active ? String(active.name || "") : ""
     }
-  }
 
-  function handleMonitors(raw) {
-    var byMonitor = {}
-    var namesByMonitor = {}
-    try {
-      var arr = JSON.parse(String(raw || ""))
-      if (Array.isArray(arr)) {
-        for (var i = 0; i < arr.length; i++) {
-          var m = arr[i]
-          var name = String(m.name || "")
-          var active = m.activeWorkspace ? m.activeWorkspace.id : 0
-          if (name) {
-            byMonitor[name] = active
-            namesByMonitor[name] = String(m.activeWorkspace?.name || "")
-          }
-        }
-      }
-    } catch (e) { }
     activeByMonitor = byMonitor
     activeNameByMonitor = namesByMonitor
   }
 
-  function switchTo(id) {
-    if (!id) return
-    switchProc.command = switchCommand(id)
-    switchProc.running = true
-  }
+  Connections {
+    target: Hyprland
 
-  function switchCommand(id) {
-    const workspace = String(id)
-    switch (root.backend) {
-    case "niri": return ["niri", "msg", "action", "focus-workspace", workspace]
-    case "mango": return ["mmsg", "-d", "workspace", workspace]
-    case "dwl": return ["dwlmsg", "-s", "view", workspace]
-    case "labwc": return ["wlrctl", "window", "switch-to-workspace", workspace]
-    // Hyprland 0.56+ exposes dispatchers through its Lua API. Keep the
-    // command as one argument so hyprctl does not parse the workspace number
-    // as a Lua token.
-    default: return ["hyprctl", "dispatch", "hl.dsp.focus({ workspace = " + workspace + " })"]
+    function onRawEvent(event) {
+      if (!event || root.backend !== "hyprland")
+        return
+
+      const name = String(event.name || "")
+      const workspaceEvents = [
+        "workspace", "workspacev2",
+        "createworkspace", "createworkspacev2",
+        "destroyworkspace", "destroyworkspacev2",
+        "moveworkspace", "moveworkspacev2",
+        "renameworkspace", "focusedmon",
+        "monitoradded", "monitorremoved",
+        "configreloaded"
+      ]
+      const windowEvents = [
+        "openwindow", "closewindow",
+        "movewindow", "movewindowv2"
+      ]
+
+      if (workspaceEvents.indexOf(name) !== -1) {
+        Hyprland.refreshWorkspaces()
+        Hyprland.refreshMonitors()
+        Hyprland.refreshToplevels()
+        refreshTimer.restart()
+      } else if (windowEvents.indexOf(name) !== -1) {
+        Hyprland.refreshToplevels()
+        refreshTimer.restart()
+      }
     }
   }
 
-  property Process switchProc: Process {
-    id: switchProc
-    command: ["hyprctl", "dispatch", "workspace"]
-  }
+  Component.onCompleted: root.refreshAll()
 
+  // Coalesce bursts of compositor events into one UI-state refresh.
   property Timer refreshTimer: Timer {
     id: refreshTimer
-    interval: 100
-    repeat: true
-    running: true
-    triggeredOnStart: true
-    onTriggered: root.refreshAll()
+    interval: 60
+    repeat: false
+    onTriggered: root.syncFromHyprland()
   }
 }
