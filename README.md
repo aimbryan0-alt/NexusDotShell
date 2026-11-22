@@ -46,8 +46,9 @@ by default; enable persistent matches with `:set hlsearch` or
 relative (`:set nu relativenumber`).
 
 > Requires a compositor with the wlr-layer-shell protocol (Hyprland, river,
-> sway, and friends all support it). Workspace state is read via `hyprctl`; the
-> bar degrades gracefully on other compositors, simply hiding that widget.
+> sway, and friends all support it). On Hyprland, workspace state is read from
+> Quickshell's native Hyprland model and updated in response to compositor IPC
+> events; the bar degrades gracefully on other compositors, simply hiding that widget.
 > On Hyprland, right-click an inactive workspace to view live previews of its
 > open windows using Quickshell's native Wayland screencopy support.
 > Alt+Tab selects the next current-workspace window; releasing Alt commits the
