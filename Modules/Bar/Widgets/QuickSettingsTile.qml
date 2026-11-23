@@ -17,10 +17,20 @@ Rectangle {
   signal rightClicked
 
   radius: Theme.cornerRadius
-  color: Theme.withAlpha(active ? Theme.primary : Theme.surfaceContainerHigh, active ? 0.22 : 0.55)
+  color: Theme.withAlpha(active ? Theme.primary : Theme.surfaceContainerHigh, active ? 0.24 : 0.48)
   border.width: 1
-  border.color: Theme.withAlpha(active ? Theme.primary : Theme.outlineVariant, 0.35)
+  border.color: Theme.withAlpha(active ? Theme.primary : Theme.outlineVariant, active ? 0.62 : 0.28)
   opacity: available ? 1 : 0.55
+
+  Rectangle {
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    height: 2
+    radius: 1
+    color: Theme.primary
+    opacity: root.active ? 0.9 : 0
+  }
 
   Row {
     anchors.fill: parent
