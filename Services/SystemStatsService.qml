@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.Common
 
 // Shared resource pollers. CPU and memory use cheap kernel interfaces;
 // filesystem and GPU accounting are probed separately at lower frequencies.
@@ -33,6 +34,25 @@ Singleton {
   property var memoryHistory: []
   property int overviewRefCount: 0
   readonly property bool overviewActive: overviewRefCount > 0
+
+  function barWidgetEnabled(id) {
+    const lists = [
+      SettingsData.barLeftWidgets,
+      SettingsData.barCenterWidgets,
+      SettingsData.barRightWidgets
+    ]
+    return lists.some(list => Array.isArray(list)
+      && list.some(entry => entry && entry.id === id && entry.enabled === true))
+  }
+
+  readonly property bool cpuStatsNeeded: root.overviewActive
+    || root.barWidgetEnabled("cpuUsage")
+    || root.barWidgetEnabled("memUsage")
+    || root.barWidgetEnabled("cpuTemperature")
+  readonly property bool gpuStatsNeeded: root.overviewActive
+    || root.barWidgetEnabled("cpuUsage")
+  readonly property bool diskStatsNeeded: root.barWidgetEnabled("diskUsage")
+
   property real diskUsage: 0
   property real cpuTemperature: -1
   property string memUsedText: "0B"
@@ -69,6 +89,8 @@ Singleton {
   }
 
   function refreshGpu() {
+    if (!root.gpuStatsNeeded)
+      return
     if (!gpuProbe.running) {
       gpuProbe.command = ["bash", "-c", root.gpuProbeScript, "myquickshell-gpu",
         root.overviewActive ? "1" : "0",
@@ -718,7 +740,7 @@ Singleton {
   property Timer pollTimer: Timer {
     interval: root.overviewActive ? 1000 : 2000
     repeat: true
-    running: true
+    running: root.cpuStatsNeeded
     triggeredOnStart: true
     onTriggered: root.refresh()
   }
@@ -736,7 +758,7 @@ Singleton {
   property Timer gpuPollTimer: Timer {
     interval: root.overviewActive ? 2000 : 15000
     repeat: true
-    running: true
+    running: root.gpuStatsNeeded
     triggeredOnStart: true
     onTriggered: root.refreshGpu()
   }
@@ -746,7 +768,7 @@ Singleton {
   property Timer diskPollTimer: Timer {
     interval: 30000
     repeat: true
-    running: true
+    running: root.diskStatsNeeded
     triggeredOnStart: true
     onTriggered: root.refreshDisk()
   }
