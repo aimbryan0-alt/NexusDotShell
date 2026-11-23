@@ -27,6 +27,17 @@ Singleton {
   property int activeIndex: -1
   property int serial: 0
   property int fetchSerial: 0
+  property int lyricsViewRefCount: 0
+
+  function addLyricsViewRef() {
+    root.lyricsViewRefCount++
+    if (root.synced && root.state === "ready")
+      root.updateActiveIndex()
+  }
+
+  function removeLyricsViewRef() {
+    root.lyricsViewRefCount = Math.max(0, root.lyricsViewRefCount - 1)
+  }
 
   onTrackKeyChanged: {
     root.serial++
@@ -59,7 +70,7 @@ Singleton {
   Timer {
     interval: 150
     repeat: true
-    running: root.synced && root.state === "ready"
+    running: root.synced && root.state === "ready" && root.lyricsViewRefCount > 0
     onTriggered: root.updateActiveIndex()
   }
 
