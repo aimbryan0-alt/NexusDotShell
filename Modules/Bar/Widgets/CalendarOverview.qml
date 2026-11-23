@@ -12,6 +12,16 @@ PopupWindow {
     property real anchorX: 0
     property real anchorY: 0
     property date today: new Date()
+    property string timeWithMilliseconds: ""
+
+    function updateMillisecondsTime() {
+        const now = new Date()
+        const h = now.getHours().toString().padStart(2, "0")
+        const m = now.getMinutes().toString().padStart(2, "0")
+        const s = now.getSeconds().toString().padStart(2, "0")
+        const ms = now.getMilliseconds().toString().padStart(3, "0")
+        root.timeWithMilliseconds = h + ":" + m + ":" + s + "." + ms
+    }
     property int shownYear: today.getFullYear()
     property int shownMonth: today.getMonth()
     property date selectedDate: today
@@ -225,6 +235,14 @@ PopupWindow {
     surfaceFormat.opaque: false
 
     Timer {
+        interval: 10
+        running: root.visible
+        repeat: true
+        onTriggered: root.updateMillisecondsTime()
+        Component.onCompleted: root.updateMillisecondsTime()
+    }
+
+    Timer {
         interval: 30000
         running: root.visible
         repeat: true
@@ -268,7 +286,7 @@ PopupWindow {
                             spacing: 4
 
                             Text {
-                                text: ClockService.timeWithMillisecondsString
+                                text: root.timeWithMilliseconds
                                 color: Theme.widgetTextColor
                                 font.family: Theme.monoFontFamily
                                 font.pixelSize: 48
