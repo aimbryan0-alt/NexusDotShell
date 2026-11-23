@@ -302,8 +302,10 @@ Item {
     onTriggered: root.syncSeparateAudio()
   }
 
+  // Playback position is persisted less often to reduce settings-file writes.
+  // Explicit seeks and playback-state changes still save immediately.
   Timer {
-    interval: 2000
+    interval: 5000
     repeat: true
     running: root.playbackStateRestored && root.isPlaying
       && root.pendingRestorePosition < 0
