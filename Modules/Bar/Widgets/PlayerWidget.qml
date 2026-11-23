@@ -1075,13 +1075,8 @@ BasePill {
           font.pixelSize: root.textSize() * 0.8
           elide: Text.ElideRight
           horizontalAlignment: Text.AlignHCenter
-          opacity: root.pillHovered ? 1 : 0.18
-          layer.enabled: !root.pillHovered
-          layer.effect: MultiEffect {
-            blurEnabled: true
-            blur: 1
-            blurMax: Theme.spaceXL
-          }
+          // Keep track information readable at rest; hover reveals full emphasis.
+          opacity: root.pillHovered ? 1 : 0.72
 
           Behavior on opacity {
             NumberAnimation {
