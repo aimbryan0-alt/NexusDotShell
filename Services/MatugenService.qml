@@ -23,6 +23,7 @@ Singleton {
 
   property bool _running: false
   property bool _pending: false
+  property string _lastGeneratedSignature: ""
 
   function localPath(u) {
     return String(u).replace(/^file:\/\//, "")
@@ -48,9 +49,23 @@ Singleton {
   // the config file, then chains matugen through a single bash invocation so
   // there is no race between writing the TOML and matugen reading it.
   function reschedule() {
-    if (root._running) { root._pending = true; return }
     const p = root._params()
     if (!p.sourceColor) return
+
+    // settings.json also changes for unrelated state (for example media
+    // playback position). Regenerate the palette only when Matugen inputs
+    // actually change.
+    const signature = JSON.stringify([p.sourceColor, p.scheme, p.mode])
+    if (signature === root._lastGeneratedSignature) {
+      root._pending = false
+      return
+    }
+    if (root._running) {
+      root._pending = true
+      return
+    }
+
+    root._lastGeneratedSignature = signature
     root._running = true
     const toml =
       "[config]\n\n"
