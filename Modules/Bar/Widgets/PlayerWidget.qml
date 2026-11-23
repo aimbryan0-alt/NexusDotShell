@@ -216,7 +216,7 @@ BasePill {
   Timer {
     interval: 90
     repeat: true
-    running: root.hasMedia && root.player.isPlaying
+    running: root.barWindow && root.barWindow.visible && root.hasMedia && root.player.isPlaying
     onTriggered: {
       const next = []
       for (let i = 0; i < root.visualizerLevels.length; i++)
