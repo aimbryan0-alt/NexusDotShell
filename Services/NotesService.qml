@@ -78,7 +78,13 @@ Singleton {
     scheduleSessionSave()
   }
 
+  function ensureReady() {
+    if (!root.ready && !directoryProcess.running)
+      directoryProcess.running = true
+  }
+
   function startNvimBackend() {
+    root.ensureReady()
     if (!nvimBridge.running && !nvimAvailable) {
       nvimStarting = true
       nvimError = ""
@@ -965,11 +971,4 @@ Singleton {
     }
   }
 
-  Timer {
-    interval: 300
-    running: true
-    triggeredOnStart: true
-    repeat: false
-    onTriggered: directoryProcess.running = true
-  }
 }
