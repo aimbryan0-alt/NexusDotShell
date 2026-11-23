@@ -53,11 +53,12 @@ Item {
   Component.onCompleted: root.rebuildWaveform()
 
   Timer {
-    interval: 16
+    // 30 FPS is sufficient for the ambient waveform and halves canvas redraws.
+    interval: 33
     repeat: true
     running: root.playing
     onTriggered: {
-      root.animationPhase = (root.animationPhase + 0.055) % (2 * Math.PI)
+      root.animationPhase = (root.animationPhase + 0.11) % (2 * Math.PI)
       waveformCanvas.requestPaint()
     }
   }
