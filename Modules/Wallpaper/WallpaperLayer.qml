@@ -64,6 +64,7 @@ Item {
     asynchronous: true
     cache: true
     playing: root.sourceType === "image" && status === Image.Ready
+      && root.layerOpacity > 0
     visible: root.sourceType === "image"
     onStatusChanged: {
       if (status === Image.Error)
