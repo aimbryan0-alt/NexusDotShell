@@ -53,7 +53,7 @@ Item {
     Rectangle {
       id: background
       anchors.fill: parent
-      radius: Theme.cornerRadius
+      radius: Math.min(height / 2, Theme.cornerRadius + 4)
       color: {
         const raw = typeof SettingsData !== "undefined" ? SettingsData.barWidgetTransparency : 0.65
         const isHovered = root.isMouseHovered
@@ -65,6 +65,22 @@ Item {
           : base
         return Theme.withAlpha(tintedBase, transparency)
       }
+      border.width: 1
+      border.color: Theme.withAlpha(
+        root.isMouseHovered ? Theme.primary : Theme.outlineVariant,
+        root.isMouseHovered ? 0.58 : 0.28
+      )
+    }
+
+    // A restrained HUD edge highlight; it is static to avoid extra animation work.
+    Rectangle {
+      anchors.top: background.top
+      anchors.horizontalCenter: background.horizontalCenter
+      width: Math.max(0, background.width - 16)
+      height: 1
+      radius: 1
+      color: Theme.primary
+      opacity: root.isMouseHovered ? 0.72 : 0.16
     }
 
     Loader {
