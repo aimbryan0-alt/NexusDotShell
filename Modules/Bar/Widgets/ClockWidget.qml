@@ -57,7 +57,7 @@ BasePill {
             id: timeLabel
             anchors.centerIn: parent
             text: ClockService.timeString
-            color: Theme.widgetTextColor
+            color: Theme.primary
             font.family: Theme.monoFontFamily
             font.pixelSize: root.textSize()
             font.bold: true
