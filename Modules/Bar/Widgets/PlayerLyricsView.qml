@@ -114,9 +114,28 @@ Item {
     }
   }
 
+  property bool _lyricsViewRegistered: false
+
+  function syncLyricsViewRegistration() {
+    if (root.visible && !root._lyricsViewRegistered) {
+      root._lyricsViewRegistered = true
+      LyricsService.addLyricsViewRef()
+    } else if (!root.visible && root._lyricsViewRegistered) {
+      root._lyricsViewRegistered = false
+      LyricsService.removeLyricsViewRef()
+    }
+  }
+
   onVisibleChanged: {
+    root.syncLyricsViewRegistration()
     if (visible && LyricsService.synced && LyricsService.activeIndex >= 0)
       lyricsList.positionViewAtIndex(LyricsService.activeIndex, ListView.Contain)
+  }
+
+  Component.onCompleted: root.syncLyricsViewRegistration()
+  Component.onDestruction: {
+    if (root._lyricsViewRegistered)
+      LyricsService.removeLyricsViewRef()
   }
 
   function escapeHtml(text) {
