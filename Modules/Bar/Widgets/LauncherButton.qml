@@ -6,52 +6,52 @@ import qs.Common
 import qs.Modules.Bar.Widgets
 import qs.Services
 
-// Launcher button. Left click opens Walker; right click toggles the compositor
-// overview.
+// Launcher button. Opens the native NexusDotShell application grid;
+// right-click continues to toggle the compositor overview.
 BasePill {
   id: root
 
   property var barWindow: null
   property var parentScreen: null
 
-  onClicked: walkerProc.running = true
+  onClicked: launcher.opened = !launcher.opened
 
   onRightClicked: {
     overviewProc.command = ["hyprctl", "dispatch", "overview:toggle"]
     overviewProc.running = true
   }
 
+  LauncherOverlay {
+    id: launcher
+    barWindow: root.barWindow
+  }
+
   content: Component {
     Item {
       implicitWidth: 28
-    implicitHeight: 22
+      implicitHeight: 22
 
-    IconImage {
-      id: archLogo
-      anchors.centerIn: parent
-      width: 22
-      height: 22
-      source: "file:///usr/share/pixmaps/archlinux-logo.svg"
-      asynchronous: true
-      layer.enabled: true
-      layer.effect: MultiEffect {
-        saturation: 0
-        colorization: 1
-        colorizationColor: Theme.primary
-        brightness: 0.5
-        contrast: 1
+      IconImage {
+        id: archLogo
+        anchors.centerIn: parent
+        width: 22
+        height: 22
+        source: "file:///usr/share/pixmaps/archlinux-logo.svg"
+        asynchronous: true
+        layer.enabled: true
+        layer.effect: MultiEffect {
+          saturation: 0
+          colorization: 1
+          colorizationColor: Theme.primary
+          brightness: 0.5
+          contrast: 1
+        }
       }
-    }
     }
   }
 
   property Process overviewProc: Process {
     id: overviewProc
     command: ["hyprctl", "dispatch", "overview:toggle"]
-  }
-
-  property Process walkerProc: Process {
-    id: walkerProc
-    command: ["walker"]
   }
 }
