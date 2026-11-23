@@ -363,6 +363,8 @@ BasePill {
         Theme.widgetBaseBackgroundColor,
         typeof SettingsData !== "undefined" ? SettingsData.barWidgetTransparency : 0.65
       )
+      border.width: 1
+      border.color: Theme.withAlpha(Theme.primary, 0.28)
 
       Flickable {
         anchors.fill: parent
@@ -383,8 +385,8 @@ BasePill {
           Text {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
-            text: "Quick settings"
-            color: Theme.widgetTextColor
+            text: "QUICK SETTINGS"
+            color: Theme.primary
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeMedium
             font.weight: Font.DemiBold
