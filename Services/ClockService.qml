@@ -21,14 +21,6 @@ QtObject {
     Component.onCompleted: root.tick()
   }
 
-  property Timer millisecondTicker: Timer {
-    interval: 10
-    running: true
-    repeat: true
-    onTriggered: root.updateTimeWithMilliseconds()
-    Component.onCompleted: root.updateTimeWithMilliseconds()
-  }
-
   function updateTimeWithMilliseconds() {
     var now = new Date()
     var h = now.getHours().toString().padStart(2, "0")
