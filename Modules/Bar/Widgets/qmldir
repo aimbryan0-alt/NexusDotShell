@@ -15,6 +15,7 @@ CpuWidget 1.0 CpuWidget.qml
 DiskWidget 1.0 DiskWidget.qml
 FocusedWindowWidget 1.0 FocusedWindowWidget.qml
 LauncherButton 1.0 LauncherButton.qml
+LauncherOverlay 1.0 LauncherOverlay.qml
 RamWidget 1.0 RamWidget.qml
 RunningAppsWidget 1.0 RunningAppsWidget.qml
 SubmapWidget 1.0 SubmapWidget.qml
