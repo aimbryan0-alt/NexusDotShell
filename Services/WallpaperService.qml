@@ -929,18 +929,26 @@ Singleton {
   }
 
   function restoreMediaSource() {
+    // Only prepare media used by the currently visible workspace/monitor
+    // stacks. WallpaperBackground resolves these too, but this keeps startup
+    // restoration from launching extractors for every inactive saved stack.
     const sources = []
-    root.allWallpaperLayers().forEach(layer => {
-      if ((layer.type === "video" || layer.type === "audio")
-          && layer.source && sources.indexOf(layer.source) < 0)
-        sources.push(layer.source)
-    })
-    sources.forEach(source => {
-      const layer = root.allWallpaperLayers().find(item => item.source === source)
-      const type = layer?.type || root.typeForSource(source)
-      root.resolveMediaSource(source, type, false)
-      if (type === "audio")
-        root.ensureAudioWaveform(source)
+    for (const screen of Array.from(Quickshell.screens || [])) {
+      const layers = root.effectiveStackForScreen(screen).layers || []
+      for (const layer of layers) {
+        if (!layer || (layer.type !== "video" && layer.type !== "audio")
+            || !layer.source)
+          continue
+        const source = String(layer.source)
+        if (!sources.some(item => item.source === source))
+          sources.push({ source: source, type: layer.type })
+      }
+    }
+
+    sources.forEach(item => {
+      root.resolveMediaSource(item.source, item.type, false)
+      if (item.type === "audio")
+        root.ensureAudioWaveform(item.source)
     })
   }
 
