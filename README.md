@@ -307,8 +307,9 @@ scan timings. It requires Python 3, a C compiler, Bash, and `awk`.
 
 All shell colors, spacing, and typography come from `Common/Theme.qml` (Material 3
 tokens: `surfaceContainer`, `onSurface`, `primary`, ...). Matugen generates
-the palette from the active local image wallpaper (or a solid-color wallpaper)
-and refreshes the shell palette when the wallpaper or active workspace changes.
+the palette from the effective wallpaper on the first available display (or a
+solid-color wallpaper) and refreshes it when the wallpaper or workspace changes.
+With different wallpapers per monitor, that first display is the palette source.
 Remote images, videos, audio, and QML/model wallpapers do not provide a local
 still image to Matugen; those sources fall back to the configured source color.
 
