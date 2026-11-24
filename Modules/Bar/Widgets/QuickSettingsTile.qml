@@ -17,9 +17,15 @@ Rectangle {
   signal rightClicked
 
   radius: Theme.cornerRadius
-  color: Theme.withAlpha(active ? Theme.primary : Theme.surfaceContainerHigh, active ? 0.24 : 0.48)
+  color: Theme.withAlpha(
+    active || tileMouse.containsMouse ? Theme.primary : Theme.surfaceContainerHigh,
+    active ? 0.24 : tileMouse.containsMouse ? 0.16 : 0.48
+  )
   border.width: 1
-  border.color: Theme.withAlpha(active ? Theme.primary : Theme.outlineVariant, active ? 0.62 : 0.28)
+  border.color: Theme.withAlpha(
+    active || tileMouse.containsMouse ? Theme.primary : Theme.outlineVariant,
+    active ? 0.72 : tileMouse.containsMouse ? 0.58 : 0.28
+  )
   opacity: available ? 1 : 0.55
 
   Rectangle {
@@ -29,7 +35,7 @@ Rectangle {
     height: 2
     radius: 1
     color: Theme.primary
-    opacity: root.active ? 0.9 : 0
+    opacity: root.active ? 0.9 : tileMouse.containsMouse ? 0.5 : 0
   }
 
   Row {
@@ -92,8 +98,10 @@ Rectangle {
   }
 
   MouseArea {
+    id: tileMouse
     anchors.fill: parent
     enabled: root.available
+    hoverEnabled: true
     cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
     acceptedButtons: Qt.LeftButton | Qt.RightButton
     onClicked: function(mouse) {
