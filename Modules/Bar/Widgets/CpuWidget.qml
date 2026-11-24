@@ -348,7 +348,7 @@ BasePill {
     }
   }
 
-  property string overviewTab: "processor"
+  property string overviewTab: "overview"
   property real overviewAnchorX: 0
 
   Timer {
@@ -1929,6 +1929,7 @@ BasePill {
 
           Repeater {
             model: [
+              { "id": "overview", "text": qsTr("Overview"), "icon": "dashboard" },
               { "id": "processor", "text": qsTr("Processor"), "icon": "memory" },
               { "id": "memory", "text": qsTr("Memory"), "icon": "developer_board" },
               { "id": "gpu", "text": qsTr("GPU"), "icon": "videogame_asset" },
@@ -1939,7 +1940,7 @@ BasePill {
               required property var modelData
               required property int index
 
-              width: (parent.width - parent.spacing * 3) / 4
+              width: (parent.width - parent.spacing * 4) / 5
               height: parent.height
               radius: Theme.cornerRadius
               color: root.overviewTab === modelData.id
@@ -1978,6 +1979,137 @@ BasePill {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.overviewTab = modelData.id
+              }
+            }
+          }
+        }
+
+        Item {
+          width: parent.width
+          height: parent.height - 38 - 38 - parent.spacing * 2
+          visible: root.overviewTab === "overview"
+
+          Grid {
+            anchors.fill: parent
+            columns: width >= 560 ? 2 : 1
+            columnSpacing: 10
+            rowSpacing: 10
+
+            Repeater {
+              model: [
+                { "id": "cpu", "title": qsTr("PROCESSOR"), "icon": "memory" },
+                { "id": "memory", "title": qsTr("MEMORY"), "icon": "developer_board" },
+                { "id": "gpu", "title": qsTr("GRAPHICS"), "icon": "videogame_asset" },
+                { "id": "temperature", "title": qsTr("CPU TEMP"), "icon": "device_thermostat" }
+              ]
+
+              delegate: Rectangle {
+                required property var modelData
+                width: (parent.width - parent.columnSpacing * (parent.columns - 1)) / parent.columns
+                height: parent.height >= 300 ? (parent.height - parent.rowSpacing) / 2 : parent.height / 2
+                radius: Theme.cornerRadius
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.72)
+                border.width: 1
+                border.color: Theme.withAlpha(Theme.primary, 0.12)
+
+                Column {
+                  anchors.fill: parent
+                  anchors.margins: 12
+                  spacing: 6
+
+                  Row {
+                    width: parent.width
+                    spacing: 7
+
+                    DmsIcon {
+                      anchors.verticalCenter: parent.verticalCenter
+                      name: modelData.icon
+                      size: 16
+                      color: Theme.primary
+                    }
+
+                    Text {
+                      anchors.verticalCenter: parent.verticalCenter
+                      text: modelData.title
+                      color: Theme.widgetInactiveIconColor
+                      font.family: Theme.monoFontFamily
+                      font.pixelSize: 10
+                      font.weight: Font.DemiBold
+                    }
+
+                    Item { width: 1; height: 1 }
+                  }
+
+                  Row {
+                    width: parent.width
+                    spacing: 5
+
+                    Text {
+                      text: modelData.id === "cpu"
+                        ? Math.round(SystemStatsService.cpuUsage) + "%"
+                        : modelData.id === "memory"
+                          ? Math.round(SystemStatsService.memoryUsage) + "%"
+                          : modelData.id === "gpu"
+                            ? (SystemStatsService.gpus.length > 0 && SystemStatsService.gpus[0].utilization >= 0
+                              ? Math.round(SystemStatsService.gpus[0].utilization) + "%" : "—")
+                            : (SystemStatsService.cpuTemperature > 0
+                              ? Math.round(SystemStatsService.cpuTemperature) + "°C" : "—")
+                      color: modelData.id === "temperature" && SystemStatsService.cpuTemperature >= 85
+                        ? Theme.error
+                        : modelData.id === "temperature" && SystemStatsService.cpuTemperature >= 70
+                          ? Theme.warning : Theme.widgetTextColor
+                      font.family: Theme.monoFontFamily
+                      font.pixelSize: 23
+                      font.weight: Font.DemiBold
+                    }
+
+                    Text {
+                      anchors.baseline: parent.children[0].baseline
+                      visible: modelData.id === "memory"
+                      text: SystemStatsService.memUsedText + " / " + SystemStatsService.memTotalText
+                      color: Theme.widgetInactiveIconColor
+                      font.pixelSize: 10
+                      elide: Text.ElideRight
+                    }
+                  }
+
+                  UsageHistoryGraph {
+                    width: parent.width
+                    height: 34
+                    visible: modelData.id !== "temperature"
+                    values: modelData.id === "cpu" ? SystemStatsService.cpuHistory
+                      : modelData.id === "memory" ? SystemStatsService.memoryHistory
+                      : (SystemStatsService.gpus.length > 0 ? SystemStatsService.gpus[0].history || [] : [])
+                    graphColor: modelData.id === "memory" ? Theme.secondary : Theme.primary
+                  }
+
+                  Text {
+                    width: parent.width
+                    visible: modelData.id === "gpu"
+                    text: SystemStatsService.gpus.length > 0
+                      ? SystemStatsService.gpus[0].name : qsTr("No graphics device data")
+                    color: Theme.widgetInactiveIconColor
+                    font.pixelSize: 9
+                    elide: Text.ElideRight
+                  }
+
+                  Text {
+                    width: parent.width
+                    visible: modelData.id === "temperature"
+                    text: SystemStatsService.cpuTemperature > 0
+                      ? qsTr("Thermal sensor reading") : qsTr("Temperature sensor unavailable")
+                    color: Theme.widgetInactiveIconColor
+                    font.pixelSize: 10
+                  }
+                }
+
+                MouseArea {
+                  anchors.fill: parent
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: root.overviewTab = modelData.id === "cpu" ? "processor"
+                    : modelData.id === "memory" ? "memory"
+                    : modelData.id === "gpu" ? "gpu" : "processor"
+                }
               }
             }
           }
