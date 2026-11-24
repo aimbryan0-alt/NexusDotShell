@@ -6,7 +6,6 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import qs.Common
-import qs.Services
 import "WallpaperShortcutConfig.js" as ShortcutConfig
 
 Singleton {
