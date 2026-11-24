@@ -40,6 +40,11 @@ Item {
     }
     return grouped
   }
+  readonly property var pinnedEntries: {
+    const ids = Array.isArray(SettingsData.dockPinnedApps) ? SettingsData.dockPinnedApps : []
+    const entries = DesktopEntries.applications ? DesktopEntries.applications.values : []
+    return ids.map(id => entries.find(entry => String(entry.id) === String(id))).filter(entry => !!entry)
+  }
   readonly property bool shouldShow: !SettingsData.dockAutoHide
     || root.dockHovered || root.triggerHovered
 
@@ -85,6 +90,64 @@ Item {
       id: dockRow
       anchors.centerIn: parent
       spacing: 5
+
+      Repeater {
+        model: root.pinnedEntries
+        delegate: Item {
+          required property var modelData
+          readonly property var entry: modelData
+          readonly property real iconSize: root.baseIconSize
+          width: iconSize + 7
+          height: iconSize + 7
+          Rectangle {
+            anchors.fill: parent
+            radius: 15
+            color: favoriteMouse.containsMouse ? Theme.withAlpha(Theme.primary, 0.18) : "transparent"
+            border.width: 1
+            border.color: Theme.withAlpha(Theme.primary, 0.42)
+          }
+          IconImage {
+            anchors.centerIn: parent
+            width: iconSize - 8
+            height: iconSize - 8
+            source: entry.icon ? Quickshell.iconPath(entry.icon) : ""
+            asynchronous: true
+          }
+          Text {
+            anchors.right: parent.right
+            anchors.top: parent.top
+            text: "★"
+            color: Theme.primary
+            font.pixelSize: 9
+          }
+          MouseArea {
+            id: favoriteMouse
+            anchors.fill: parent
+            hoverEnabled: true
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            cursorShape: Qt.PointingHandCursor
+            onClicked: function(mouse) {
+              if (mouse.button === Qt.RightButton) {
+                SettingsData.set("dockPinnedApps", SettingsData.dockPinnedApps.filter(id => id !== String(entry.id)))
+                return
+              }
+              entry.execute()
+            }
+          }
+          ToolTip.visible: favoriteMouse.containsMouse
+          ToolTip.text: entry.name || "Pinned application"
+          ToolTip.delay: 450
+        }
+      }
+
+      Rectangle {
+        visible: root.pinnedEntries.length > 0 && root.dockWindows.length > 0
+        width: 1
+        height: root.baseIconSize * 0.58
+        radius: 1
+        color: Theme.withAlpha(Theme.primary, 0.36)
+        anchors.verticalCenter: parent.verticalCenter
+      }
 
       Repeater {
         model: root.dockWindows
@@ -145,8 +208,8 @@ Item {
       }
 
       Text {
-        visible: root.dockWindows.length === 0
-        text: "NEXUS  //  NO ACTIVE APPS"
+        visible: root.pinnedEntries.length === 0 && root.dockWindows.length === 0
+        text: "NEXUS  //  NO APPS PINNED OR RUNNING"
         color: Theme.surfaceVariantText
         font.family: Theme.monoFontFamily
         font.pixelSize: 10
