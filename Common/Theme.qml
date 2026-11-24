@@ -17,7 +17,7 @@ Singleton {
   // DMS remains the source of truth until MyQuickshell's own generator is
   // complete. Keep the local path ready as the future preferred source.
   readonly property string colorsPath: String(StandardPaths.writableLocation(StandardPaths.GenericCacheLocation)).replace(/^file:\/\//, "") + "/MyQuickshell/mql-colors.json"
-  readonly property string localColorsPath: colorsPath
+  readonly property string localColorsPath: String(StandardPaths.writableLocation(StandardPaths.GenericCacheLocation)).replace(/^file:\/\//, "") + "/DankMaterialShell/dms-colors.json"
 
   property var matugenColors: ({})
   readonly property bool isLightMode: String(matugenColors.mode || "dark") === "light"
