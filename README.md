@@ -86,7 +86,8 @@ relative (`:set nu relativenumber`).
 ## Runtime dependencies
 
 - **Required:** Quickshell 0.3.1 or newer with Qt 6 (including the
-  `quickshell` and `qs` command-line tools), and a Wayland compositor
+  `quickshell` and `qs` command-line tools), `matugen` for wallpaper-driven
+  color generation, and a Wayland compositor
   supporting `wlr-layer-shell`.
 - **System statistics and GPU telemetry:** Bash runs the telemetry probes. The
   CPU and memory probe prefers its compiled C helper and falls back to the
