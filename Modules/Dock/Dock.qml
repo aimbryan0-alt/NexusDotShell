@@ -40,11 +40,8 @@ Item {
     }
     return grouped
   }
-  readonly property bool shouldShow: !SettingsData.dockAutoHide || root.pointerInside
-
-  HoverHandler {
-    onHoveredChanged: root.pointerInside = hovered
-  }
+  readonly property bool shouldShow: !SettingsData.dockAutoHide
+    || root.dockHovered || root.triggerHovered
 
   Rectangle {
     id: dockSurface
