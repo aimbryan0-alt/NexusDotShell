@@ -46,7 +46,7 @@ BasePill {
     target: NotificationService
     function onNotificationReceived(notification) {
       root.toastNotification = notification
-      if (!root.centerOpen && root.barWindow) {
+      if (!root.centerOpen && root.barWindow && root.parentScreen === Quickshell.screens[0]) {
         root.positionPopups()
         toastPopup.visible = true
         toastTimer.restart()
@@ -279,6 +279,7 @@ BasePill {
 
           ListView {
             id: notificationList
+            visible: NotificationService.count > 0
             width: parent.width
             height: parent.height - 28
             clip: true
