@@ -25,7 +25,7 @@ BasePill {
     const popupWidth = centerPopup.implicitWidth
     centerPopup.anchor.rect.x = Math.max(8, screenWidth - popupWidth - 12)
     centerPopup.anchor.rect.y = root.barWindow.height + Theme.spaceS
-    toastPopup.anchor.rect.x = Math.max(8, screenWidth - toastPopup.width - 12)
+    toastPopup.anchor.rect.x = Math.max(8, screenWidth - toastPopup.implicitWidth - 12)
     toastPopup.anchor.rect.y = root.barWindow.height + Theme.spaceS
   }
 
@@ -108,7 +108,7 @@ BasePill {
     surfaceFormat.opaque: false
     implicitWidth: 360
     implicitHeight: Math.min(500, Math.max(260,
-      root.parentScreen ? root.parentScreen.height - root.barWindow.height - 24 : 460))
+      root.parentScreen ? root.parentScreen.height - (root.barWindow ? root.barWindow.height : Theme.barHeight) - 24 : 460))
 
     onVisibleChanged: {
       if (!visible)
@@ -142,6 +142,7 @@ BasePill {
 
           Text {
             anchors.verticalCenter: parent.verticalCenter
+            width: parent.width - 58
             text: "NEXUS // NOTIFICATIONS"
             color: Theme.primary
             font.family: Theme.monoFontFamily
@@ -238,6 +239,7 @@ BasePill {
 
             Text {
               anchors.verticalCenter: parent.verticalCenter
+              width: parent.width - 68
               text: NotificationService.count === 0 ? "INBOX // EMPTY" : "INBOX // LIVE"
               color: Theme.widgetInactiveIconColor
               font.family: Theme.monoFontFamily
