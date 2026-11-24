@@ -232,7 +232,7 @@ QtObject {
     }
   }
 
-  Connections {
+  property Connections hyprlandConnections: Connections {
     target: Hyprland
 
     function onRawEvent(event) {
