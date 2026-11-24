@@ -29,7 +29,7 @@ QtObject {
       current[i].dismiss()
   }
 
-  Loader {
+  property Loader serverLoader: Loader {
     id: serverLoader
     active: root.enabled
 
