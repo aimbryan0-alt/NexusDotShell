@@ -38,21 +38,33 @@ BasePill {
     Item {
       implicitWidth: root.cleanedTitle === "" ? 0 : Math.min(
         Math.max(0, root.maxWidth - root.horizontalPadding * 2),
-        titleText.implicitWidth
+        titleText.implicitWidth + 10
       )
       implicitHeight: titleText.implicitHeight + 2
+
+      Rectangle {
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        width: 2
+        height: 9
+        radius: 1
+        color: Theme.primary
+        opacity: 0.9
+      }
+
       Text {
         id: titleText
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.left: parent.left
+        anchors.leftMargin: 7
+        anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
-        width: parent.width
         text: root.cleanedTitle
         color: Theme.widgetTextColor
         font.family: Theme.fontFamily
         font.pixelSize: root.textSize()
         elide: Text.ElideRight
         wrapMode: Text.NoWrap
-        horizontalAlignment: Text.AlignHCenter
+        horizontalAlignment: Text.AlignLeft
       }
       MouseArea {
         anchors.fill: parent
