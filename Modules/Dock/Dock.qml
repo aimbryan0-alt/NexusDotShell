@@ -23,11 +23,30 @@ Item {
         && (!monitorName || window.monitor.name === monitorName)
     )
   }
+  function appAliases(value) {
+    const full = String(value || "").toLowerCase().replace(/\\.desktop$/, "")
+    const tail = full.split(".").pop()
+    return full ? [full, tail] : []
+  }
+  function matchesPinnedWindow(entry, window) {
+    if (!entry || !window)
+      return false
+    const pinnedAliases = root.appAliases(entry.id)
+    const windowValues = [window.class, window.initialClass,
+      window.wayland ? window.wayland.appId : ""]
+    return windowValues.some(value =>
+      root.appAliases(value).some(alias => pinnedAliases.indexOf(alias) !== -1)
+    )
+  }
+  function runningWindowFor(entry) {
+    return root.monitorWindows.find(window => root.matchesPinnedWindow(entry, window)) || null
+  }
   readonly property var dockWindows: {
-    const windows = root.monitorWindows
+    const windows = root.monitorWindows.filter(window =>
+      !root.pinnedEntries.some(entry => root.matchesPinnedWindow(entry, window))
+    )
     if (!SettingsData.dockGroupByApp)
       return windows.map(window => window.wayland)
-
     const seen = []
     const grouped = []
     for (let i = 0; i < windows.length; i++) {
@@ -103,8 +122,8 @@ Item {
             anchors.fill: parent
             radius: 15
             color: favoriteMouse.containsMouse ? Theme.withAlpha(Theme.primary, 0.18) : "transparent"
-            border.width: 1
-            border.color: Theme.withAlpha(Theme.primary, 0.42)
+            border.width: root.runningWindowFor(entry) ? 1.5 : 1
+            border.color: Theme.withAlpha(Theme.primary, root.runningWindowFor(entry) ? 0.9 : 0.42)
           }
           IconImage {
             anchors.centerIn: parent
@@ -120,6 +139,15 @@ Item {
             color: Theme.primary
             font.pixelSize: 9
           }
+          Rectangle {
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            width: root.runningWindowFor(entry) ? 13 : 4
+            height: 3
+            radius: 2
+            color: Theme.primary
+            opacity: root.runningWindowFor(entry) ? 1 : 0.42
+          }
           MouseArea {
             id: favoriteMouse
             anchors.fill: parent
@@ -132,7 +160,11 @@ Item {
                 SettingsData.set("dockPinnedApps", pinned.filter(id => id !== String(entry.id)))
                 return
               }
-              entry.execute()
+              const running = root.runningWindowFor(entry)
+              if (running && running.wayland)
+                running.wayland.activate()
+              else
+                entry.execute()
             }
           }
           ToolTip.visible: favoriteMouse.containsMouse
