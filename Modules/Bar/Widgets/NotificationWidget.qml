@@ -239,7 +239,7 @@ BasePill {
 
             Text {
               anchors.verticalCenter: parent.verticalCenter
-              width: parent.width - 68
+              width: parent.width - 150
               text: NotificationService.count === 0 ? "INBOX // EMPTY" : "INBOX // LIVE"
               color: Theme.widgetInactiveIconColor
               font.family: Theme.monoFontFamily
@@ -247,7 +247,7 @@ BasePill {
             }
 
             Text {
-              width: 60
+              width: 65
               anchors.verticalCenter: parent.verticalCenter
               visible: NotificationService.count > 0
               text: "CLEAR ALL"
@@ -260,6 +260,22 @@ BasePill {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
                 onClicked: NotificationService.dismissAll()
+              }
+            }
+
+            Text {
+              width: 78
+              anchors.verticalCenter: parent.verticalCenter
+              text: "SERVER OFF"
+              color: Theme.tertiary
+              font.family: Theme.monoFontFamily
+              font.pixelSize: 9
+              horizontalAlignment: Text.AlignRight
+
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: SettingsData.set("notificationServerEnabled", false)
               }
             }
           }
