@@ -16,14 +16,16 @@ Singleton {
 
   readonly property string shellDir: Quickshell.shellDir
   readonly property string templatePath: localPath(shellDir) + "/assets/matugen/dank.json"
-  readonly property string cacheDir: localPath(StandardPaths.writableLocation(StandardPaths.CacheLocation)) + "/myquickshell"
-  readonly property string colorsPath: cacheDir + "/dms-colors.json"
+  readonly property string cacheDir: localPath(StandardPaths.writableLocation(StandardPaths.GenericCacheLocation)) + "/MyQuickshell"
+  readonly property string colorsPath: cacheDir + "/mql-colors.json"
   readonly property string configPath: cacheDir + "/matugen.toml"
   readonly property string settingsPath: localPath(StandardPaths.writableLocation(StandardPaths.ConfigLocation)) + "/myquickshell/settings.json"
 
   property bool _running: false
   property bool _pending: false
   property string _lastGeneratedSignature: ""
+  property string _wallpaperImage: ""
+  property string _wallpaperColor: ""
 
   function localPath(u) {
     return String(u).replace(/^file:\/\//, "")
@@ -39,10 +41,27 @@ Singleton {
       if (txt && txt.trim()) obj = JSON.parse(txt)
     } catch (e) { }
     return {
-      sourceColor: obj.matugenSourceColor || spec.matugenSourceColor.def,
+      sourceColor: root._wallpaperColor || obj.matugenSourceColor || spec.matugenSourceColor.def,
+      sourceImage: root._wallpaperImage,
       scheme: obj.matugenScheme || spec.matugenScheme.def,
       mode: obj.matugenMode || spec.matugenMode.def
     }
+  }
+
+  function setWallpaperSource(source, type) {
+    const value = String(source || "")
+    if (type === "image" && value && !value.startsWith("http://") && !value.startsWith("https://")) {
+      root._wallpaperImage = value.replace(/^file:\/\//, "")
+      root._wallpaperColor = ""
+    } else if (type === "color" && /^#?[0-9a-fA-F]{6}$/.test(value)) {
+      root._wallpaperImage = ""
+      root._wallpaperColor = value.replace(/^#/, "")
+    } else {
+      root._wallpaperImage = ""
+      root._wallpaperColor = ""
+    }
+    root._lastGeneratedSignature = ""
+    root.reschedule()
   }
 
   // Public entry point used by Theme/Settings to (re)generate colors. Sets up
@@ -55,7 +74,7 @@ Singleton {
     // settings.json also changes for unrelated state (for example media
     // playback position). Regenerate the palette only when Matugen inputs
     // actually change.
-    const signature = JSON.stringify([p.sourceColor, p.scheme, p.mode])
+    const signature = JSON.stringify([p.sourceImage, p.sourceColor, p.scheme, p.mode])
     if (signature === root._lastGeneratedSignature) {
       root._pending = false
       return
@@ -70,14 +89,26 @@ Singleton {
     const toml =
       "[config]\n\n"
       + "[templates.dank]\n"
-      + "input_path = '" + root.templatePath + "'\n"
-      + "output_path = '" + root.colorsPath + "'\n"
+      + "input_path = \"" + root.templatePath + "\"\n"
+      + "output_path = \"" + root.colorsPath + "\"\n\n"
+      + "[templates.alacritty]\n"
+      + "input_path = \"" + root.shellDir + "/assets/matugen/alacritty.toml\"\n"
+      + "output_path = \"~/.config/alacritty/themes/nexusdot-matugen.toml\"\n\n"
+      + "[templates.hyprland]\n"
+      + "input_path = \"" + root.shellDir + "/assets/matugen/hyprland.conf\"\n"
+      + "output_path = \"~/.config/hypr/nexusdot-matugen.conf\"\n\n"
+      + "[templates.gtk]\n"
+      + "input_path = \"" + root.shellDir + "/assets/matugen/gtk.css\"\n"
+      + "output_path = \"~/.config/gtk-3.0/gtk.css\"\n"
     const script =
       "mkdir -p '" + root.cacheDir + "'\n"
       + "cat > '" + root.configPath + "' <<'DMS_MATGEN_EOF'\n"
       + toml
       + "DMS_MATGEN_EOF\n"
-      + "matugen color hex " + p.sourceColor + " --config '" + root.configPath + "' --type " + p.scheme + " --mode " + p.mode
+      + (p.sourceImage
+        ? "matugen image '" + p.sourceImage.replace(/'/g, "'\\''") + "'"
+        : "matugen color hex " + p.sourceColor)
+      + " --config '" + root.configPath + "' --type " + p.scheme + " --mode " + p.mode
     matugenProc.command = ["bash", "-c", script]
     matugenProc.running = true
   }
