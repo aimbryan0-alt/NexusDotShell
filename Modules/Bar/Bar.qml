@@ -4,6 +4,7 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs.Common
 import qs.Modules.Bar
+import qs.Modules.Dock
 import qs.Services
 
 // The top bar. Instantiates one PanelWindow layer surface per screen via
@@ -30,6 +31,42 @@ Item {
         required property var modelData
         screen: modelData
       }
+    }
+  }
+
+  Variants {
+    model: Quickshell.screens
+
+    delegate: Component {
+      DockPanel {
+        required property var modelData
+        targetScreen: modelData
+      }
+    }
+  }
+
+  component DockPanel: PanelWindow {
+    id: dockWindow
+
+    property var targetScreen: null
+
+    screen: targetScreen
+    anchors {
+      bottom: true
+      left: true
+      right: true
+    }
+    visible: typeof SettingsData !== "undefined" && SettingsData.showDock
+    implicitHeight: 88
+    color: "transparent"
+    surfaceFormat.opaque: false
+    exclusionMode: ExclusionMode.Ignore
+    WlrLayershell.namespace: "nexusdot-dock"
+    WlrLayershell.layer: WlrLayer.Overlay
+
+    Dock {
+      anchors.fill: parent
+      screen: dockWindow.screen
     }
   }
 
