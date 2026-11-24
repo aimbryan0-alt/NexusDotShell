@@ -1991,7 +1991,7 @@ BasePill {
 
           Grid {
             anchors.fill: parent
-            columns: width >= 560 ? 2 : 1
+            columns: 2
             columnSpacing: 10
             rowSpacing: 10
 
@@ -2064,7 +2064,7 @@ BasePill {
                     }
 
                     Text {
-                      anchors.baseline: parent.children[0].baseline
+                      anchors.verticalCenter: parent.verticalCenter
                       visible: modelData.id === "memory"
                       text: SystemStatsService.memUsedText + " / " + SystemStatsService.memTotalText
                       color: Theme.widgetInactiveIconColor
