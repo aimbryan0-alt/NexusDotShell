@@ -112,9 +112,7 @@ Item {
       && (!barWindow.regularWorkspaceFullscreen
         || barWindow.specialWorkspaceOverFullscreen)
     implicitHeight: Theme.barHeight + Theme.space2() * 2
-    color: barWindow.backgroundEnabled
-      ? Theme.withAlpha(Theme.surfaceContainer, 1)
-      : "transparent"
+    color: "transparent"
     surfaceFormat.opaque: false
     exclusionMode: ExclusionMode.Auto
     WlrLayershell.namespace: "mybar"
@@ -129,6 +127,68 @@ Item {
       y: 0
       width: barWindow.width
       height: barWindow.height
+    }
+
+    // Rounded HUD chassis keeps the original bar layout while giving it
+    // a compact cyberpunk frame. All accents are static to avoid extra work.
+    Rectangle {
+      id: hudFrame
+      anchors.fill: parent
+      anchors.leftMargin: 10
+      anchors.rightMargin: 10
+      anchors.topMargin: 3
+      anchors.bottomMargin: 3
+      radius: 13
+      color: Theme.withAlpha(
+        Theme.surfaceContainerLowest,
+        barWindow.backgroundEnabled ? 0.94 : 0.24
+      )
+      border.width: 1
+      border.color: Theme.withAlpha(Theme.primary, barWindow.backgroundEnabled ? 0.48 : 0.24)
+
+      Rectangle {
+        anchors.left: parent.left
+        anchors.leftMargin: 17
+        anchors.top: parent.top
+        width: 62
+        height: 2
+        radius: 1
+        color: Theme.primary
+        opacity: 0.9
+      }
+
+      Rectangle {
+        anchors.right: parent.right
+        anchors.rightMargin: 18
+        anchors.bottom: parent.bottom
+        width: 38
+        height: 2
+        radius: 1
+        color: Theme.tertiary
+        opacity: 0.78
+      }
+
+      Rectangle {
+        anchors.left: parent.left
+        anchors.leftMargin: 5
+        anchors.verticalCenter: parent.verticalCenter
+        width: 2
+        height: 9
+        radius: 1
+        color: Theme.primary
+        opacity: 0.8
+      }
+
+      Rectangle {
+        anchors.right: parent.right
+        anchors.rightMargin: 5
+        anchors.verticalCenter: parent.verticalCenter
+        width: 2
+        height: 9
+        radius: 1
+        color: Theme.tertiary
+        opacity: 0.8
+      }
     }
 
     MouseArea {
@@ -339,7 +399,10 @@ Item {
 
     BarBody {
       anchors.fill: parent
-      anchors.margins: Theme.space2()
+      anchors.topMargin: Theme.space2()
+      anchors.bottomMargin: Theme.space2()
+      anchors.leftMargin: Theme.space2() + 6
+      anchors.rightMargin: Theme.space2() + 6
       screen: barWindow.screen
       barWindow: barWindow
     }
