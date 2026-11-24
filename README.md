@@ -68,7 +68,7 @@ relative (`:set nu relativenumber`).
 > workspace, its apps are included; the underlying regular workspace's apps
 > are listed individually when there are one or two, or as a workspace group
 > when there are more.
-> Use Alt+Shift+Tab or Alt+grave to cycle backward. On startup, MyQuickshell
+> Use Alt+Shift+Tab or Alt+grave to cycle backward. On startup, NexusDotShell
 > replaces Hyprshell's matching Alt+Tab bindings so the switchers do not compete.
 > Right-clicking the workspace pill outside its numbered buttons opens the
 > optional ScrollOverview live workspace overview.
