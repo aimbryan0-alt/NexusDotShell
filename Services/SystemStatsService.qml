@@ -73,6 +73,13 @@ Singleton {
       cpuHistory = []
       memoryHistory = []
       gpuHistoryById = ({})
+      gpus = gpus.map(gpu => {
+        const current = ({})
+        for (const key in gpu)
+          current[key] = gpu[key]
+        current.history = []
+        return current
+      })
     }
     refreshGpu()
   }
