@@ -46,6 +46,9 @@ var SPEC = {
     dockIconSize: { def: 45 },
     dockPinnedApps: { def: [] },
 
+    // ---- notifications -----------------------------------------------------
+    notificationServerEnabled: { def: false },
+
     // ---- launcher ----------------------------------------------------------
     launcherLogoMode: { def: "os" },
     launcherLogoColorOverride: { def: "primary" },
