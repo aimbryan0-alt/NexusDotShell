@@ -32,9 +32,10 @@ BasePill {
         }
         Text {
           text: Math.round(SystemStatsService.memoryUsage) + "%"
-          color: Theme.widgetTextColor
+          color: root.usageColor()
           font.family: Theme.monoFontFamily
           font.pixelSize: root.textSize()
+          font.bold: true
         }
       }
       Column {
@@ -45,14 +46,14 @@ BasePill {
         Text {
           anchors.horizontalCenter: parent.horizontalCenter
           text: "MEM"
-          color: Theme.widgetTextColor
+          color: Theme.primary
           font.family: Theme.monoFontFamily
           font.pixelSize: root.textSize()
         }
         Text {
           anchors.horizontalCenter: parent.horizontalCenter
           text: SystemStatsService.memUsedText + "/" + SystemStatsService.memTotalText
-          color: Theme.widgetInactiveIconColor
+          color: root.usageColor()
           font.family: Theme.monoFontFamily
           font.pixelSize: Math.round(root.textSize() * 0.7)
         }
