@@ -364,7 +364,30 @@ BasePill {
         typeof SettingsData !== "undefined" ? SettingsData.barWidgetTransparency : 0.65
       )
       border.width: 1
-      border.color: Theme.withAlpha(Theme.primary, 0.28)
+      border.color: Theme.withAlpha(Theme.primary, 0.34)
+
+      Rectangle {
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: 12
+        height: 2
+        radius: 1
+        color: Theme.primary
+        opacity: 0.72
+      }
+
+      Rectangle {
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: 12
+        anchors.bottomMargin: 12
+        width: 22
+        height: 2
+        radius: 1
+        color: Theme.tertiary
+        opacity: 0.55
+      }
 
       Flickable {
         anchors.fill: parent
@@ -380,25 +403,37 @@ BasePill {
 
         Item {
           width: parent.width
-          height: 28
+          height: 32
+
+          Rectangle {
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            width: 3
+            height: 18
+            radius: 1
+            color: Theme.primary
+          }
 
           Text {
             anchors.left: parent.left
+            anchors.leftMargin: 11
             anchors.verticalCenter: parent.verticalCenter
-            text: "QUICK SETTINGS"
+            text: "NEXUS // QUICK SETTINGS"
             color: Theme.primary
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSizeMedium
+            font.family: Theme.monoFontFamily
+            font.pixelSize: Theme.fontSizeMedium - 1
             font.weight: Font.DemiBold
+            font.letterSpacing: 0.8
           }
 
           Text {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            text: "Done"
+            text: "CLOSE"
             color: Theme.primary
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSizeSmall
+            font.family: Theme.monoFontFamily
+            font.pixelSize: Theme.fontSizeSmall - 1
+            font.letterSpacing: 0.6
             MouseArea {
               anchors.fill: parent
               anchors.margins: -8
