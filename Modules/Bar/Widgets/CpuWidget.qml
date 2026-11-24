@@ -524,8 +524,8 @@ BasePill {
             delegate: Rectangle {
               required property var modelData
               width: gpuCards.width
-              implicitHeight: 210
-              height: 210
+              implicitHeight: 250
+              height: 250
               radius: Theme.cornerRadius
               color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.72)
 
@@ -577,6 +577,13 @@ BasePill {
                     font.pixelSize: 14
                     font.weight: Font.DemiBold
                   }
+                }
+
+                UsageHistoryGraph {
+                  width: parent.width
+                  height: 34
+                  values: modelData.history || []
+                  graphColor: Theme.secondary
                 }
 
                 Rectangle {
