@@ -50,16 +50,17 @@ Singleton {
 
   function setWallpaperSource(source, type) {
     const value = String(source || "")
+    let image = ""
+    let color = ""
     if (type === "image" && value && !value.startsWith("http://") && !value.startsWith("https://")) {
-      root._wallpaperImage = value.replace(/^file:\/\//, "")
-      root._wallpaperColor = ""
+      image = value.replace(/^file:\/\//, "")
     } else if (type === "color" && /^#?[0-9a-fA-F]{6}$/.test(value)) {
-      root._wallpaperImage = ""
-      root._wallpaperColor = value.replace(/^#/, "")
-    } else {
-      root._wallpaperImage = ""
-      root._wallpaperColor = ""
+      color = value.replace(/^#/, "")
     }
+    if (image === root._wallpaperImage && color === root._wallpaperColor)
+      return
+    root._wallpaperImage = image
+    root._wallpaperColor = color
     root._lastGeneratedSignature = ""
     root.reschedule()
   }
@@ -96,12 +97,16 @@ Singleton {
       + "output_path = \"~/.config/alacritty/themes/nexusdot-matugen.toml\"\n\n"
       + "[templates.hyprland]\n"
       + "input_path = \"" + root.shellDir + "/assets/matugen/hyprland.conf\"\n"
-      + "output_path = \"~/.config/hypr/nexusdot-matugen.conf\"\n\n"
+      + "output_path = \"~/.config/hypr/nexusdot-matugen.conf\"\n"
+      + "post_hook = \"hyprctl reload\"\n\n"
       + "[templates.gtk]\n"
       + "input_path = \"" + root.shellDir + "/assets/matugen/gtk.css\"\n"
-      + "output_path = \"~/.config/gtk-3.0/gtk.css\"\n"
+      + "output_path = \"~/.config/gtk-3.0/nexusdot-matugen.css\"\n\n"
+      + "[templates.gtk4]\n"
+      + "input_path = \"" + root.shellDir + "/assets/matugen/gtk.css\"\n"
+      + "output_path = \"~/.config/gtk-4.0/nexusdot-matugen.css\"\n"
     const script =
-      "mkdir -p '" + root.cacheDir + "'\n"
+      "mkdir -p '" + root.cacheDir + "' \"$HOME/.config/alacritty/themes\" \"$HOME/.config/hypr\" \"$HOME/.config/gtk-3.0\" \"$HOME/.config/gtk-4.0\"\n"
       + "cat > '" + root.configPath + "' <<'DMS_MATGEN_EOF'\n"
       + toml
       + "DMS_MATGEN_EOF\n"
