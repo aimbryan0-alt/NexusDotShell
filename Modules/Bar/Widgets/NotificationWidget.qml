@@ -13,7 +13,6 @@ BasePill {
   property var parentScreen: null
   property bool centerOpen: false
   property var toastNotification: null
-  property int toastRevision: 0
 
   readonly property var notificationItems: NotificationService.notifications
     ? NotificationService.notifications.slice().reverse()
@@ -23,8 +22,7 @@ BasePill {
     if (!root.barWindow)
       return
     const screenWidth = root.parentScreen ? root.parentScreen.width : root.barWindow.width
-    const popupWidth = Math.min(360, Math.max(280, screenWidth - 24))
-    centerPopup.implicitWidth = popupWidth
+    const popupWidth = centerPopup.implicitWidth
     centerPopup.anchor.rect.x = Math.max(8, screenWidth - popupWidth - 12)
     centerPopup.anchor.rect.y = root.barWindow.height + Theme.spaceS
     toastPopup.anchor.rect.x = Math.max(8, screenWidth - toastPopup.width - 12)
@@ -48,7 +46,6 @@ BasePill {
     target: NotificationService
     function onNotificationReceived(notification) {
       root.toastNotification = notification
-      root.toastRevision++
       if (!root.centerOpen && root.barWindow) {
         root.positionPopups()
         toastPopup.visible = true
@@ -152,14 +149,14 @@ BasePill {
             font.bold: true
           }
 
-          Item { width: 1; height: 1; Layout.fillWidth: true }
-
           Text {
+            width: 42
             anchors.verticalCenter: parent.verticalCenter
             text: NotificationService.count.toString().padStart(2, "0")
             color: Theme.widgetTextColor
             font.family: Theme.monoFontFamily
             font.pixelSize: 11
+            horizontalAlignment: Text.AlignRight
           }
         }
 
@@ -247,15 +244,15 @@ BasePill {
               font.pixelSize: 9
             }
 
-            Item { width: 1; height: 1; Layout.fillWidth: true }
-
             Text {
+              width: 60
               anchors.verticalCenter: parent.verticalCenter
               visible: NotificationService.count > 0
               text: "CLEAR ALL"
               color: Theme.primary
               font.family: Theme.monoFontFamily
               font.pixelSize: 9
+              horizontalAlignment: Text.AlignRight
 
               MouseArea {
                 anchors.fill: parent
