@@ -44,6 +44,7 @@ var SPEC = {
     dockAutoHide: { def: true },
     dockGroupByApp: { def: true },
     dockIconSize: { def: 45 },
+    dockPinnedApps: { def: [] },
 
     // ---- launcher ----------------------------------------------------------
     launcherLogoMode: { def: "os" },
