@@ -32,6 +32,7 @@ Item {
   Component { id: batteryComp; BatteryWidget {} }
   Component { id: settingsComp; SettingsWidget {} }
   Component { id: notepadComp; NotesWidget {} }
+  Component { id: notificationComp; NotificationWidget {} }
 
   function registryFor(id) {
     switch (id) {
@@ -50,6 +51,7 @@ Item {
     case "battery": return batteryComp
     case "controlCenterButton": return settingsComp
     case "notepadButton": return notepadComp
+    case "notificationButton": return notificationComp
     default: return null
     }
   }
