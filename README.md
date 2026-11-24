@@ -86,6 +86,19 @@ relative (`:set nu relativenumber`).
 > utilization and per-process attribution depend on metrics exposed by each
 > device's driver.
 
+## Notification center
+
+The bar's notification pill opens the NexusDotShell HUD inbox. The native
+Quickshell notification server is **opt-in**: it is disabled by default so an
+existing desktop notification daemon, such as KDE Plasma's, remains in
+control. Open the notification pill and choose **Enable Nexus Notifications**
+to register the shell as the desktop notification server. This registration
+uses Quickshell's native Desktop Notifications API; incoming alerts are
+tracked in memory, shown as short HUD toasts, and can be dismissed individually
+or cleared from the inbox. Disabling the option releases the notification
+server again. Notification actions and Do Not Disturb controls are not exposed
+by this first iteration.
+
 ## Runtime dependencies
 
 - **Required:** Quickshell 0.3.1 or newer with Qt 6 (including the
