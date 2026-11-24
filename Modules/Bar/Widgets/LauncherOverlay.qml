@@ -51,6 +51,19 @@ PopupWindow {
     root.opened = false
   }
 
+  function togglePinnedApp(entry) {
+    if (!entry || !entry.id) return
+    const id = String(entry.id)
+    const pinned = Array.isArray(SettingsData.dockPinnedApps) ? SettingsData.dockPinnedApps : []
+    const next = pinned.indexOf(id) !== -1 ? pinned.filter(item => item !== id) : pinned.concat([id])
+    SettingsData.set("dockPinnedApps", next)
+  }
+
+  function isPinned(entry) {
+    return !!entry && !!entry.id && Array.isArray(SettingsData.dockPinnedApps)
+      && SettingsData.dockPinnedApps.indexOf(String(entry.id)) !== -1
+  }
+
   onVisibleChanged: {
     if (visible) {
       searchField.text = ""
@@ -111,7 +124,7 @@ PopupWindow {
             font.bold: true
           }
           Text {
-            text: root.filteredApps.length + " applications available"
+            text: root.filteredApps.length + " applications · right-click to pin/unpin"
             color: Theme.surfaceVariantText
             font.family: Theme.fontFamily
             font.pixelSize: 11
@@ -217,7 +230,25 @@ PopupWindow {
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onEntered: grid.currentIndex = index
-            onClicked: root.launchEntry(modelData)
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: function(mouse) {
+              if (mouse.button === Qt.RightButton) {
+                root.togglePinnedApp(modelData)
+                return
+              }
+              root.launchEntry(modelData)
+            }
+          }
+
+          Text {
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 11
+            anchors.topMargin: 8
+            text: root.isPinned(modelData) ? "★" : "+"
+            color: root.isPinned(modelData) ? Theme.primary : Theme.surfaceVariantText
+            font.pixelSize: 14
+            font.bold: true
           }
         }
 
