@@ -513,13 +513,20 @@ BasePill {
           readonly property bool isActive: modelData === root.activeId
           readonly property bool isOccupied: WorkspacesService.occupiedIds.indexOf(modelData) !== -1
 
-          width: isActive ? 32 : 24
-          height: 24
+          width: isActive ? 34 : 25
+          height: 23
           anchors.verticalCenter: parent.verticalCenter
-          radius: height / 2
-          color: isActive ? Theme.primary
-                      : (isOccupied ? Theme.surfaceContainerHighest : Theme.surfaceVariant)
-          opacity: isActive ? 1.0 : (isOccupied ? 0.75 : 0.45)
+          radius: 7
+          color: isActive
+            ? Theme.withAlpha(Theme.primary, 0.2)
+            : (isOccupied
+              ? Theme.withAlpha(Theme.surfaceContainerHighest, 0.88)
+              : Theme.withAlpha(Theme.surfaceVariant, 0.42))
+          border.width: isActive ? 1.4 : (isOccupied ? 1 : 0)
+          border.color: isActive
+            ? Theme.primary
+            : Theme.withAlpha(Theme.tertiary, isOccupied ? 0.42 : 0)
+          opacity: isActive ? 1.0 : (isOccupied ? 0.88 : 0.58)
 
           Behavior on width {
             NumberAnimation {
@@ -540,13 +547,36 @@ BasePill {
             }
           }
 
+          Rectangle {
+            anchors.top: parent.top
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: isActive ? 17 : 8
+            height: 2
+            radius: 1
+            color: isActive ? Theme.primary : Theme.tertiary
+            opacity: isActive ? 1 : (isOccupied ? 0.72 : 0)
+          }
+
           Text {
             anchors.centerIn: parent
-            text: String(modelData)
-            color: isActive ? Theme.onPrimary : Theme.withAlpha(Theme.surfaceText, 0.9)
+            anchors.verticalCenterOffset: -1
+            text: String(modelData).padStart(2, "0")
+            color: isActive ? Theme.primary : Theme.withAlpha(Theme.surfaceText, 0.9)
+            font.family: Theme.monoFontFamily
             font.pixelSize: Theme.fontSizeSmall
-            font.bold: isActive
+            font.bold: isActive || isOccupied
             opacity: isActive ? 1.0 : 0.95
+          }
+
+          Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottomMargin: 3
+            width: isActive ? 9 : 4
+            height: 2
+            radius: 1
+            color: isActive ? Theme.primary : Theme.tertiary
+            opacity: isActive || isOccupied ? 0.9 : 0
           }
 
           MouseArea {
