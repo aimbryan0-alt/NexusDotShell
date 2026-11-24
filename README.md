@@ -1,12 +1,15 @@
-# MyQuickshell
+# NexusDotShell
 
-A self-contained Quickshell desktop shell for Wayland compositors. It renders a
-top bar (clock, workspaces, system tray) with a Material 3 theme, built on top
-of [Quickshell](https://quickshell.outfoxxed.me) (requires >= 0.3.1, Qt 6).
+A modular, performance-conscious Quickshell desktop shell for Wayland, with a
+compact cyberpunk HUD identity. It combines a configurable top bar, floating
+dock, native application launcher, quick settings, wallpaper-driven Matugen
+theming, and a detailed system monitor. The interface is built with Qt 6 and
+[Quickshell](https://quickshell.outfoxxed.me) (requires Quickshell 0.3.1 or
+newer). Hyprland provides the richest workspace and window integration; other
+Wayland compositors receive the features supported by their protocols.
 
-This is a starting point: a single top bar, structured so that more modules
-(control center, dock, notifications, lock, ...) can be added following the
-same conventions. The bar includes a Notes button that opens a file-based
+NexusDotShell is organized into reusable modules and shared services rather
+than one monolithic UI. The bar includes a Notes button that opens a file-based
 plain-text editor with tabs, Open/Save/New actions, optional line numbers,
 configurable autosave, and a Markdown preview that renders note contents without
 changing the saved Markdown source. File dialogs default to
@@ -119,7 +122,7 @@ relative (`:set nu relativenumber`).
   The option starts off and does not change the compositor's global blur
   setting. On compositors without this protocol, the option has no visual
   effect.
-- **Wallpapers:** MyQuickshell renders a per-screen background layer, black by
+- **Wallpapers:** NexusDotShell renders a per-screen background layer, black by
   default. The clock calendar overlay opens the wallpaper library, where you
   can choose a local file, add multiple folders, set a solid hex color, or use
   an HTTP(S) media URL. Images and animated GIFs use Qt Quick's image provider.
@@ -238,7 +241,7 @@ relative (`:set nu relativenumber`).
 
 ## License
 
-MyQuickshell is licensed under the [GNU General Public License v3.0](LICENSE) —
+NexusDotShell is distributed under the [GNU General Public License v3.0](LICENSE) —
 anyone distributing a shell derived from this code must release it under the
 same license with complete source, so derivative projects stay open source.
 There is no warranty, to the extent permitted by law.
@@ -247,15 +250,16 @@ Copyright (C) 2026 mmj2023
 
 ## Showcase
 
-![MyQuickshell desktop bar showcase](assets/Mybar_showcase.png)
+![NexusDotShell desktop bar showcase](assets/Mybar_showcase.png)
 
 ## Structure
 
 - `shell.qml` - entry point
 - `Common/` - app-wide singletons (`Theme`)
 - `Services/` - headless singletons that talk to the system
-- `Modules/Bar/` - the visible top bar
-- `Modules/Bar/Widgets/` - reusable widgets (Clock, Workspaces, SystemTray)
+- `Modules/Bar/` - the top bar and per-screen dock integration
+- `Modules/Bar/Widgets/` - reusable bar widgets, quick settings, launcher, and system monitor
+- `Modules/Dock/` - floating application dock
 
 ## Running
 
