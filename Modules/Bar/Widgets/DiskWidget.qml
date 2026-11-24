@@ -109,7 +109,7 @@ BasePill {
 
                   Text {
                     text: root.displayMount(modelData.mount) + " " + Math.round(modelData.usage) + "%"
-                    color: Theme.widgetTextColor
+                    color: root.usageColor(modelData.usage)
                     font.family: Theme.monoFontFamily
                     font.pixelSize: root.textSize()
                     font.bold: true
@@ -140,7 +140,7 @@ BasePill {
                     Text {
                       text: root.displayMountRelative(modelData.mount, mountGroup.modelData.mount)
                         + " " + Math.round(modelData.usage) + "%"
-                      color: Theme.widgetInactiveIconColor
+                      color: root.usageColor(modelData.usage)
                       font.family: Theme.monoFontFamily
                       font.pixelSize: Math.max(9, Math.round(root.textSize() * 0.7))
                       anchors.verticalCenter: parent.verticalCenter
