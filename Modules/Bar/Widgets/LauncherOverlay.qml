@@ -74,10 +74,10 @@ PopupWindow {
 
   Rectangle {
     anchors.fill: parent
-    radius: 22
+    radius: 18
     color: Theme.withAlpha(Theme.surfaceContainer, 0.97)
     border.width: 1
-    border.color: Theme.withAlpha(Theme.primary, 0.42)
+    border.color: Theme.withAlpha(Theme.primary, 0.48)
 
     Rectangle {
       anchors.left: parent.left
@@ -94,51 +94,71 @@ PopupWindow {
       anchors.margins: 22
       spacing: 16
 
-      Row {
+      Item {
         width: parent.width
-        spacing: 12
+        height: 46
 
         Rectangle {
+          anchors.left: parent.left
+          anchors.verticalCenter: parent.verticalCenter
+          width: 3
+          height: 30
+          radius: 1
+          color: Theme.primary
+        }
+
+        Rectangle {
+          anchors.left: parent.left
+          anchors.leftMargin: 12
+          anchors.verticalCenter: parent.verticalCenter
           width: 42
           height: 42
-          radius: 13
-          color: Theme.withAlpha(Theme.primary, 0.14)
+          radius: 11
+          color: Theme.withAlpha(Theme.primary, 0.13)
+          border.width: 1
+          border.color: Theme.withAlpha(Theme.primary, 0.32)
+
           Text {
             anchors.centerIn: parent
             text: "N"
             color: Theme.primary
-            font.family: Theme.fontFamily
+            font.family: Theme.monoFontFamily
             font.pixelSize: 22
             font.bold: true
           }
         }
 
         Column {
+          anchors.left: parent.left
+          anchors.leftMargin: 66
           anchors.verticalCenter: parent.verticalCenter
-          spacing: 2
+          spacing: 3
+
           Text {
             text: "NEXUS // APPLICATIONS"
-            color: Theme.surfaceText
-            font.family: Theme.fontFamily
-            font.pixelSize: 16
+            color: Theme.primary
+            font.family: Theme.monoFontFamily
+            font.pixelSize: 15
+            font.letterSpacing: 0.7
             font.bold: true
           }
           Text {
-            text: root.filteredApps.length + " applications · right-click to pin/unpin"
+            text: root.filteredApps.length + " APPS  ·  RIGHT-CLICK TO PIN"
             color: Theme.surfaceVariantText
-            font.family: Theme.fontFamily
-            font.pixelSize: 11
+            font.family: Theme.monoFontFamily
+            font.pixelSize: 9
+            font.letterSpacing: 0.35
           }
         }
 
-        Item { width: 1; height: 1; Layout.fillWidth: true }
-
         Text {
+          anchors.right: parent.right
           anchors.verticalCenter: parent.verticalCenter
-          text: "ESC  CLOSE"
-          color: Theme.surfaceVariantText
-          font.family: Theme.fontFamily
-          font.pixelSize: 10
+          text: "ESC  /  CLOSE"
+          color: Theme.primary
+          font.family: Theme.monoFontFamily
+          font.pixelSize: 9
+          font.letterSpacing: 0.4
         }
       }
 
@@ -154,10 +174,10 @@ PopupWindow {
         leftPadding: 16
         rightPadding: 16
         background: Rectangle {
-          radius: 13
-          color: Theme.withAlpha(Theme.surfaceContainerHighest, 0.75)
-          border.width: searchField.activeFocus ? 1 : 0
-          border.color: Theme.primary
+          radius: 10
+          color: Theme.withAlpha(Theme.surfaceContainerHighest, 0.72)
+          border.width: searchField.activeFocus ? 1 : 0.6
+          border.color: Theme.withAlpha(Theme.primary, searchField.activeFocus ? 0.9 : 0.24)
         }
         onTextChanged: root.filterApps(text)
         Keys.onEscapePressed: root.opened = false
@@ -193,10 +213,10 @@ PopupWindow {
             anchors.margins: 5
             radius: 15
             color: appMouse.containsMouse || grid.currentIndex === index
-              ? Theme.withAlpha(Theme.primary, 0.12)
-              : Theme.withAlpha(Theme.surfaceContainerHigh, 0.42)
-            border.width: grid.currentIndex === index ? 1 : 0
-            border.color: Theme.withAlpha(Theme.primary, 0.55)
+              ? Theme.withAlpha(Theme.primary, 0.14)
+              : Theme.withAlpha(Theme.surfaceContainerHigh, 0.38)
+            border.width: grid.currentIndex === index || appMouse.containsMouse ? 1 : 0.6
+            border.color: Theme.withAlpha(Theme.primary, grid.currentIndex === index ? 0.72 : 0.18)
 
             Column {
               anchors.centerIn: parent
