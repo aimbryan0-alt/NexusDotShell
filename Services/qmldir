@@ -16,3 +16,4 @@ singleton BatteryPowerService 1.0 BatteryPowerService.qml
 singleton WallpaperService 1.0 WallpaperService.qml
 singleton PrivacyService 1.0 PrivacyService.qml
 singleton BatteryNotificationService 1.0 BatteryNotificationService.qml
+singleton NotificationService 1.0 NotificationService.qml
