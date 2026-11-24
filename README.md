@@ -302,11 +302,49 @@ scan timings. It requires Python 3, a C compiler, Bash, and `awk`.
 | `qs.Modules.Bar`| `Modules/Bar/qmldir` |
 | `qs.Modules.Bar.Widgets` | `Modules/Bar/Widgets/qmldir` |
 
-## Theming
+## Theming and Matugen
 
-All colors, spacing, and typography come from `Common/Theme.qml` (Material 3
-tokens: `surfaceContainer`, `onSurface`, `primary`, ...). Widgets reference
-theme tokens instead of hardcoding values.
+All shell colors, spacing, and typography come from `Common/Theme.qml` (Material 3
+tokens: `surfaceContainer`, `onSurface`, `primary`, ...). Matugen generates
+the palette from the active local image wallpaper (or a solid-color wallpaper)
+and refreshes the shell palette when the wallpaper or active workspace changes.
+Remote images, videos, audio, and QML/model wallpapers do not provide a local
+still image to Matugen; those sources fall back to the configured source color.
+
+The same generation pass writes optional desktop theme files without replacing
+the user's main application configuration files:
+
+- Alacritty: `~/.config/alacritty/themes/nexusdot-matugen.toml`
+- Hyprland window borders: `~/.config/hypr/nexusdot-matugen.conf`
+- GTK 3: `~/.config/gtk-3.0/nexusdot-matugen.css`
+- GTK 4: `~/.config/gtk-4.0/nexusdot-matugen.css`
+
+To enable those integrations, add the following once to the existing configs
+(merge the Alacritty import into its existing `[general]` section if present):
+
+```toml
+# ~/.config/alacritty/alacritty.toml
+[general]
+import = ["~/.config/alacritty/themes/nexusdot-matugen.toml"]
+```
+
+```ini
+# ~/.config/hypr/hyprland.conf
+source = ~/.config/hypr/nexusdot-matugen.conf
+```
+
+For GTK applications, add this import to the existing `gtk.css` in each
+directory (`gtk-3.0` and/or `gtk-4.0`):
+
+```css
+@import url("nexusdot-matugen.css");
+```
+
+Hyprland reloads after each successful palette generation. Alacritty and GTK
+applications may need to reload or restart to pick up their generated files.
+Qt/KDE application colors are not changed by these GTK templates; they continue
+to follow the KDE color scheme. NexusDotShell does not overwrite existing user
+configuration files.
 
 ## Adding a backend (IPC seam)
 
