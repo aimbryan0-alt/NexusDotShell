@@ -128,7 +128,8 @@ Item {
             cursorShape: Qt.PointingHandCursor
             onClicked: function(mouse) {
               if (mouse.button === Qt.RightButton) {
-                SettingsData.set("dockPinnedApps", SettingsData.dockPinnedApps.filter(id => id !== String(entry.id)))
+                const pinned = Array.isArray(SettingsData.dockPinnedApps) ? SettingsData.dockPinnedApps : []
+                SettingsData.set("dockPinnedApps", pinned.filter(id => id !== String(entry.id)))
                 return
               }
               entry.execute()
