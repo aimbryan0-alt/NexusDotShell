@@ -1031,6 +1031,14 @@ BasePill {
             implicitWidth: root.controlSize
             implicitHeight: root.controlSize
             opacity: controlEnabled ? 1 : 0.55
+            Rectangle {
+              anchors.fill: parent
+              anchors.margins: 4
+              radius: 6
+              color: Theme.withAlpha(root.playerPillAccentColor, 0.13)
+              border.width: 1
+              border.color: Theme.withAlpha(root.playerPillAccentColor, 0.38)
+            }
             DmsIcon {
               anchors.fill: parent
               name: parent.iconName
@@ -1067,24 +1075,40 @@ BasePill {
           }
         }
 
-        Text {
+        Row {
           width: parent.width
-          text: root.trackText()
-          color: Theme.widgetTextColor
-          font.family: Theme.monoFontFamily
-          font.pixelSize: root.textSize() * 0.8
-          elide: Text.ElideRight
-          horizontalAlignment: Text.AlignHCenter
-          // Keep track information readable at rest; hover reveals full emphasis.
-          opacity: root.pillHovered ? 1 : 0.72
+          spacing: Theme.spaceXS
+          anchors.horizontalCenter: parent.horizontalCenter
 
-          Behavior on opacity {
-            NumberAnimation {
-              duration: Theme.shortDuration
-              easing.type: Easing.OutCubic
-            }
+          Rectangle {
+            width: 3
+            height: 9
+            radius: 2
+            anchors.verticalCenter: parent.verticalCenter
+            color: root.playerPillAccentColor
+            opacity: root.player && root.player.isPlaying ? 1 : 0.42
           }
 
+          Text {
+            width: parent.width - 3 - Theme.spaceXS
+            text: root.trackText()
+            color: Theme.widgetTextColor
+            font.family: Theme.monoFontFamily
+            font.pixelSize: root.textSize() * 0.8
+            font.weight: Font.Medium
+            font.letterSpacing: 0.15
+            elide: Text.ElideRight
+            horizontalAlignment: Text.AlignLeft
+            // Keep track information readable at rest; hover reveals full emphasis.
+            opacity: root.pillHovered ? 1 : 0.82
+
+            Behavior on opacity {
+              NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Easing.OutCubic
+              }
+            }
+          }
         }
       }
     }
