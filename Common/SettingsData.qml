@@ -60,6 +60,7 @@ Singleton {
   property bool dockAutoHide: true
   property bool dockGroupByApp: true
   property int dockIconSize: 45
+  property var dockPinnedApps: []
   property string launcherLogoMode: "os"
   property string launcherLogoColorOverride: "primary"
   property var barLeftWidgets: Util.cloneDef(Spec.SPEC["barLeftWidgets"].def)
