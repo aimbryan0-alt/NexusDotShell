@@ -24,7 +24,7 @@ Item {
     )
   }
   function appAliases(value) {
-    const full = String(value || "").toLowerCase().replace(/\\.desktop$/, "")
+    const full = String(value || "").toLowerCase().replace(/\.desktop$/, "")
     const tail = full.split(".").pop()
     return full ? [full, tail] : []
   }
