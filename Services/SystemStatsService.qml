@@ -16,6 +16,7 @@ Singleton {
   property var cpuHistory: []
   property var processes: []
   property var gpus: []
+  property var gpuHistoryById: ({})
   property bool gpuProcessUsageAvailable: false
   property int processCount: 0
   property int currentUid: -1
@@ -71,6 +72,7 @@ Singleton {
     if (!overviewActive) {
       cpuHistory = []
       memoryHistory = []
+      gpuHistoryById = ({})
     }
     refreshGpu()
   }
@@ -423,8 +425,22 @@ Singleton {
         && gpu.memoryUsage < 0 && !Object.keys(processGpuByPid).some(pid =>
           processGpuByPid[pid][gpu.pciAddress] !== undefined)))
     responsiveGpus.sort((a, b) => a.index - b.index || a.name.localeCompare(b.name))
-    for (let index = 0; index < responsiveGpus.length; index++)
-      responsiveGpus[index].displayIndex = index + 1
+    for (let index = 0; index < responsiveGpus.length; index++) {
+      const gpu = responsiveGpus[index]
+      gpu.displayIndex = index + 1
+      if (root.overviewActive && gpu.utilization >= 0) {
+        const previous = root.gpuHistoryById[gpu.id] || []
+        gpu.history = previous.concat([gpu.utilization]).slice(-60)
+      } else {
+        gpu.history = root.gpuHistoryById[gpu.id] || []
+      }
+    }
+    if (root.overviewActive) {
+      const nextHistory = ({})
+      for (const gpu of responsiveGpus)
+        nextHistory[gpu.id] = gpu.history
+      root.gpuHistoryById = nextHistory
+    }
     root.gpus = responsiveGpus
 
     root.processes = root.processes.map(process => {
