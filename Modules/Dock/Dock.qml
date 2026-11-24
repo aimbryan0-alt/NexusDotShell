@@ -9,7 +9,8 @@ Item {
   id: root
 
   property var screen: null
-  property bool pointerInside: false
+  property bool dockHovered: false
+  property bool triggerHovered: false
 
   readonly property real baseIconSize: Math.max(36, Math.min(
     64, Number(SettingsData.dockIconSize) || 45
@@ -58,6 +59,10 @@ Item {
     border.color: Theme.withAlpha(Theme.primary, root.shouldShow ? 0.72 : 0.3)
     opacity: root.shouldShow ? 1 : 0
     visible: opacity > 0
+
+    HoverHandler {
+      onHoveredChanged: root.dockHovered = hovered
+    }
 
     Behavior on anchors.bottomMargin {
       NumberAnimation {
@@ -159,6 +164,10 @@ Item {
     anchors.bottom: parent.bottom
     height: 5
     color: "transparent"
-    visible: SettingsData.dockAutoHide && !root.pointerInside
+    visible: SettingsData.dockAutoHide
+
+    HoverHandler {
+      onHoveredChanged: root.triggerHovered = hovered
+    }
   }
 }
