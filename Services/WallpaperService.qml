@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import qs.Common
+import qs.Services
 import "WallpaperShortcutConfig.js" as ShortcutConfig
 
 Singleton {
@@ -113,6 +114,7 @@ Singleton {
     Qt.callLater(root.restoreConfiguredShortcut)
     Qt.callLater(root.restoreAppWindow)
     Qt.callLater(root.restoreMediaSource)
+    Qt.callLater(root.refreshMatugenSource)
   }
 
   Component.onDestruction: {
@@ -128,6 +130,7 @@ Singleton {
       root.restoreConfiguredShortcut()
       root.restoreAppWindow()
       root.restoreMediaSource()
+      Qt.callLater(root.refreshMatugenSource)
     }
   }
 
@@ -136,6 +139,7 @@ Singleton {
     function onWallpaperStacksChanged() {
       root.refreshMediaControllers()
       root.restoreMediaSource()
+      Qt.callLater(root.refreshMatugenSource)
     }
   }
 
@@ -144,6 +148,8 @@ Singleton {
     function onRawEvent(event) {
       if (event.name === "configreloaded")
         Qt.callLater(function() { root.restoreConfiguredShortcut(true) })
+      if (event.name === "workspace" || event.name === "focusedmon" || event.name === "activespecial")
+        Qt.callLater(root.refreshMatugenSource)
     }
   }
 
@@ -801,6 +807,28 @@ Singleton {
         return controller
     }
     return null
+  }
+
+  function refreshMatugenSource() {
+    const screens = Quickshell.screens || []
+    const screen = screens.length > 0 ? screens[0] : null
+    const layers = screen
+      ? root.effectiveStackForScreen(screen).layers
+      : root.stackForScope("global", null).layers
+    let selected = null
+    for (let index = layers.length - 1; index >= 0; index--) {
+      const layer = layers[index]
+      if (Number(layer.opacity ?? 1) <= 0)
+        continue
+      if (layer.type === "image" || layer.type === "color") {
+        selected = layer
+        break
+      }
+    }
+    if (selected)
+      MatugenService.setWallpaperSource(root.pathFromUrl(selected.source), selected.type)
+    else
+      MatugenService.setWallpaperSource("", "")
   }
 
   function refreshMediaControllers() {
