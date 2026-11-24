@@ -102,7 +102,29 @@ Item {
       height: 2
       radius: 1
       color: Theme.primary
-      opacity: 0.75
+      opacity: 0.82
+    }
+
+    // Small HUD corner marks keep the dock visually aligned with the top bar.
+    Rectangle {
+      anchors.left: parent.left
+      anchors.leftMargin: 11
+      anchors.top: parent.top
+      anchors.topMargin: 9
+      width: 9
+      height: 2
+      color: Theme.primary
+      opacity: 0.55
+    }
+    Rectangle {
+      anchors.right: parent.right
+      anchors.rightMargin: 11
+      anchors.top: parent.top
+      anchors.topMargin: 9
+      width: 9
+      height: 2
+      color: Theme.primary
+      opacity: 0.55
     }
 
     Row {
@@ -121,9 +143,14 @@ Item {
           Rectangle {
             anchors.fill: parent
             radius: 15
-            color: favoriteMouse.containsMouse ? Theme.withAlpha(Theme.primary, 0.18) : "transparent"
-            border.width: root.runningWindowFor(entry) ? 1.5 : 1
-            border.color: Theme.withAlpha(Theme.primary, root.runningWindowFor(entry) ? 0.9 : 0.42)
+            color: favoriteMouse.containsMouse
+              ? Theme.withAlpha(Theme.primary, 0.2)
+              : root.runningWindowFor(entry)
+                ? Theme.withAlpha(Theme.primary, 0.08)
+                : "transparent"
+            border.width: favoriteMouse.containsMouse || root.runningWindowFor(entry) ? 1.5 : 1
+            border.color: Theme.withAlpha(Theme.primary,
+              favoriteMouse.containsMouse ? 1 : root.runningWindowFor(entry) ? 0.92 : 0.38)
           }
           IconImage {
             anchors.centerIn: parent
@@ -201,10 +228,13 @@ Item {
             anchors.fill: parent
             radius: 15
             color: iconMouse.containsMouse
-              ? Theme.withAlpha(Theme.primary, 0.16)
-              : "transparent"
-            border.width: appWindow.activated ? 1 : 0
-            border.color: Theme.withAlpha(Theme.primary, 0.52)
+              ? Theme.withAlpha(Theme.primary, 0.2)
+              : appWindow.activated
+                ? Theme.withAlpha(Theme.primary, 0.08)
+                : "transparent"
+            border.width: iconMouse.containsMouse || appWindow.activated ? 1 : 0
+            border.color: Theme.withAlpha(Theme.primary,
+              iconMouse.containsMouse ? 0.9 : 0.68)
           }
 
           IconImage {
