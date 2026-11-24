@@ -48,7 +48,7 @@ QtObject {
   property bool _fullNotified: false
   property var _accessoryNotificationStates: ({})
 
-  Timer {
+  property Timer notificationTimer: Timer {
     interval: 5000
     repeat: true
     running: root.active
