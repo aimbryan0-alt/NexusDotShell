@@ -44,9 +44,9 @@ BasePill {
       anchors.verticalCenter: parent.verticalCenter
 
       Rectangle {
-        width: 32
-        height: 32
-        radius: 8
+        width: 28
+        height: 28
+        radius: 7
         clip: true
         color: Theme.withAlpha(Theme.primary, 0.12)
         border.width: 1
