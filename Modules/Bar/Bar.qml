@@ -50,14 +50,34 @@ Item {
 
     property var targetScreen: null
 
+    readonly property var hyprlandMonitor: Hyprland.monitorFor(dockWindow.screen)
+    readonly property var specialWorkspace: dockWindow.hyprlandMonitor?.lastIpcObject?.specialWorkspace
+    readonly property var specialWorkspaceState: {
+      const monitor = dockWindow.hyprlandMonitor
+      const special = dockWindow.specialWorkspace
+      if (!monitor || !special || special.id === 0)
+        return null
+      return (Hyprland.workspaces?.values || []).find(workspace =>
+        workspace.name === special.name
+          && workspace.monitor?.name === monitor.name) || null
+    }
+    readonly property bool fullscreenOnMonitor:
+      !!dockWindow.hyprlandMonitor?.activeWorkspace?.hasFullscreen
+        || !!dockWindow.specialWorkspaceState?.hasFullscreen
+
     screen: targetScreen
     anchors {
       bottom: true
       left: true
       right: true
     }
-    visible: typeof SettingsData !== "undefined" && SettingsData.showDock
-    implicitHeight: 88
+    // Remove the entire layer surface during fullscreen so it cannot capture
+    // pointer input over the fullscreen application.
+    visible: typeof SettingsData !== "undefined"
+      && SettingsData.showDock && !dockWindow.fullscreenOnMonitor
+    // In auto-hide mode, keep only the 8 px reveal strip interactive while
+    // the dock is tucked away; the full 88 px surface returns on hover.
+    implicitHeight: dockContent.shouldShow ? 88 : 8
     color: "transparent"
     surfaceFormat.opaque: false
     exclusionMode: ExclusionMode.Ignore
@@ -65,6 +85,7 @@ Item {
     WlrLayershell.layer: WlrLayer.Overlay
 
     Dock {
+      id: dockContent
       anchors.fill: parent
       screen: dockWindow.screen
     }
@@ -90,15 +111,6 @@ Item {
       const workspace = barWindow.specialWorkspaceState
       return !!workspace?.hasFullscreen
     }
-    readonly property bool specialWorkspaceOverFullscreen: {
-      const special = barWindow.specialWorkspace
-      const monitor = barWindow.hyprlandMonitor
-      if (!monitor || !special || special.id === 0
-          || !special.name.startsWith("special:"))
-        return false
-      return !!monitor.activeWorkspace?.hasFullscreen
-        && !barWindow.specialWorkspaceFullscreen
-    }
     readonly property bool regularWorkspaceFullscreen:
       !!barWindow.hyprlandMonitor?.activeWorkspace?.hasFullscreen
 
@@ -108,16 +120,15 @@ Item {
       right: true
     }
 
+    // Hide the bar on this monitor for fullscreen on either workspace.
     visible: !barWindow.specialWorkspaceFullscreen
-      && (!barWindow.regularWorkspaceFullscreen
-        || barWindow.specialWorkspaceOverFullscreen)
+      && !barWindow.regularWorkspaceFullscreen
     implicitHeight: Theme.barHeight + Theme.space2() * 2
     color: "transparent"
     surfaceFormat.opaque: false
     exclusionMode: ExclusionMode.Auto
     WlrLayershell.namespace: "mybar"
-    WlrLayershell.layer: barWindow.specialWorkspaceOverFullscreen
-      ? WlrLayer.Overlay : WlrLayer.Top
+    WlrLayershell.layer: WlrLayer.Top
 
     BackgroundEffect.blurRegion: SettingsData.barBlurEnabled ? barBlurRegion : null
 
