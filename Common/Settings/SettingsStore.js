@@ -257,6 +257,34 @@ function migrateToVersion(obj, targetVersion) {
         settings.barLeftWidgets = leftForMedia;
         settings.barRightWidgets = rightWithoutMedia;
     }
+    if (currentVersion < 16) {
+        // Move Nexus Center out of the isolated center lane and place it
+        // after every right-side widget, making it the final bar element.
+        var centerForNexus = Array.isArray(settings.barCenterWidgets)
+            ? settings.barCenterWidgets.slice()
+            : Util.cloneDef(SpecModule.SPEC["barCenterWidgets"].def);
+        var rightForNexus = Array.isArray(settings.barRightWidgets)
+            ? settings.barRightWidgets.slice()
+            : Util.cloneDef(SpecModule.SPEC["barRightWidgets"].def);
+        var leftForNexus = Array.isArray(settings.barLeftWidgets)
+            ? settings.barLeftWidgets.slice()
+            : Util.cloneDef(SpecModule.SPEC["barLeftWidgets"].def);
+        var nexusEntry = null;
+        [leftForNexus, centerForNexus, rightForNexus].forEach(function(list) {
+            var index = list.findIndex(function(widget) {
+                return widget && widget.id === "controlCenterButton";
+            });
+            if (index >= 0) {
+                var found = list.splice(index, 1)[0];
+                if (!nexusEntry) nexusEntry = found;
+            }
+        });
+        if (!nexusEntry) nexusEntry = { id: "controlCenterButton", enabled: true };
+        rightForNexus.push(nexusEntry);
+        settings.barLeftWidgets = leftForNexus;
+        settings.barCenterWidgets = centerForNexus;
+        settings.barRightWidgets = rightForNexus;
+    }
     settings.configVersion = targetVersion;
     return settings;
 }
