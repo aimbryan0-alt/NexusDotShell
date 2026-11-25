@@ -102,7 +102,7 @@ BasePill {
         Row {
           id: dateRow
           anchors.horizontalCenter: parent.horizontalCenter
-          spacing: 6
+          spacing: 4
 
           Text {
             text: ClockService.dateString
@@ -184,7 +184,7 @@ BasePill {
         Row {
           id: weatherRow
           anchors.centerIn: parent
-          spacing: 4
+          spacing: 3
 
           DmsIcon {
             anchors.verticalCenter: parent.verticalCenter
