@@ -1080,7 +1080,7 @@ PanelWindow {
                     readonly property int groupContentHeight: collapsed
                       ? 0
                       : directoryGroup.modelData.items.length > 0
-                        ? Math.ceil(directoryGroup.modelData.items.length / 3) * 132
+                        ? Math.ceil(directoryGroup.modelData.items.length / 4) * 108
                         : 36
                     width: wallpaperGroups.width
                     height: 44 + (groupContentHeight > 0 ? Theme.spaceXS + groupContentHeight : 0)
@@ -1197,9 +1197,9 @@ PanelWindow {
                         height: directoryItemsViewport.viewportHeight
                         y: directoryItemsViewport.scrollOffset
                         contentY: directoryItemsViewport.scrollOffset
-                        property int columnCount: 3
+                        property int columnCount: 4
                         cellWidth: width / columnCount
-                        cellHeight: 132
+                        cellHeight: 108
                         cacheBuffer: 0
                         model: directoryGroup.collapsed
                           ? []
@@ -2074,24 +2074,21 @@ PanelWindow {
             : Theme.withAlpha(Theme.outlineVariant, 0.65)
           clip: true
 
-          AnimatedImage {
+          Image {
             anchors.fill: parent
             source: parent.parent.previewActivated
               && WallpaperService.typeForSource(parent.parent.modelData) === "image"
-              && (!root.isGifSource(parent.parent.modelData) || root.gifAnimationDelayElapsed)
               ? parent.parent.modelData
               : ""
             fillMode: Image.PreserveAspectCrop
-            sourceSize: Qt.size(200, 100)
+            sourceSize: Qt.size(160, 80)
             asynchronous: true
-            cache: true
-            playing: !root.isGifSource(parent.parent.modelData)
-              || (parent.parent.previewActivated && root.gifAnimationDelayElapsed)
+            cache: false
             opacity: status === Image.Ready ? 1 : 0
 
             Behavior on opacity {
               NumberAnimation {
-                duration: 100
+                duration: 90
                 easing.type: Theme.standardEasing
               }
             }
