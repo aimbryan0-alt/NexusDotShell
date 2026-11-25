@@ -1997,7 +1997,7 @@ BasePill {
       color: Theme.withAlpha(Theme.widgetBaseBackgroundColor,
         typeof SettingsData !== "undefined" ? SettingsData.popupTransparency : 0.65)
       border.width: 1
-      border.color: Theme.withAlpha(Theme.outline, 0.35)
+      border.color: Theme.withAlpha(Theme.primary, 0.34)
 
       Column {
         anchors.fill: parent
@@ -2011,9 +2011,9 @@ BasePill {
 
           DmsIcon {
             anchors.verticalCenter: parent.verticalCenter
-            name: "monitoring"
-            size: 24
-            color: Theme.primary
+            name: "memory"
+            size: 23
+            color: Theme.secondary
           }
 
           Column {
@@ -2023,16 +2023,18 @@ BasePill {
 
             Text {
               width: parent.width
-              text: qsTr("System Monitor")
+              text: "NEXUS // CORE"
               color: Theme.widgetTextColor
-              font.pixelSize: 16
-              font.weight: Font.DemiBold
+              font.pixelSize: 15
+              font.weight: Font.Bold
+              font.family: Theme.monoFontFamily
+              font.letterSpacing: 1.1
               elide: Text.ElideRight
             }
 
             Text {
               width: parent.width
-              text: SystemStatsService.cpuModel || qsTr("Processor and memory")
+              text: (SystemStatsService.cpuModel || qsTr("Processor and memory")) + "  ·  " + qsTr("%1 cores").arg(SystemStatsService.cpuCoreCount)
               color: Theme.widgetInactiveIconColor
               font.pixelSize: 11
               elide: Text.ElideRight
@@ -2085,12 +2087,12 @@ BasePill {
               height: parent.height
               radius: Theme.cornerRadius
               color: root.overviewTab === modelData.id
-                ? Theme.withAlpha(Theme.primary, 0.16)
+                ? Theme.withAlpha(Theme.primary, 0.22)
                 : overviewTabMouse.containsMouse
                   ? Theme.withAlpha(Theme.primary, 0.1)
                   : Theme.withAlpha(Theme.surfaceContainerHigh, 0.65)
               border.width: root.overviewTab === modelData.id || overviewTabMouse.containsMouse ? 1 : 0
-              border.color: Theme.withAlpha(Theme.primary, 0.4)
+              border.color: Theme.withAlpha(Theme.primary, 0.52)
 
               Row {
                 anchors.centerIn: parent
@@ -2149,9 +2151,13 @@ BasePill {
                 width: (parent.width - parent.columnSpacing * (parent.columns - 1)) / parent.columns
                 height: parent.height >= 300 ? (parent.height - parent.rowSpacing) / 2 : parent.height / 2
                 radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.72)
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.76)
                 border.width: 1
-                border.color: Theme.withAlpha(Theme.primary, 0.12)
+                border.color: Theme.withAlpha(
+                  modelData.id === "memory" ? Theme.secondary
+                    : modelData.id === "gpu" ? Theme.tertiary
+                    : modelData.id === "temperature" ? Theme.warning : Theme.primary,
+                  0.24)
 
                 Column {
                   anchors.fill: parent
@@ -2221,7 +2227,8 @@ BasePill {
                     values: modelData.id === "cpu" ? SystemStatsService.cpuHistory
                       : modelData.id === "memory" ? SystemStatsService.memoryHistory
                       : (SystemStatsService.gpus.length > 0 ? SystemStatsService.gpus[0].history || [] : [])
-                    graphColor: modelData.id === "memory" ? Theme.secondary : Theme.primary
+                    graphColor: modelData.id === "memory" ? Theme.secondary
+                      : modelData.id === "gpu" ? Theme.tertiary : Theme.primary
                   }
 
                   // Compact live-load rail complements the history graph.
