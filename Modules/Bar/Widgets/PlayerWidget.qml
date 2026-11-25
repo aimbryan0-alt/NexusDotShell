@@ -460,14 +460,17 @@ BasePill {
 
       ClippingRectangle {
         id: artwork
-        width: Math.min(mediaContent.width, mediaContent.height)
+        width: Math.min(mediaContent.width, mediaContent.height, 360)
         height: width
         anchors.horizontalCenter: mediaContent.horizontalCenter
         anchors.verticalCenter: mediaContent.verticalCenter
-        radius: Theme.cornerRadius
+        radius: width / 2
         color: Theme.withAlpha(root.playerAccentContainerColor, root.overviewElementAlpha)
         visible: !root.lyricsOpen
+        antialiasing: true
 
+        // The artwork becomes the label of a vinyl record and rotates only
+        // while the player is visible and actively playing.
         Image {
           id: artworkImage
           anchors.fill: parent
@@ -482,11 +485,72 @@ BasePill {
           mipmap: true
           smooth: true
           visible: status === Image.Ready
+          transform: Rotation {
+            origin.x: artworkImage.width / 2
+            origin.y: artworkImage.height / 2
+            angle: artworkImage.rotation
+          }
+          NumberAnimation on rotation {
+            from: 0
+            to: 360
+            duration: 9000
+            loops: Animation.Infinite
+            running: root.overviewOpen && root.hasMedia && root.player
+              && root.player.isPlaying && artworkImage.visible && !root.lyricsOpen
+          }
           onStatusChanged: {
             if (status === Image.Error)
               root.fallbackFromLowResolutionArtwork(0)
             else if (status === Image.Ready)
               root.fallbackFromLowResolutionArtwork(implicitWidth)
+          }
+        }
+
+        Rectangle {
+          anchors.fill: parent
+          radius: width / 2
+          color: "transparent"
+          border.width: 1
+          border.color: Theme.withAlpha(root.playerAccentColor, 0.72)
+        }
+
+        // Fine concentric grooves give the record depth without shader effects.
+        Repeater {
+          model: [0.76, 0.61, 0.46]
+          delegate: Rectangle {
+            required property real modelData
+            width: artwork.width * modelData
+            height: width
+            anchors.centerIn: parent
+            radius: width / 2
+            color: "transparent"
+            border.width: 1
+            border.color: Theme.withAlpha(Theme.surfaceText, 0.18)
+          }
+        }
+
+        Rectangle {
+          width: artwork.width * 0.23
+          height: width
+          anchors.centerIn: parent
+          radius: width / 2
+          color: Theme.withAlpha(root.playerSurfaceColor, 0.94)
+          border.width: 2
+          border.color: Theme.withAlpha(root.playerAccentColor, 0.9)
+
+          DmsIcon {
+            anchors.centerIn: parent
+            name: "music_note"
+            size: Math.max(18, parent.width * 0.34)
+            color: root.playerAccentColor
+          }
+
+          Rectangle {
+            width: 5
+            height: 5
+            anchors.centerIn: parent
+            radius: width / 2
+            color: Theme.surfaceText
           }
         }
 
@@ -498,7 +562,6 @@ BasePill {
           visible: !artworkImage.visible
         }
       }
-
         PlayerLyricsView {
           anchors.left: parent.left
           anchors.right: parent.right
@@ -507,6 +570,7 @@ BasePill {
           anchors.topMargin: 0
           visible: root.lyricsOpen
           textSize: 14
+          accentColor: root.playerAccentColor
         }
       }
 

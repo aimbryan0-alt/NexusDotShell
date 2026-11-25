@@ -7,6 +7,7 @@ Item {
   id: root
 
   property real textSize: 16
+  property color accentColor: Theme.primary
 
   Rectangle {
     anchors.fill: parent
@@ -41,7 +42,7 @@ Item {
       width: lyricsList.width - 8
       text: root.lineText(modelData, index)
       textFormat: LyricsService.synced ? Text.RichText : Text.PlainText
-      color: Theme.surfaceText
+      color: LyricsService.synced && index === LyricsService.activeIndex ? root.accentColor : Theme.surfaceText
       opacity: LyricsService.synced && index !== LyricsService.activeIndex ? 0.48 : 1
       font.family: "serif"
       font.italic: true
@@ -71,12 +72,12 @@ Item {
       width: parent.width
       text: {
         switch (LyricsService.state) {
-        case "loading": return "Searching for lyrics…"
+        case "loading": return "Procurando letras…"
         case "instrumental": return "Instrumental"
-        case "unavailable": return "Lyrics are unavailable"
-        case "error": return "Lyrics could not be loaded"
-        case "none": return "No lyrics found"
-        default: return "Lyrics are not available"
+        case "unavailable": return "Letras indisponíveis"
+        case "error": return "Não foi possível carregar as letras"
+        case "none": return "Nenhuma letra encontrada"
+        default: return "Letras não disponíveis"
         }
       }
       color: Theme.surfaceText
@@ -90,7 +91,7 @@ Item {
     Text {
       anchors.horizontalCenter: parent.horizontalCenter
       visible: LyricsService.state === "none" || LyricsService.state === "error"
-      text: "Retry"
+      text: "Tentar novamente"
       color: Theme.primary
       font.family: "serif"
       font.italic: true
