@@ -29,6 +29,8 @@ var SPEC = {
     weatherCoordinates: { def: "" },
     calendarBirthYear: { def: -1 },
     calendarLifeExpectancy: { def: 90 },
+    lyricsHudEnabled: { def: false },
+    lyricsHudPosition: { def: "bottom-right" },
     notesAutoSave: { def: false },
     notesShowLineNumbers: { def: false },
     notesExpanded: { def: false },
