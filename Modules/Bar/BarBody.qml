@@ -3,24 +3,20 @@ import QtQuick.Layouts
 import qs.Common
 import qs.Modules.Bar.Widgets
 
-// The bar's visual body: a transparent canvas laying out bar widgets into
-// left / center / right groups, driven by the SettingsData widget lists.
-// Widgets that have no component yet are skipped. Each widget id maps to an
-// inline Component over the registered widget type. The bar surface wraps this
-// and supplies the screen.
+// Preserve the original Nexus bar architecture: left lane, adaptive center,
+// right lane, and a dedicated music slot at the far right. This avoids
+// squeezing the complete system HUD into a single clipped Row.
 Item {
   id: root
 
   property QtObject screen: null
   property QtObject barWindow: null
 
-  // Keep groups readable even when older settings contain zero/negative spacing.
-  readonly property int spacing: Math.max(2,
+  readonly property int spacing: Math.max(3,
     typeof SettingsData !== "undefined" ? SettingsData.barSpacing : 3)
-  readonly property int innerPadding: Math.max(6,
-    typeof SettingsData !== "undefined" ? SettingsData.barInnerPadding : 6)
-  // Keep side groups close to Nexus Center without touching its centered position.
-  readonly property int centerGap: Math.max(10, root.spacing + 8)
+  readonly property int innerPadding: Math.max(8,
+    typeof SettingsData !== "undefined" ? SettingsData.barInnerPadding : 8)
+  readonly property int laneGap: Math.max(8, root.spacing + 5)
 
   Component { id: launcherButtonComp; LauncherButton {} }
   Component { id: submapComp; SubmapWidget {} }
@@ -88,11 +84,14 @@ Item {
       if (!entry || entry.enabled !== true) continue
       if (groupCpuMemory && entry.id === "memUsage") continue
       var comp = root.registryFor(entry.id)
-      if (comp && comp.status === Component.Error) {
+      if (comp && comp.status === Component.Error)
         console.error("MQBAR component error for", entry.id, ":", comp.errorString())
+      if (comp === null) {
+        console.info("MQBAR skip (no comp):", entry.id)
+        continue
       }
-      if (comp === null) { console.info("MQBAR skip (no comp):", entry.id); continue }
-      var targetRow = hostRow
+      // The music widget has its own terminal slot, matching the original bar.
+      var targetRow = entry.id === "player" ? playerRow : hostRow
       var initProps = {
         "screen": root.screen,
         "parentScreen": root.screen,
@@ -116,9 +115,8 @@ Item {
   }
 
   function rebuild() {
-    for (var i = 0; i < root._created.length; i++) {
+    for (var i = 0; i < root._created.length; i++)
       root._created[i].destroy()
-    }
     root._created = []
     root.fillRow(SettingsData.barLeftWidgets, leftRow)
     root.fillRow(SettingsData.barCenterWidgets, centerRow)
@@ -127,66 +125,59 @@ Item {
 
   function titleSpaceFor(titleWidget) {
     var usedWidth = 0
-    var precedingWidgets = 0
+    var count = 0
     for (var i = 0; i < leftRow.children.length; i++) {
       var child = leftRow.children[i]
-      if (child === titleWidget)
-        break
-      if (!child.visible)
-        continue
-      if (precedingWidgets > 0)
-        usedWidth += root.spacing
+      if (child === titleWidget) break
+      if (!child.visible) continue
+      if (count > 0) usedWidth += root.spacing
       usedWidth += child.width
-      precedingWidgets++
+      count++
     }
-    if (precedingWidgets > 0)
-      usedWidth += root.spacing
-    return Math.min(156, Math.max(0, centerRow.x - root.centerGap - leftRow.x - usedWidth))
+    if (count > 0) usedWidth += root.spacing
+    return Math.max(0, Math.min(190,
+      centerRow.x - root.laneGap - leftRow.x - usedWidth))
   }
 
-  Component.onCompleted: {
-    root.rebuild()
-  }
+  Component.onCompleted: root.rebuild()
 
   Connections {
     target: SettingsData
-    function onSettingsApplied() {
-      root.rebuild()
-    }
+    function onSettingsApplied() { root.rebuild() }
   }
 
   Row {
     id: leftRow
-    // Left group stays attached to the left edge; it only uses the space
-    // available before the centered group.
     x: root.innerPadding
-    width: Math.max(0, centerRow.x - root.centerGap - x)
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
-    clip: true
   }
 
-  // Nexus Center remains mathematically centered and independent of side groups.
+  // The center remains visually centered when space permits, but yields a
+  // little to the side lanes instead of covering or clipping their widgets.
   Row {
     id: centerRow
-    width: Math.min(implicitWidth, Math.max(0, root.width - root.innerPadding * 2))
-    x: Math.round((root.width - width) / 2)
+    x: Math.max(leftRow.x + leftRow.width + root.laneGap,
+      Math.min((root.width - width) / 2,
+        rightRow.x - root.laneGap - width))
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
-    clip: true
-    visible: width > 0
+    visible: x + width <= rightRow.x - root.laneGap
   }
 
-  // The right group hugs the right edge when it fits. On narrow displays it
-  // uses only the space left after Nexus Center instead of drifting off-screen.
   Row {
     id: rightRow
-    // Right group is right-aligned inside the bar and clipped to its lane.
-    x: centerRow.x + centerRow.width + root.centerGap
-    width: Math.max(0, root.width - x - root.innerPadding)
-    layoutDirection: Qt.RightToLeft
+    anchors.right: playerRow.left
+    anchors.rightMargin: root.laneGap
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
-    clip: true
+  }
+
+  Row {
+    id: playerRow
+    anchors.right: parent.right
+    anchors.rightMargin: root.innerPadding
+    anchors.verticalCenter: parent.verticalCenter
+    spacing: root.spacing
   }
 }
