@@ -798,7 +798,6 @@ PanelWindow {
               spacing: Theme.spaceS
 
               Text {
-                visible: root.advancedOptionsOpen
                 width: parent.width - refreshButton.width
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.overviewMode
@@ -811,7 +810,6 @@ PanelWindow {
               }
 
               Rectangle {
-                visible: root.advancedOptionsOpen
                 id: refreshButton
                 width: 36
                 height: 32
