@@ -27,6 +27,9 @@ Singleton {
   property bool locationSearchPending: false
   property int _locationSearchSerial: 0
   property string _locationSearchQuery: ""
+  property int _geocodeSerial: 0
+  property string _pendingGeocodeCity: ""
+  property bool _geocodePending: false
   readonly property int _minFetchInterval: 30000
 
   readonly property var _dayIcons: ({
@@ -210,7 +213,18 @@ Singleton {
   }
 
   function geocodeCity(city) {
+    const serial = ++root._geocodeSerial
+    root._pendingGeocodeCity = city
+    if (geocodeFetcher.running) {
+      root._geocodePending = true
+      return
+    }
+    startGeocode(city, serial)
+  }
+
+  function startGeocode(city, serial) {
     geocodeFetcher.requestedLocation = city
+    geocodeFetcher.requestedSerial = serial
     geocodeFetcher.command = ["curl","-sf","--max-time","10",
       "https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(city)+"&count=5&language=pt&format=json"]
     geocodeFetcher.running = true
@@ -301,20 +315,28 @@ Singleton {
   Process {
     id: geocodeFetcher
     property string requestedLocation: ""
+    property int requestedSerial: 0
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
+        if (geocodeFetcher.requestedSerial !== root._geocodeSerial
+            || SettingsData.weatherCoordinates !== ""
+            || SettingsData.weatherLocation !== geocodeFetcher.requestedLocation)
+          return
         try {
           const d = JSON.parse(text.trim())
           const r = (d.results||[])[0]
           if (!r) throw new Error("No geocoding results")
-          if (SettingsData.weatherCoordinates !== ""
-              || SettingsData.weatherLocation !== geocodeFetcher.requestedLocation)
-            return
           root.location = {city:r.name, country:r.country||"", latitude:r.latitude, longitude:r.longitude}
           SettingsData.set("weatherCoordinates", r.latitude + "," + r.longitude)
           root.fetchWeather()
         } catch(e) { root.lastFetchError = "Geocoding failed: "+String(e) }
+      }
+    }
+    onExited: {
+      if (root._geocodePending) {
+        root._geocodePending = false
+        root.startGeocode(root._pendingGeocodeCity, root._geocodeSerial)
       }
     }
   }
