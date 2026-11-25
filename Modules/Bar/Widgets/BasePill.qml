@@ -68,31 +68,30 @@ Item {
       border.width: 1
       border.color: Theme.withAlpha(
         root.isMouseHovered ? Theme.primary : Theme.outlineVariant,
-        root.isMouseHovered ? 0.58 : 0.28
+        root.isMouseHovered ? 0.48 : 0.16
       )
     }
 
-    // A restrained HUD edge highlight; it is static to avoid extra animation work.
+    // Quiet macOS-like glass pill; the Nexus accent appears on interaction.
     Rectangle {
       anchors.top: background.top
       anchors.horizontalCenter: background.horizontalCenter
-      width: Math.max(0, background.width - 16)
+      width: Math.max(0, background.width - 20)
       height: 1
       radius: 1
       color: Theme.primary
-      opacity: root.isMouseHovered ? 0.72 : 0.16
+      opacity: root.isMouseHovered ? 0.68 : 0.05
     }
 
-    // Offset signal dash: a static glitch cue with no animation or polling.
     Rectangle {
       anchors.top: background.top
       anchors.right: background.right
       anchors.rightMargin: 12
-      width: 9
+      width: 7
       height: 2
       radius: 1
       color: Theme.tertiary
-      opacity: root.isMouseHovered ? 0.95 : 0.42
+      opacity: root.isMouseHovered ? 0.82 : 0
     }
 
     Loader {
