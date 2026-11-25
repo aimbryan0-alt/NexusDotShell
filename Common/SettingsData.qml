@@ -14,7 +14,7 @@ import "Settings/SpecUtil.js" as Util
 Singleton {
   id: root
 
-  readonly property int settingsConfigVersion: 13
+  readonly property int settingsConfigVersion: 14
   readonly property string _configDir: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/myquickshell"
   readonly property string settingsPath: _configDir + "/settings.json"
 
