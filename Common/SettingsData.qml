@@ -47,6 +47,8 @@ Singleton {
   property string weatherCoordinates: ""
   property real calendarBirthYear: -1
   property real calendarLifeExpectancy: 90
+  property bool lyricsHudEnabled: false
+  property string lyricsHudPosition: "bottom-right"
   property bool notesAutoSave: false
   property bool notesShowLineNumbers: false
   property bool notesExpanded: false
