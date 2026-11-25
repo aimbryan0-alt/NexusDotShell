@@ -96,11 +96,13 @@ BasePill {
 
   content: Component {
     Row {
-      spacing: 6
+      spacing: 5
+      anchors.verticalCenter: parent.verticalCenter
 
       DmsIcon {
-        name: "network_check"
-        size: root.iconSize(-4)
+        name: root.interfaceName && root.interfaceName.startsWith("wl")
+          ? "wifi" : root.interfaceName ? "lan" : "wifi_off"
+        size: root.iconSize(-3)
         color: root.interfaceName ? Theme.primary : Theme.widgetInactiveIconColor
         anchors.verticalCenter: parent.verticalCenter
       }
@@ -110,10 +112,10 @@ BasePill {
         spacing: 0
 
         Row {
-          spacing: 4
+          spacing: 3
           DmsIcon {
             name: "south"
-            size: 10
+            size: 9
             color: Theme.primary
             anchors.verticalCenter: parent.verticalCenter
           }
@@ -121,15 +123,15 @@ BasePill {
             text: root.formatRate(root.downloadRate)
             color: Theme.widgetTextColor
             font.family: Theme.monoFontFamily
-            font.pixelSize: root.textSize() - 1
+            font.pixelSize: Math.max(8, root.textSize() - 2)
           }
         }
 
         Row {
-          spacing: 4
+          spacing: 3
           DmsIcon {
             name: "north"
-            size: 10
+            size: 9
             color: Theme.secondary
             anchors.verticalCenter: parent.verticalCenter
           }
@@ -137,32 +139,11 @@ BasePill {
             text: root.formatRate(root.uploadRate)
             color: Theme.widgetInactiveIconColor
             font.family: Theme.monoFontFamily
-            font.pixelSize: root.textSize() - 1
+            font.pixelSize: Math.max(8, root.textSize() - 2)
           }
-        }
-      }
-
-      Row {
-        spacing: 4
-        anchors.verticalCenter: parent.verticalCenter
-
-        Rectangle {
-          width: 5
-          height: 5
-          radius: 3
-          color: root.interfaceName ? Theme.primary : Theme.widgetInactiveIconColor
-          anchors.verticalCenter: parent.verticalCenter
-        }
-
-        Text {
-          text: root.connectionLabel
-          color: root.interfaceName ? Theme.primary : Theme.widgetInactiveIconColor
-          font.family: Theme.monoFontFamily
-          font.pixelSize: 8
-          font.bold: true
-          anchors.verticalCenter: parent.verticalCenter
         }
       }
     }
   }
+}
 }
