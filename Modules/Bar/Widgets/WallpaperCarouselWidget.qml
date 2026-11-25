@@ -44,9 +44,9 @@ BasePill {
       anchors.verticalCenter: parent.verticalCenter
 
       Rectangle {
-        width: 26
-        height: 26
-        radius: 13
+        width: 32
+        height: 32
+        radius: 8
         clip: true
         color: Theme.withAlpha(Theme.primary, 0.12)
         border.width: 1
@@ -67,7 +67,7 @@ BasePill {
         DmsIcon {
           anchors.centerIn: parent
           name: "wallpaper"
-          size: 15
+          size: 16
           color: Theme.primary
           visible: root.currentImage === ""
         }
