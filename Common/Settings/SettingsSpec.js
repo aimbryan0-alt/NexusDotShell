@@ -62,7 +62,8 @@ var SPEC = {
             { id: "submap", enabled: true },
             { id: "workspaceSwitcher", enabled: true },
             { id: "runningApps", enabled: true },
-            { id: "focusedWindow", enabled: true }
+            { id: "focusedWindow", enabled: true },
+            { id: "player", enabled: true }
         ]
     },
     barCenterWidgets: {
@@ -71,9 +72,8 @@ var SPEC = {
         ]
     },
     barRightWidgets: {
-        // Natural left-to-right order: complete system core, notes and
-        // notifications, wallpaper cover, then clock. Music uses its own
-        // dedicated far-right slot in BarBody.
+        // Right side: complete system core, notes, notifications, wallpaper and clock.
+        // Media follows the focused-window widget on the left side.
         def: [
             { id: "systemTray", enabled: true },
             { id: "networkMonitor", enabled: true },
@@ -85,8 +85,7 @@ var SPEC = {
             { id: "notepadButton", enabled: true },
             { id: "notificationButton", enabled: true },
             { id: "wallpaperCarousel", enabled: true },
-            { id: "clock", enabled: true },
-            { id: "player", enabled: true }
+            { id: "clock", enabled: true }
         ]
     },
     barTransparency: { def: 0 },
