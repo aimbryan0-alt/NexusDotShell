@@ -45,17 +45,18 @@ BasePill {
 
       // Time + Date Column
       Column {
-        spacing: 0
+        spacing: 1
         anchors.verticalCenter: parent.verticalCenter
 
         Item {
           id: timeRow
-          implicitWidth: dateRow.implicitWidth
+          implicitWidth: timeLabel.implicitWidth + Theme.spaceXS + wallpaperButton.width
           implicitHeight: Math.max(timeLabel.implicitHeight, Theme.iconSizeSmall)
 
           Text {
             id: timeLabel
-            anchors.centerIn: parent
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
             text: ClockService.timeString
             color: Theme.primary
             font.family: Theme.monoFontFamily
@@ -65,7 +66,8 @@ BasePill {
 
           Item {
             id: wallpaperButton
-            x: timeLabel.x + timeLabel.width + Theme.spaceXXS
+            anchors.left: timeLabel.right
+            anchors.leftMargin: Theme.spaceXS
             anchors.verticalCenter: parent.verticalCenter
             width: Theme.iconSizeSmall
             height: Theme.iconSizeSmall
