@@ -157,20 +157,19 @@ Item {
     id: leftRow
     anchors.left: parent.left
     anchors.leftMargin: Math.max(0, root.innerPadding)
-    width: Math.min(implicitWidth, root.width * 0.26)
+    width: Math.max(0, Math.min(implicitWidth,
+      centerRow.x - root.spacing - x))
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
     clip: true
   }
 
-  // Keep the music pill and clock together in the center group. This avoids
-  // hiding the player whenever the bar becomes too narrow for a second row.
-  // Keep the center group inside the free lane between left and right.
-  // Clipping prevents long widget groups from painting over their neighbors.
+  // Nexus Center is the single, fixed focal point of the bar.
+  // Side groups use only the space around it and cannot push it away.
   Row {
     id: centerRow
-    x: leftRow.x + leftRow.width + root.spacing
-    width: Math.max(0, rightRow.x - root.spacing - x)
+    width: implicitWidth
+    x: Math.round((root.width - width) / 2)
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
     clip: true
@@ -179,9 +178,8 @@ Item {
 
   Row {
     id: rightRow
-    anchors.right: parent.right
-    anchors.rightMargin: Math.max(0, root.innerPadding)
-    width: Math.min(implicitWidth, root.width * 0.52)
+    x: centerRow.x + centerRow.width + root.spacing
+    width: Math.max(0, root.width - x - Math.max(0, root.innerPadding))
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
     clip: true
