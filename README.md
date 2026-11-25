@@ -274,6 +274,31 @@ Copyright (C) 2026 mmj2023
 - `Modules/Bar/Widgets/` - reusable bar widgets, quick settings, launcher, and system monitor
 - `Modules/Dock/` - floating application dock
 
+## Hyprland autostart
+
+To start NexusDotShell automatically when you log into Hyprland, run this from
+the repository directory:
+
+```sh
+bash scripts/enable-hyprland-autostart.sh
+```
+
+The helper backs up `~/.config/hypr/hyprland.conf` before adding a clearly
+marked `exec-once` block. It refuses to add a second Quickshell startup entry
+if one is already present, so review any existing entry first. The startup
+wrapper checks Quickshell's instance list for this project before launching,
+which avoids starting another copy if NexusDotShell was already opened
+manually. Log out and back into Hyprland after enabling it.
+
+To remove only the block added by NexusDotShell, run:
+
+```sh
+bash scripts/disable-hyprland-autostart.sh
+```
+
+This removal helper also creates a backup. Neither helper replaces the rest of
+the user's Hyprland configuration.
+
 ## Running
 
 ```sh
