@@ -96,7 +96,7 @@ BasePill {
 
   content: Component {
     Row {
-      spacing: 5
+      spacing: 4
       anchors.verticalCenter: parent.verticalCenter
 
       DmsIcon {
@@ -112,10 +112,10 @@ BasePill {
         spacing: 0
 
         Row {
-          spacing: 3
+          spacing: 2
           DmsIcon {
             name: "south"
-            size: 9
+            size: 8
             color: Theme.primary
             anchors.verticalCenter: parent.verticalCenter
           }
@@ -128,10 +128,10 @@ BasePill {
         }
 
         Row {
-          spacing: 3
+          spacing: 2
           DmsIcon {
             name: "north"
-            size: 9
+            size: 8
             color: Theme.secondary
             anchors.verticalCenter: parent.verticalCenter
           }
