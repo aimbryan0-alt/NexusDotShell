@@ -104,6 +104,18 @@ PopupWindow {
         return parts.length === 3 ? parts[2] + "/" + parts[1] : dateString;
     }
 
+    function selectedDayForecast() {
+        if (!WeatherService.weather.available)
+            return null;
+        const forecast = WeatherService.weather.forecast || [];
+        const key = dateKey(selectedDate);
+        for (let i = 0; i < forecast.length; i++) {
+            if (forecast[i].date === key)
+                return forecast[i];
+        }
+        return null;
+    }
+
     function addEvent() {
         const title = eventTitle.trim();
         if (!title)
@@ -375,7 +387,10 @@ PopupWindow {
 
                             DmsIcon {
                                 anchors.verticalCenter: parent.verticalCenter
-                                name: WeatherService.weatherIcon(WeatherService.weather.wCode, WeatherService.weather.isDay)
+                                name: WeatherService.weatherIcon(
+                                    root.selectedDayForecast() ? root.selectedDayForecast().wCode : WeatherService.weather.wCode,
+                                    true
+                                )
                                 size: 34
                                 color: Theme.primary
                             }
@@ -386,7 +401,9 @@ PopupWindow {
                                 spacing: 3
 
                                 Text {
-                                    text: WeatherService.currentTempText()
+                                    text: root.selectedDayForecast()
+                                        ? WeatherService.formatTemp(root.selectedDayForecast().tempMin) + " / " + WeatherService.formatTemp(root.selectedDayForecast().tempMax)
+                                        : WeatherService.currentTempText()
                                     color: Theme.widgetTextColor
                                     font.family: Theme.monoFontFamily
                                     font.pixelSize: 23
@@ -395,7 +412,9 @@ PopupWindow {
 
                                 Text {
                                     width: parent.width
-                                    text: WeatherService.weather.available ? WeatherService.weatherCondition(WeatherService.weather.wCode) : qsTr("Weather unavailable")
+                                    text: root.selectedDayForecast()
+                                        ? WeatherService.weatherCondition(root.selectedDayForecast().wCode)
+                                        : WeatherService.weather.available ? WeatherService.weatherCondition(WeatherService.weather.wCode) : qsTr("Weather unavailable")
                                     color: Theme.widgetTextColor
                                     font.pixelSize: 11
                                     elide: Text.ElideRight
@@ -412,9 +431,11 @@ PopupWindow {
 
                                 Text {
                                     width: parent.width
-                                    text: WeatherService.weather.available
-                                        ? qsTr("Chuva %1 · %2").arg(WeatherService.formatPercent(WeatherService.weather.precipitationProbability)).arg(WeatherService.formatRain(WeatherService.weather.precipitationMm))
-                                        : qsTr("Previsão de chuva indisponível")
+                                    text: root.selectedDayForecast()
+                                        ? qsTr("Chuva %1 · %2").arg(WeatherService.formatPercent(root.selectedDayForecast().precipitationProbability)).arg(WeatherService.formatRain(root.selectedDayForecast().precipitationMm))
+                                        : WeatherService.weather.available
+                                            ? qsTr("Previsão indisponível para esta data")
+                                            : qsTr("Previsão de chuva indisponível")
                                     color: Theme.widgetInactiveIconColor
                                     font.pixelSize: 10
                                     elide: Text.ElideRight

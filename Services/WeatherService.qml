@@ -409,7 +409,7 @@ Singleton {
 
           const forecast = (daily.time||[]).map(function(t,i) {
             return {
-              day: root._fmtDay(t,i), wCode: daily.weather_code?.[i]||0,
+              date: t, day: root._fmtDay(t,i), wCode: daily.weather_code?.[i]||0,
               tempMin: daily.temperature_2m_min?.[i]||0,
               tempMax: daily.temperature_2m_max?.[i]||0,
               tempMinF: (daily.temperature_2m_min?.[i]||0)*9/5+32,
