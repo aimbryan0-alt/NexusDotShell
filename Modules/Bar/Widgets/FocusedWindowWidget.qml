@@ -45,11 +45,18 @@ BasePill {
       Rectangle {
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        width: 2
-        height: 9
-        radius: 1
+        width: root.titleHovered ? 3 : 2
+        height: 10
+        radius: 2
         color: Theme.primary
-        opacity: 0.9
+        opacity: root.titleHovered ? 1.0 : 0.62
+
+        Behavior on width {
+          NumberAnimation { duration: 130; easing.type: Easing.OutCubic }
+        }
+        Behavior on opacity {
+          NumberAnimation { duration: 130; easing.type: Easing.OutCubic }
+        }
       }
 
       Text {
@@ -118,7 +125,8 @@ BasePill {
         Theme.widgetBaseBackgroundColor,
         typeof SettingsData !== "undefined" ? SettingsData.barWidgetTransparency : 0.65
       )
-      border.width: 0
+      border.width: 1
+      border.color: Theme.withAlpha(Theme.outline, 0.3)
 
       Flickable {
         id: titleFlickable
