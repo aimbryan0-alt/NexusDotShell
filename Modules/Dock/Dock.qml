@@ -156,7 +156,7 @@ Item {
           }
           Rectangle {
             anchors.fill: parent
-            radius: 14
+            radius: 18
             color: favoriteMouse.containsMouse
               ? Theme.withAlpha(Theme.primary, 0.16)
               : root.runningWindowFor(entry)
