@@ -26,6 +26,8 @@ Singleton {
   property string _lastGeneratedSignature: ""
   property string _wallpaperImage: ""
   property string _wallpaperColor: ""
+  property string lastError: ""
+  property int lastExitCode: -1
 
   function localPath(u) {
     return String(u).replace(/^file:\/\//, "")
@@ -86,6 +88,8 @@ Singleton {
     }
 
     root._lastGeneratedSignature = signature
+    root.lastError = ""
+    root.lastExitCode = -1
     root._running = true
     const toml =
       "[config]\n\n"
@@ -120,7 +124,12 @@ Singleton {
 
   Process {
     id: matugenProc
-    stdout: SplitParser {}
+
+    stdout: StdioCollector {}
+    stderr: StdioCollector {
+      id: matugenError
+    }
+
     onRunningChanged: {
       if (!matugenProc.running) {
         root._running = false
@@ -130,9 +139,18 @@ Singleton {
         }
       }
     }
+
     onExited: function(status, exitStatus) {
-      if (status !== 0)
-        console.error("matugen failed with status " + status)
+      root.lastExitCode = status
+      root.lastError = status === 0
+        ? ""
+        : (matugenError.text.trim() || qsTr("Matugen could not generate the color palette."))
+
+      if (status !== 0) {
+        // Allow the same inputs to be retried after fixing the underlying issue.
+        root._lastGeneratedSignature = ""
+        console.error("matugen failed with status " + status + ": " + root.lastError)
+      }
     }
   }
 
