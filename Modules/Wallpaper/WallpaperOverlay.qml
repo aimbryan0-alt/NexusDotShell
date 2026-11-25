@@ -1080,7 +1080,7 @@ PanelWindow {
                     readonly property int groupContentHeight: collapsed
                       ? 0
                       : directoryGroup.modelData.items.length > 0
-                        ? Math.ceil(directoryGroup.modelData.items.length / 3) * 152
+                        ? Math.ceil(directoryGroup.modelData.items.length / 3) * 132
                         : 36
                     width: wallpaperGroups.width
                     height: 44 + (groupContentHeight > 0 ? Theme.spaceXS + groupContentHeight : 0)
@@ -1199,8 +1199,8 @@ PanelWindow {
                         contentY: directoryItemsViewport.scrollOffset
                         property int columnCount: 3
                         cellWidth: width / columnCount
-                        cellHeight: 152
-                        cacheBuffer: cellHeight
+                        cellHeight: 132
+                        cacheBuffer: 0
                         model: directoryGroup.collapsed
                           ? []
                           : directoryGroup.modelData.items
@@ -1226,16 +1226,46 @@ PanelWindow {
                   }
                 }
 
-                Text {
+                Rectangle {
                   visible: root.overviewMode && WallpaperService.directoryGroups.length === 0
                   width: parent.width
-                  height: 120
-                  horizontalAlignment: Text.AlignHCenter
-                  verticalAlignment: Text.AlignVCenter
-                  text: qsTr("No wallpaper folders added.\nAdd one or more folders to build your library.")
-                  color: Theme.surfaceVariantText
-                  font.family: Theme.fontFamily
-                  font.pixelSize: Theme.fontSizeMedium
+                  height: 112
+                  radius: Theme.cornerRadius
+                  color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.48)
+                  border.width: 1
+                  border.color: Theme.withAlpha(Theme.primary, 0.28)
+
+                  Row {
+                    anchors.centerIn: parent
+                    spacing: Theme.spaceM
+
+                    DmsIcon {
+                      anchors.verticalCenter: parent.verticalCenter
+                      name: "wallpaper"
+                      size: 28
+                      color: Theme.primary
+                    }
+
+                    Column {
+                      anchors.verticalCenter: parent.verticalCenter
+                      spacing: Theme.spaceXS
+
+                      Text {
+                        text: qsTr("NEXUS WALLPAPER // EMPTY")
+                        color: Theme.surfaceText
+                        font.family: Theme.monoFontFamily
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.DemiBold
+                      }
+
+                      Text {
+                        text: qsTr("Add a folder to build your wallpaper library.")
+                        color: Theme.surfaceVariantText
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeSmall
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -2052,7 +2082,7 @@ PanelWindow {
               ? parent.parent.modelData
               : ""
             fillMode: Image.PreserveAspectCrop
-            sourceSize: Qt.size(240, 120)
+            sourceSize: Qt.size(200, 100)
             asynchronous: true
             cache: true
             playing: !root.isGifSource(parent.parent.modelData)
