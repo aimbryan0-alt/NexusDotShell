@@ -27,3 +27,4 @@ NotesWidget 1.0 NotesWidget.qml
 NotificationWidget 1.0 NotificationWidget.qml
 WallpaperCarouselWidget 1.0 WallpaperCarouselWidget.qml
 WorldClockOverlay 1.0 WorldClockOverlay.qml
+NetworkWidget 1.0 NetworkWidget.qml

@@ -47,10 +47,9 @@ PopupWindow {
         timeZone: timeZone,
         hour: "2-digit",
         minute: "2-digit",
-        hour12: false
+        hourCycle: "h23"
       }).format(new Date())
     } catch (error) {
-      console.warn("WorldClockOverlay: falha ao formatar horário para", timeZone, error)
       return "--:--"
     }
   }
@@ -65,7 +64,6 @@ PopupWindow {
         month: "short"
       }).format(new Date())
     } catch (error) {
-      console.warn("WorldClockOverlay: falha ao formatar data para", timeZone, error)
       return ""
     }
   }
