@@ -603,7 +603,7 @@ BasePill {
           Text {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
-            text: "QUICK ACCESS"
+            text: "CONNECTIVITY"
             color: Theme.widgetInactiveIconColor
             font.family: Theme.monoFontFamily
             font.pixelSize: Theme.fontSizeSmall - 2
@@ -614,7 +614,7 @@ BasePill {
           Text {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            text: "01  /  CONNECTIVITY"
+            text: "01  /  NETWORK + AUDIO"
             color: Theme.tertiary
             font.family: Theme.monoFontFamily
             font.pixelSize: Theme.fontSizeSmall - 2
@@ -1593,6 +1593,32 @@ BasePill {
               }
             }
           }
+          }
+
+          Row {
+            width: parent.width
+            height: 18
+
+            Text {
+              anchors.left: parent.left
+              anchors.verticalCenter: parent.verticalCenter
+              text: "POWER & DISPLAY"
+              color: Theme.widgetInactiveIconColor
+              font.family: Theme.monoFontFamily
+              font.pixelSize: Theme.fontSizeSmall - 2
+              font.weight: Font.DemiBold
+              font.letterSpacing: 1.0
+            }
+
+            Text {
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              text: "02  /  ENERGY"
+              color: Theme.tertiary
+              font.family: Theme.monoFontFamily
+              font.pixelSize: Theme.fontSizeSmall - 2
+              font.letterSpacing: 0.5
+            }
           }
 
           Rectangle {
