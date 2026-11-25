@@ -562,20 +562,36 @@ PopupWindow {
             delegate: Rectangle {
               required property var modelData
               width: locationSuggestionList.width
-              height: 32
+              height: 42
               radius: Theme.hoverRadius
               color: suggestionMouse.containsMouse ? Theme.withAlpha(Theme.primary, 0.16) : "transparent"
 
-              Text {
+              Column {
                 anchors.fill: parent
                 anchors.leftMargin: 8
                 anchors.rightMargin: 8
-                verticalAlignment: Text.AlignVCenter
-                elide: Text.ElideRight
-                text: [modelData.name, modelData.admin1, modelData.country].filter(Boolean).join(" · ")
-                color: Theme.surfaceText
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSizeSmall
+                anchors.topMargin: 5
+                anchors.bottomMargin: 4
+                spacing: 1
+
+                Text {
+                  width: parent.width
+                  text: modelData.name
+                  color: Theme.surfaceText
+                  font.family: Theme.fontFamily
+                  font.pixelSize: Theme.fontSizeSmall
+                  font.weight: Font.Medium
+                  elide: Text.ElideRight
+                }
+
+                Text {
+                  width: parent.width
+                  text: [modelData.admin1, modelData.admin2, modelData.country].filter(Boolean).join(" · ")
+                  color: Theme.withAlpha(Theme.surfaceText, 0.58)
+                  font.family: Theme.fontFamily
+                  font.pixelSize: Theme.fontSizeSmall - 2
+                  elide: Text.ElideRight
+                }
               }
 
               MouseArea {
