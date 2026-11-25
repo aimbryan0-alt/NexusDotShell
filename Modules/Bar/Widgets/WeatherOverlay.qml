@@ -35,7 +35,7 @@ PopupWindow {
     { icon: "humidity_low", label: qsTr("Umidade"), value: WeatherService.formatPercent(WeatherService.weather.humidity) },
     { icon: "air", label: qsTr("Vento"), value: WeatherService.formatSpeed(WeatherService.weather.wind) },
     { icon: "speed", label: qsTr("Pressão"), value: WeatherService.formatPressure(WeatherService.weather.pressure) },
-    { icon: "rainy", label: qsTr("Chuva"), value: WeatherService.formatPercent(WeatherService.weather.precipitationProbability) },
+    { icon: "rainy", label: qsTr("Chuva"), value: qsTr("%1 · %2").arg(WeatherService.formatPercent(WeatherService.weather.precipitationProbability)).arg(WeatherService.formatRain(WeatherService.weather.precipitationMm)) },
     { icon: "wb_twilight", label: qsTr("Nascer do sol"), value: WeatherService.weather.sunrise || "--" },
     { icon: "bedtime", label: qsTr("Pôr do sol"), value: WeatherService.weather.sunset || "--" }
   ]

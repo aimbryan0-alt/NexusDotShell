@@ -51,15 +51,16 @@ Singleton {
     "95":"thunderstorm","96":"thunderstorm","99":"thunderstorm"
   })
   readonly property var _conditions: ({
-    "0":"Clear Sky","1":"Clear Sky","2":"Partly Cloudy","3":"Overcast",
-    "45":"Fog","48":"Fog","51":"Drizzle","53":"Drizzle","55":"Heavy Drizzle",
-    "56":"Freezing Drizzle","57":"Freezing Drizzle",
-    "61":"Light Rain","63":"Rain","65":"Heavy Rain",
-    "66":"Light Freezing Rain","67":"Heavy Freezing Rain",
-    "71":"Light Snow","73":"Snow","75":"Heavy Snow","77":"Snow Grains",
-    "80":"Light Showers","81":"Showers","82":"Heavy Showers",
-    "85":"Light Snow Showers","86":"Heavy Snow Showers",
-    "95":"Thunderstorm","96":"Thunderstorm w/ Hail","99":"Thunderstorm w/ Hail"
+    "0":"Céu limpo","1":"Predomínio de sol","2":"Parcialmente nublado","3":"Nublado",
+    "45":"Nevoeiro","48":"Nevoeiro com geada",
+    "51":"Garoa fraca","53":"Garoa moderada","55":"Garoa intensa",
+    "56":"Garoa congelante fraca","57":"Garoa congelante intensa",
+    "61":"Chuva fraca","63":"Chuva moderada","65":"Chuva forte",
+    "66":"Chuva congelante fraca","67":"Chuva congelante forte",
+    "71":"Neve fraca","73":"Neve moderada","75":"Neve intensa","77":"Grãos de neve",
+    "80":"Pancadas fracas","81":"Pancadas moderadas","82":"Pancadas fortes",
+    "85":"Pancadas de neve fracas","86":"Pancadas de neve fortes",
+    "95":"Trovoada","96":"Trovoada com granizo","99":"Trovoada com granizo intenso"
   })
 
 
@@ -120,18 +121,18 @@ Singleton {
     const dateObj = new Date(date)
 
     const periods = [
-      { name: "Dawn", start: new Date(times.nightEnd), end: new Date(times.nauticalDawn) },
-      { name: "Dawn", start: new Date(times.nauticalDawn), end: new Date(times.dawn) },
-      { name: "Dawn", start: new Date(times.dawn), end: new Date(times.sunrise) },
-      { name: "Sunrise", start: new Date(times.sunrise), end: new Date(times.sunriseEnd) },
-      { name: "Golden Hour", start: new Date(times.sunriseEnd), end: new Date(times.goldenHourEnd) },
-      { name: "Morning", start: new Date(times.goldenHourEnd), end: new Date(times.solarNoon) },
-      { name: "Afternoon", start: new Date(times.solarNoon), end: new Date(times.goldenHour) },
-      { name: "Golden Hour", start: new Date(times.goldenHour), end: new Date(times.sunsetStart) },
-      { name: "Sunset", start: new Date(times.sunsetStart), end: new Date(times.sunset) },
-      { name: "Dusk", start: new Date(times.sunset), end: new Date(times.dusk) },
-      { name: "Dusk", start: new Date(times.dusk), end: new Date(times.nauticalDusk) },
-      { name: "Dusk", start: new Date(times.nauticalDusk), end: new Date(times.night) }
+      { name: "Amanhecer", start: new Date(times.nightEnd), end: new Date(times.nauticalDawn) },
+      { name: "Amanhecer", start: new Date(times.nauticalDawn), end: new Date(times.dawn) },
+      { name: "Amanhecer", start: new Date(times.dawn), end: new Date(times.sunrise) },
+      { name: "Nascer do sol", start: new Date(times.sunrise), end: new Date(times.sunriseEnd) },
+      { name: "Hora dourada", start: new Date(times.sunriseEnd), end: new Date(times.goldenHourEnd) },
+      { name: "Manhã", start: new Date(times.goldenHourEnd), end: new Date(times.solarNoon) },
+      { name: "Tarde", start: new Date(times.solarNoon), end: new Date(times.goldenHour) },
+      { name: "Hora dourada", start: new Date(times.goldenHour), end: new Date(times.sunsetStart) },
+      { name: "Pôr do sol", start: new Date(times.sunsetStart), end: new Date(times.sunset) },
+      { name: "Anoitecer", start: new Date(times.sunset), end: new Date(times.dusk) },
+      { name: "Anoitecer", start: new Date(times.dusk), end: new Date(times.nauticalDusk) },
+      { name: "Anoitecer", start: new Date(times.nauticalDusk), end: new Date(times.night) }
     ]
 
     const sunrise = new Date(times.nightEnd)
@@ -150,7 +151,7 @@ Singleton {
         }
       }
     }
-    return { period: "Night", periodIndex: 0, periodPercent: 0, dayPercent: dayPercent }
+    return { period: "Noite", periodIndex: 0, periodPercent: 0, dayPercent: dayPercent }
   }
 
   function getSkyArcPosition(date, isSun) {
