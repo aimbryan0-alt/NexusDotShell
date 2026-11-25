@@ -56,14 +56,12 @@ BasePill {
   readonly property var audioSinks: Pipewire.nodes ? Pipewire.nodes.values.filter(node => node.audio && node.isSink && !node.isStream) : []
   readonly property var player: root.activePlayer()
   readonly property string baseArtworkUrl: root.resolveArtworkUrl(root.player)
-  readonly property string artworkUrl: root.useArtworkFallback
-    ? root.lowerResolutionArtworkUrl(root.baseArtworkUrl)
-    : root.baseArtworkUrl
+  readonly property string artworkUrl: root.youtubeArtworkUrl(root.baseArtworkUrl)
   readonly property bool hasMedia: !!root.player && String(root.player.trackTitle || "").trim() !== ""
   readonly property bool lyricsAvailable: LyricsService.hasLyrics
   property bool overviewOpen: false
   property bool lyricsOpen: false
-  property bool useArtworkFallback: false
+  property int artworkFallbackLevel: 0
   property var selectedPlayer: null
   property int popupX: 0
   property int popupY: 0
@@ -76,7 +74,7 @@ BasePill {
     root.updateLyricsPlayer()
     root.displayedPosition = root.player ? root.player.position : 0
   }
-  onBaseArtworkUrlChanged: root.useArtworkFallback = false
+  onBaseArtworkUrlChanged: root.artworkFallbackLevel = 0
   onLyricsAvailableChanged: {
     if (!root.lyricsAvailable)
       root.lyricsOpen = false
@@ -130,8 +128,13 @@ BasePill {
     return ""
   }
 
-  function lowerResolutionArtworkUrl(url) {
-    return url.replace("/maxresdefault.jpg", "/hqdefault.jpg")
+  function youtubeArtworkUrl(url) {
+    if (!url || !url.includes("img.youtube.com/vi/"))
+      return url
+
+    const variants = ["maxresdefault.jpg", "sddefault.jpg", "hqdefault.jpg"]
+    const variant = variants[Math.min(2, root.artworkFallbackLevel)]
+    return url.replace(/(?:maxresdefault|sddefault|hqdefault)\.jpg$/, variant)
   }
 
   Canvas {
@@ -209,20 +212,8 @@ BasePill {
 
   function fallbackFromLowResolutionArtwork(width) {
     if (root.baseArtworkUrl.includes("img.youtube.com/vi/") &&
-        !root.useArtworkFallback && width < 640)
-      root.useArtworkFallback = true
-  }
-
-  Timer {
-    interval: 90
-    repeat: true
-    running: root.barWindow && root.barWindow.visible && root.hasMedia && root.player.isPlaying
-    onTriggered: {
-      const next = []
-      for (let i = 0; i < root.visualizerLevels.length; i++)
-        next.push(0.25 + Math.random() * 0.75)
-      root.visualizerLevels = next
-    }
+        root.artworkFallbackLevel < 2 && width < 640)
+      root.artworkFallbackLevel += 1
   }
 
   Timer {
@@ -286,17 +277,28 @@ BasePill {
           source: root.artworkUrl
           fillMode: Image.PreserveAspectCrop
           sourceSize: Qt.size(
-            Math.round(width * Theme.screenScaleOf(root.parentScreen)),
-            Math.round(height * Theme.screenScaleOf(root.parentScreen))
+            Math.round(root.overviewWidth * Theme.screenScaleOf(root.parentScreen)),
+            Math.round(460 * Theme.screenScaleOf(root.parentScreen))
           )
           asynchronous: true
           cache: true
+          mipmap: true
+          smooth: true
           visible: status === Image.Ready
           onStatusChanged: {
             if (status === Image.Error)
               root.fallbackFromLowResolutionArtwork(0)
             else if (status === Image.Ready)
               root.fallbackFromLowResolutionArtwork(implicitWidth)
+          }
+        }
+
+        Rectangle {
+          anchors.fill: parent
+          gradient: Gradient {
+            GradientStop { position: 0.0; color: Qt.rgba(5 / 255, 8 / 255, 15 / 255, 0.72) }
+            GradientStop { position: 0.52; color: Qt.rgba(5 / 255, 8 / 255, 15 / 255, 0.38) }
+            GradientStop { position: 1.0; color: Qt.rgba(5 / 255, 8 / 255, 15 / 255, 0.68) }
           }
         }
       }
@@ -472,11 +474,13 @@ BasePill {
           source: root.artworkUrl
           fillMode: Image.PreserveAspectCrop
           sourceSize: Qt.size(
-            Math.round(width * Theme.screenScaleOf(root.parentScreen)),
-            Math.round(height * Theme.screenScaleOf(root.parentScreen))
+            Math.round(768 * Theme.screenScaleOf(root.parentScreen)),
+            Math.round(768 * Theme.screenScaleOf(root.parentScreen))
           )
           asynchronous: true
           cache: true
+          mipmap: true
+          smooth: true
           visible: status === Image.Ready
           onStatusChanged: {
             if (status === Image.Error)

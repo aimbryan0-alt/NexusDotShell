@@ -41,11 +41,17 @@ Item {
       width: lyricsList.width - 8
       text: root.lineText(modelData, index)
       textFormat: LyricsService.synced ? Text.RichText : Text.PlainText
-      color: "#f3eee8"
-      opacity: LyricsService.synced && index !== LyricsService.activeIndex ? 0.72 : 1
-      font.family: Theme.fontFamily
-      font.pixelSize: root.textSize
+      color: Theme.surfaceText
+      opacity: LyricsService.synced && index !== LyricsService.activeIndex ? 0.48 : 1
+      font.family: "serif"
+      font.italic: true
+      font.pixelSize: LyricsService.synced && index === LyricsService.activeIndex
+        ? root.textSize + 5
+        : root.textSize
       font.weight: LyricsService.synced && index === LyricsService.activeIndex ? Font.DemiBold : Font.Normal
+      font.letterSpacing: 0.25
+      lineHeight: 1.18
+      lineHeightMode: Text.ProportionalHeight
       wrapMode: Text.Wrap
       horizontalAlignment: Text.AlignHCenter
       onYChanged: {
@@ -73,9 +79,10 @@ Item {
         default: return "Lyrics are not available"
         }
       }
-      color: "#eee5dc"
-      font.family: Theme.fontFamily
-      font.pixelSize: 14
+      color: Theme.surfaceText
+      font.family: "serif"
+      font.italic: true
+      font.pixelSize: 15
       horizontalAlignment: Text.AlignHCenter
       wrapMode: Text.Wrap
     }
@@ -84,9 +91,10 @@ Item {
       anchors.horizontalCenter: parent.horizontalCenter
       visible: LyricsService.state === "none" || LyricsService.state === "error"
       text: "Retry"
-      color: "#ffd2bd"
-      font.family: Theme.fontFamily
-      font.pixelSize: 13
+      color: Theme.primary
+      font.family: "serif"
+      font.italic: true
+      font.pixelSize: 14
       MouseArea {
         anchors.fill: parent
         anchors.margins: -8
@@ -102,8 +110,9 @@ Item {
     anchors.bottomMargin: Theme.spaceXS
     visible: LyricsService.state === "ready" && LyricsService.attributionName !== ""
     text: LyricsService.attributionName
-    color: "#c9bdb2"
-    font.family: Theme.fontFamily
+    color: Theme.surfaceVariantText
+    font.family: "serif"
+    font.italic: true
     font.pixelSize: 10
     opacity: 0.9
     MouseArea {
