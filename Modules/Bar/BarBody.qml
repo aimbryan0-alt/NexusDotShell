@@ -3,9 +3,8 @@ import QtQuick.Layouts
 import qs.Common
 import qs.Modules.Bar.Widgets
 
-// Preserve the original Nexus bar architecture: left lane, adaptive center,
-// right lane, and a dedicated music slot at the far right. This avoids
-// squeezing the complete system HUD into a single clipped Row.
+// Balanced Nexus bar: launcher and window controls with media on the left,
+// adaptive Nexus Center in the middle, and system HUD widgets on the right.
 Item {
   id: root
 
@@ -90,8 +89,8 @@ Item {
         console.info("MQBAR skip (no comp):", entry.id)
         continue
       }
-      // The music widget has its own terminal slot, matching the original bar.
-      var targetRow = entry.id === "player" ? playerRow : hostRow
+      // Keep widgets in the lane configured by SettingsData.
+      var targetRow = hostRow
       var initProps = {
         "screen": root.screen,
         "parentScreen": root.screen,
@@ -167,14 +166,6 @@ Item {
 
   Row {
     id: rightRow
-    anchors.right: playerRow.left
-    anchors.rightMargin: root.laneGap
-    anchors.verticalCenter: parent.verticalCenter
-    spacing: root.spacing
-  }
-
-  Row {
-    id: playerRow
     anchors.right: parent.right
     anchors.rightMargin: root.innerPadding
     anchors.verticalCenter: parent.verticalCenter
