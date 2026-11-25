@@ -1855,6 +1855,52 @@ BasePill {
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSmall - 1
           }
+
+          Rectangle {
+            width: parent.width
+            height: 1
+            color: Theme.withAlpha(Theme.primary, 0.2)
+          }
+
+          Row {
+            width: parent.width
+            height: 18
+
+            Text {
+              anchors.verticalCenter: parent.verticalCenter
+              text: "NEXUS // LOCAL SESSION"
+              color: Theme.widgetInactiveIconColor
+              font.family: Theme.monoFontFamily
+              font.pixelSize: Theme.fontSizeSmall - 2
+              font.letterSpacing: 0.5
+            }
+
+            Row {
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              spacing: 5
+
+              Rectangle {
+                width: 6
+                height: 6
+                radius: 3
+                anchors.verticalCenter: parent.verticalCenter
+                color: SettingsPanelService.errorMessage === "" && root.connectionError === ""
+                  ? Theme.primary : Theme.error
+              }
+
+              Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: SettingsPanelService.errorMessage === "" && root.connectionError === ""
+                  ? "SYSTEM READY" : "ATTENTION"
+                color: SettingsPanelService.errorMessage === "" && root.connectionError === ""
+                  ? Theme.primary : Theme.error
+                font.family: Theme.monoFontFamily
+                font.pixelSize: Theme.fontSizeSmall - 2
+                font.letterSpacing: 0.5
+              }
+            }
+          }
         }
       }
     }
