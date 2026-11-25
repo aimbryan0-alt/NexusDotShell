@@ -480,7 +480,7 @@ BasePill {
             Text {
               anchors.right: parent.right
               anchors.verticalCenter: parent.verticalCenter
-              text: "LIVE // LOCAL"
+              text: "RESOURCE STATUS"
               color: Theme.tertiary
               font.family: Theme.monoFontFamily
               font.pixelSize: Theme.fontSizeSmall - 3
@@ -496,13 +496,15 @@ BasePill {
               model: [
                 {
                   label: "CPU",
+                  description: "PROCESSOR LOAD",
                   value: Math.round(SystemStatsService.cpuUsage) + "%",
                   level: SystemStatsService.cpuUsage,
                   tint: SystemStatsService.cpuUsage >= 85 ? Theme.error
                     : SystemStatsService.cpuUsage >= 65 ? Theme.warning : Theme.primary
                 },
                 {
-                  label: "MEM",
+                  label: "RAM",
+                  description: "MEMORY IN USE",
                   value: Math.round(SystemStatsService.memoryUsage) + "%",
                   level: SystemStatsService.memoryUsage,
                   tint: SystemStatsService.memoryUsage >= 90 ? Theme.error
@@ -510,8 +512,9 @@ BasePill {
                 },
                 {
                   label: "TEMP",
+                  description: "CPU TEMPERATURE",
                   value: SystemStatsService.cpuTemperature > 0
-                    ? Math.round(SystemStatsService.cpuTemperature) + "°"
+                    ? Math.round(SystemStatsService.cpuTemperature) + "°C"
                     : "--",
                   level: SystemStatsService.cpuTemperature > 0
                     ? Math.min(100, SystemStatsService.cpuTemperature) : 0,
@@ -520,6 +523,7 @@ BasePill {
                 },
                 {
                   label: "DISK",
+                  description: "STORAGE USED",
                   value: Math.round(SystemStatsService.diskUsage) + "%",
                   level: SystemStatsService.diskUsage,
                   tint: SystemStatsService.diskUsage >= 90 ? Theme.error
@@ -580,7 +584,7 @@ BasePill {
 
                   Text {
                     width: parent.width
-                    text: modelData.label === "TEMP" ? "THERMAL" : "UTILIZATION"
+                    text: modelData.description
                     color: Theme.widgetInactiveIconColor
                     font.family: Theme.monoFontFamily
                     font.pixelSize: Math.max(7, Theme.fontSizeSmall - 4)
