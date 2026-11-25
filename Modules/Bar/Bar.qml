@@ -399,8 +399,8 @@ Item {
 
     BarBody {
       anchors.fill: parent
-      anchors.topMargin: Theme.space2()
-      anchors.bottomMargin: Theme.space2()
+      anchors.topMargin: Theme.spaceXS
+      anchors.bottomMargin: Theme.spaceXS
       anchors.leftMargin: Theme.space2() + 6
       anchors.rightMargin: Theme.space2() + 6
       screen: barWindow.screen
