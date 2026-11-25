@@ -13,7 +13,23 @@ BasePill {
   content: Component {
     Item {
       implicitWidth: compactRow.visible ? compactRow.implicitWidth : expandedColumn.implicitWidth
-      implicitHeight: compactRow.visible ? compactRow.implicitHeight : expandedColumn.implicitHeight
+      implicitHeight: (compactRow.visible ? compactRow.implicitHeight : expandedColumn.implicitHeight) + 3
+
+      Rectangle {
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: Math.max(18, parent.implicitWidth - 8)
+        height: 2
+        radius: 1
+        color: Theme.withAlpha(Theme.outline, 0.28)
+
+        Rectangle {
+          width: parent.width * Math.max(0, Math.min(100, SystemStatsService.cpuTemperature)) / 100
+          height: parent.height
+          radius: parent.radius
+          color: root.temperatureColor()
+        }
+      }
 
       Row {
         id: compactRow
@@ -30,9 +46,10 @@ BasePill {
 
         Text {
           text: root.temperatureText()
-          color: Theme.widgetTextColor
+          color: root.temperatureColor()
           font.family: Theme.monoFontFamily
           font.pixelSize: root.textSize()
+          font.bold: true
           anchors.verticalCenter: parent.verticalCenter
         }
       }
@@ -46,7 +63,7 @@ BasePill {
         Text {
           anchors.horizontalCenter: parent.horizontalCenter
           text: "TEMP"
-          color: Theme.widgetTextColor
+          color: Theme.primary
           font.family: Theme.monoFontFamily
           font.pixelSize: root.textSize()
         }
@@ -54,7 +71,7 @@ BasePill {
         Text {
           anchors.horizontalCenter: parent.horizontalCenter
           text: root.temperatureText()
-          color: Theme.widgetInactiveIconColor
+          color: root.temperatureColor()
           font.family: Theme.monoFontFamily
           font.pixelSize: Math.round(root.textSize() * 0.7)
         }
