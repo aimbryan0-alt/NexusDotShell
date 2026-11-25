@@ -157,10 +157,10 @@ Item {
 
   Row {
     id: leftRow
-    x: Math.max(root.innerPadding,
-      centerRow.x - root.centerGap - implicitWidth)
-    width: Math.max(0, Math.min(implicitWidth,
-      centerRow.x - root.centerGap - x))
+    // Left group stays attached to the left edge; it only uses the space
+    // available before the centered group.
+    x: root.innerPadding
+    width: Math.max(0, centerRow.x - root.centerGap - x)
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
     clip: true
@@ -169,7 +169,7 @@ Item {
   // Nexus Center remains mathematically centered and independent of side groups.
   Row {
     id: centerRow
-    width: implicitWidth
+    width: Math.min(implicitWidth, Math.max(0, root.width - root.innerPadding * 2))
     x: Math.round((root.width - width) / 2)
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
@@ -181,11 +181,10 @@ Item {
   // uses only the space left after Nexus Center instead of drifting off-screen.
   Row {
     id: rightRow
-    x: Math.max(
-      centerRow.x + centerRow.width + root.centerGap,
-      root.width - implicitWidth - root.innerPadding
-    )
+    // Right group is right-aligned inside the bar and clipped to its lane.
+    x: centerRow.x + centerRow.width + root.centerGap
     width: Math.max(0, root.width - x - root.innerPadding)
+    layoutDirection: Qt.RightToLeft
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
     clip: true
