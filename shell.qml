@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Modules.Bar
 import qs.Modules.Wallpaper
+import qs.Modules.DesktopWidgets
 import qs.Services
 
 // Entry point for the MyQuickshell shell. Wires shared singletons and mounts
@@ -17,5 +18,6 @@ ShellRoot {
 
   Bar { id: bar }
   WallpaperManager { }
+  DesktopWidgets { }
   WindowSwitcher { }
 }
