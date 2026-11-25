@@ -503,7 +503,7 @@ BasePill {
 
   content: Component {
     Row {
-      spacing: 5
+      spacing: 4
 
       Repeater {
         model: WorkspacesService.workspaceIds
@@ -513,10 +513,10 @@ BasePill {
           readonly property bool isActive: modelData === root.activeId
           readonly property bool isOccupied: WorkspacesService.occupiedIds.indexOf(modelData) !== -1
 
-          width: isActive ? 34 : 25
-          height: 23
+          width: isActive ? 32 : 27
+          height: 25
           anchors.verticalCenter: parent.verticalCenter
-          radius: 7
+          radius: 8
           color: isActive
             ? Theme.withAlpha(Theme.primary, 0.2)
             : (isOccupied
@@ -530,7 +530,7 @@ BasePill {
 
           Behavior on width {
             NumberAnimation {
-              duration: 180
+              duration: 150
               easing.type: Easing.OutCubic
             }
           }
@@ -550,7 +550,7 @@ BasePill {
           Rectangle {
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
-            width: isActive ? 17 : 8
+            width: isActive ? 15 : 7
             height: 2
             radius: 1
             color: isActive ? Theme.primary : Theme.tertiary
@@ -563,7 +563,7 @@ BasePill {
             text: String(modelData).padStart(2, "0")
             color: isActive ? Theme.primary : Theme.withAlpha(Theme.surfaceText, 0.9)
             font.family: Theme.monoFontFamily
-            font.pixelSize: Theme.fontSizeSmall
+            font.pixelSize: Math.max(10, Theme.fontSizeSmall - 1)
             font.bold: isActive || isOccupied
             opacity: isActive ? 1.0 : 0.95
           }
