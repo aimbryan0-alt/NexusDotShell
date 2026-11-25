@@ -1529,7 +1529,7 @@ BasePill {
         Item {
           id: actionBar
           width: parent.width
-          height: 64
+          height: 56
 
           Item {
             anchors.fill: parent
@@ -1539,16 +1539,16 @@ BasePill {
             Row {
               anchors.left: parent.left
               anchors.right: parent.right
-              anchors.rightMargin: 44
+              anchors.rightMargin: 42
               anchors.verticalCenter: parent.verticalCenter
-              spacing: 2
+              spacing: 6
 
               Repeater {
                 model: [
                   { id: "save", label: qsTr("Save"), icon: "save" },
                   { id: "open", label: qsTr("Open"), icon: "folder_open" },
                   { id: "new", label: qsTr("New"), icon: "note_add" },
-                  { id: "autosave", label: qsTr("Auto-save"), icon: "sync" },
+                  { id: "autosave", label: qsTr("Auto"), icon: "sync" },
                   { id: "preview", label: root.markdownPreview ? qsTr("Edit") : qsTr("Preview"), icon: root.markdownPreview ? "edit" : "visibility" }
                 ]
 
@@ -1556,37 +1556,39 @@ BasePill {
                   id: actionButton
                   required property var modelData
                   readonly property bool hovered: actionMouse.containsMouse
-                  width: actionLayout.implicitWidth + 12
-                  height: 42
+                  readonly property bool active: (modelData.id === "autosave" && SettingsData.notesAutoSave)
+                    || (modelData.id === "preview" && root.markdownPreview)
+                  width: actionLayout.implicitWidth + 18
+                  height: 38
                   anchors.verticalCenter: parent.verticalCenter
-                  radius: Theme.hoverRadius
-                  color: actionButton.modelData.id === "autosave" && SettingsData.notesAutoSave
-                    ? Theme.withAlpha(Theme.primary, 0.2)
-                    : (hovered ? Theme.withAlpha(Theme.primary, 0.12) : Theme.withAlpha(Theme.surfaceContainerHigh, 0.28))
-                  border.width: actionButton.modelData.id === "autosave" && SettingsData.notesAutoSave ? 1 : 0
-                  border.color: Theme.withAlpha(Theme.primary, 0.55)
+                  radius: 12
+                  color: active ? Theme.withAlpha(Theme.primary, 0.16)
+                    : hovered ? Theme.withAlpha(Theme.primary, 0.1)
+                    : Theme.withAlpha(Theme.surfaceContainerHigh, 0.34)
+                  border.width: active ? 1 : 0
+                  border.color: Theme.withAlpha(Theme.primary, 0.42)
 
                   Row {
                     id: actionLayout
                     anchors.centerIn: parent
-                    spacing: 4
+                    spacing: 6
 
                     DmsIcon {
                       anchors.verticalCenter: parent.verticalCenter
                       name: actionButton.modelData.icon
-                      size: 20
-                      color: actionButton.hovered ? Theme.primary : Theme.widgetInactiveIconColor
+                      size: 17
+                      color: actionButton.active || actionButton.hovered
+                        ? Theme.primary : Theme.widgetInactiveIconColor
                     }
 
                     Text {
                       anchors.verticalCenter: parent.verticalCenter
                       text: actionButton.modelData.id === "autosave" && SettingsData.notesAutoSave
-                        ? actionButton.modelData.label + " ✓"
-                        : actionButton.modelData.label
-                      color: actionButton.modelData.id === "autosave" && SettingsData.notesAutoSave
-                        ? Theme.primary : Theme.widgetTextColor
+                        ? qsTr("Auto ✓") : actionButton.modelData.label
+                      color: actionButton.active ? Theme.primary : Theme.widgetTextColor
                       font.family: Theme.fontFamily
                       font.pixelSize: Theme.fontSizeSmall
+                      font.weight: actionButton.active ? Font.DemiBold : Font.Medium
                     }
                   }
 
@@ -1613,18 +1615,19 @@ BasePill {
             }
 
             Rectangle {
-              width: 40
-              height: 40
+              width: 36
+              height: 36
               anchors.right: parent.right
               anchors.verticalCenter: parent.verticalCenter
-              radius: Theme.hoverRadius
-              color: moreMouse.containsMouse ? Theme.withAlpha(Theme.primary, 0.13) : "transparent"
+              radius: 12
+              color: moreMouse.containsMouse ? Theme.withAlpha(Theme.primary, 0.13)
+                : Theme.withAlpha(Theme.surfaceContainerHigh, 0.34)
 
               DmsIcon {
                 anchors.centerIn: parent
                 name: "more_horiz"
-                size: 20
-                color: Theme.widgetInactiveIconColor
+                size: 19
+                color: moreMouse.containsMouse ? Theme.primary : Theme.widgetInactiveIconColor
               }
 
               MouseArea {

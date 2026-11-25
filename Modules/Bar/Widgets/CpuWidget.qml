@@ -2034,9 +2034,11 @@ BasePill {
 
             Text {
               width: parent.width
-              text: (SystemStatsService.cpuModel || qsTr("Processor and memory")) + "  ·  " + qsTr("%1 cores").arg(SystemStatsService.cpuCoreCount)
+              text: qsTr("CPU · MEMORY · GRAPHICS  /  %1 CORES").arg(SystemStatsService.cpuCoreCount)
               color: Theme.widgetInactiveIconColor
-              font.pixelSize: 11
+              font.family: Theme.monoFontFamily
+              font.pixelSize: 10
+              font.letterSpacing: 0.35
               elide: Text.ElideRight
             }
           }
@@ -2067,16 +2069,16 @@ BasePill {
 
         Row {
           width: parent.width
-          height: 38
-          spacing: 8
+          height: 34
+          spacing: 6
 
           Repeater {
             model: [
               { "id": "overview", "text": qsTr("Overview"), "icon": "dashboard" },
-              { "id": "processor", "text": qsTr("Processor"), "icon": "memory" },
-              { "id": "memory", "text": qsTr("Memory"), "icon": "developer_board" },
+              { "id": "processor", "text": qsTr("CPU"), "icon": "memory" },
+              { "id": "memory", "text": qsTr("RAM"), "icon": "developer_board" },
               { "id": "gpu", "text": qsTr("GPU"), "icon": "videogame_asset" },
-              { "id": "processes", "text": qsTr("Processes"), "icon": "view_list" }
+              { "id": "processes", "text": qsTr("Tasks"), "icon": "view_list" }
             ]
 
             delegate: Rectangle {
@@ -2085,14 +2087,14 @@ BasePill {
 
               width: (parent.width - parent.spacing * 4) / 5
               height: parent.height
-              radius: Theme.cornerRadius
+              radius: Theme.hoverRadius
               color: root.overviewTab === modelData.id
-                ? Theme.withAlpha(Theme.primary, 0.22)
+                ? Theme.withAlpha(Theme.primary, 0.16)
                 : overviewTabMouse.containsMouse
-                  ? Theme.withAlpha(Theme.primary, 0.1)
-                  : Theme.withAlpha(Theme.surfaceContainerHigh, 0.65)
-              border.width: root.overviewTab === modelData.id || overviewTabMouse.containsMouse ? 1 : 0
-              border.color: Theme.withAlpha(Theme.primary, 0.52)
+                  ? Theme.withAlpha(Theme.primary, 0.08)
+                  : Theme.withAlpha(Theme.surfaceContainerHigh, 0.38)
+              border.width: root.overviewTab === modelData.id ? 1 : 0
+              border.color: Theme.withAlpha(Theme.primary, 0.38)
 
               Row {
                 anchors.centerIn: parent
@@ -2111,7 +2113,7 @@ BasePill {
                   text: modelData.text
                   color: root.overviewTab === modelData.id || overviewTabMouse.containsMouse
                     ? Theme.primary : Theme.widgetTextColor
-                  font.pixelSize: 11
+                  font.pixelSize: 10
                   font.weight: root.overviewTab === modelData.id ? Font.DemiBold : Font.Normal
                 }
               }
