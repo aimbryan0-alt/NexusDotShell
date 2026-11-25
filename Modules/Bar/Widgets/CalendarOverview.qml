@@ -235,7 +235,8 @@ PopupWindow {
     surfaceFormat.opaque: false
 
     Timer {
-        interval: 10
+        // Keep the HUD milliseconds responsive without waking the UI every 10 ms.
+        interval: 100
         running: root.visible
         repeat: true
         onTriggered: root.updateMillisecondsTime()
