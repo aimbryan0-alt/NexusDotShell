@@ -26,7 +26,16 @@ Rectangle {
     active || tileMouse.containsMouse ? Theme.primary : Theme.outlineVariant,
     active ? 0.72 : tileMouse.containsMouse ? 0.58 : 0.28
   )
+  Behavior on color {
+    ColorAnimation { duration: Theme.shortDuration; easing.type: Theme.standardEasing }
+  }
+  Behavior on border.color {
+    ColorAnimation { duration: Theme.shortDuration; easing.type: Theme.standardEasing }
+  }
   opacity: available ? 1 : 0.55
+  Behavior on opacity {
+    NumberAnimation { duration: Theme.shortDuration; easing.type: Theme.standardEasing }
+  }
 
   Rectangle {
     anchors.left: parent.left
@@ -36,6 +45,9 @@ Rectangle {
     radius: 1
     color: Theme.primary
     opacity: root.active ? 0.9 : tileMouse.containsMouse ? 0.5 : 0
+    Behavior on opacity {
+      NumberAnimation { duration: Theme.shortDuration; easing.type: Theme.standardEasing }
+    }
   }
 
   Rectangle {
@@ -62,6 +74,12 @@ Rectangle {
       color: Theme.withAlpha(root.active ? Theme.primary : Theme.surfaceContainerHighest, root.active ? 0.2 : 0.62)
       border.width: 1
       border.color: Theme.withAlpha(root.active ? Theme.primary : Theme.outlineVariant, root.active ? 0.42 : 0.24)
+      Behavior on color {
+        ColorAnimation { duration: Theme.shortDuration; easing.type: Theme.standardEasing }
+      }
+      Behavior on border.color {
+        ColorAnimation { duration: Theme.shortDuration; easing.type: Theme.standardEasing }
+      }
 
       DmsIcon {
         anchors.centerIn: parent
