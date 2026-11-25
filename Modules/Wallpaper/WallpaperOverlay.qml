@@ -284,7 +284,6 @@ PanelWindow {
               }
 
               Row {
-                visible: root.advancedOptionsOpen
                 width: parent.width
                 height: 36
                 spacing: Theme.spaceXS
@@ -314,7 +313,6 @@ PanelWindow {
               }
 
               Text {
-                visible: root.advancedOptionsOpen
                 width: parent.width
                 text: WallpaperService.targetLabelForScope(
                   root.selectedScope, root.targetScreen
@@ -447,7 +445,6 @@ PanelWindow {
               }
 
               ActionButton {
-                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: qsTr("Add wallpaper folder…")
                 onClicked: WallpaperService.chooseDirectory(root.targetScreen)
