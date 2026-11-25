@@ -386,8 +386,8 @@ PopupWindow {
                                 Text {
                                     width: parent.width
                                     text: WeatherService.weather.available
-                                        ? qsTr("Rain %1").arg(WeatherService.formatPercent(WeatherService.weather.precipitationProbability))
-                                        : qsTr("Rain forecast unavailable")
+                                        ? qsTr("Chuva %1 · %2").arg(WeatherService.formatPercent(WeatherService.weather.precipitationProbability)).arg(WeatherService.formatRain(WeatherService.weather.precipitationMm))
+                                        : qsTr("Previsão de chuva indisponível")
                                     color: Theme.widgetInactiveIconColor
                                     font.pixelSize: 10
                                     elide: Text.ElideRight

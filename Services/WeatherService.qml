@@ -183,6 +183,7 @@ Singleton {
   function formatPercent(v) { return v != null ? v + "%" : "--" }
   function formatSpeed(kmh) { return kmh != null ? kmh + " km/h" : "--" }
   function formatPressure(hpa) { return hpa != null ? hpa + " hPa" : "--" }
+  function formatRain(mm) { return mm != null ? Number(mm).toLocaleString(Qt.locale(), "f", 1) + " mm" : "--" }
   function calendarDayDifference(a, b) {
     return Math.floor((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate()) -
       Date.UTC(a.getFullYear(),a.getMonth(),a.getDate())) / 86400000)
@@ -252,6 +253,9 @@ Singleton {
         name: result.name || "",
         admin1: result.admin1 || "",
         country: result.country || "",
+        countryCode: result.country_code || "",
+        admin2: result.admin2 || "",
+        population: result.population || 0,
         latitude: result.latitude,
         longitude: result.longitude
       }))
@@ -272,8 +276,8 @@ Singleton {
     const params = [
       "latitude="+lat,"longitude="+lon,
       "current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,surface_pressure,wind_speed_10m",
-      "daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max",
-      "hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,apparent_temperature,relative_humidity_2m,surface_pressure,visibility",
+      "daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,precipitation_sum",
+      "hourly=temperature_2m,weather_code,precipitation_probability,precipitation,wind_speed_10m,apparent_temperature,relative_humidity_2m,surface_pressure,visibility",
       "timezone=auto","forecast_days=7"
     ]
     lastFetchTime = now
@@ -403,6 +407,7 @@ Singleton {
               tempMinF: (daily.temperature_2m_min?.[i]||0)*9/5+32,
               tempMaxF: (daily.temperature_2m_max?.[i]||0)*9/5+32,
               precipitationProbability: daily.precipitation_probability_max?.[i]||0,
+              precipitationMm: daily.precipitation_sum?.[i]??0,
               sunrise: daily.sunrise?.[i] ? root._fmtTime(daily.sunrise[i]) : "",
               sunset:  daily.sunset?.[i]  ? root._fmtTime(daily.sunset[i])  : "",
               rawSunrise: daily.sunrise?.[i]||"", rawSunset: daily.sunset?.[i]||""
@@ -425,6 +430,7 @@ Singleton {
               wind: hourly.wind_speed_10m?.[i]||0,
               pressure: hourly.surface_pressure?.[i]||0,
               precipitationProbability: hourly.precipitation_probability?.[i]||0,
+              precipitationMm: hourly.precipitation?.[i]??0,
               isDay: sr<t && t<ss
             }
           })

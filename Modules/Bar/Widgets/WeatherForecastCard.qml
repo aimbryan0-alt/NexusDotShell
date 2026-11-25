@@ -49,10 +49,10 @@ Rectangle {
   readonly property string precipitationText: (root.forecastData?.precipitationProbability ?? 0) + "%"
 
   readonly property var values: daily ? [] : [
-    { label: "Humidity", text: root.humidityText, icon: "humidity_low" },
-    { label: "Wind", text: root.windText, icon: "air" },
-    { label: "Pressure", text: root.pressureText, icon: "speed" },
-    { label: "Precipitation", text: root.precipitationText, icon: "rainy" }
+    { label: qsTr("Umidade"), text: root.humidityText, icon: "humidity_low" },
+    { label: qsTr("Vento"), text: root.windText, icon: "air" },
+    { label: qsTr("Pressão"), text: root.pressureText, icon: "speed" },
+    { label: qsTr("Chuva"), text: root.precipitationText, icon: "rainy" }
   ]
 
   color: isCurrent ? Theme.withAlpha(Theme.primary, 0.11) : Theme.nestedSurface
@@ -110,7 +110,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
       }
       Text {
-        text: root.precipitationText + " rain"
+        text: qsTr("%1 · %2").arg(root.precipitationText).arg(WeatherService.formatRain(root.forecastData.precipitationMm))
         font.family: Theme.monoFontFamily
         font.pixelSize: Theme.fontSizeSmall - 3
         color: Theme.withAlpha(Theme.surfaceText, 0.68)
@@ -119,7 +119,7 @@ Rectangle {
     }
 
     Text {
-      text: root.feelsLikeText
+      text: qsTr("Sensação %1").arg(root.feelsLikeText)
       font.family: Theme.monoFontFamily
       font.pixelSize: Theme.fontSizeSmall - 2
       color: root.isCurrent ? Theme.primary : Theme.withAlpha(Theme.surfaceText, 0.7)

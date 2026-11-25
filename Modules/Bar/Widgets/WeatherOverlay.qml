@@ -32,12 +32,12 @@ PopupWindow {
   readonly property var locationSuggestions: WeatherService.locationSuggestions
   readonly property bool locationSearchPending: WeatherService.locationSearchPending
   readonly property var heroMetrics: [
-    { icon: "humidity_low", label: qsTr("Humidity"), value: WeatherService.formatPercent(WeatherService.weather.humidity) },
-    { icon: "air", label: qsTr("Wind"), value: WeatherService.formatSpeed(WeatherService.weather.wind) },
-    { icon: "speed", label: qsTr("Pressure"), value: WeatherService.formatPressure(WeatherService.weather.pressure) },
-    { icon: "rainy", label: qsTr("Precipitation"), value: WeatherService.formatPercent(WeatherService.weather.precipitationProbability) },
-    { icon: "wb_twilight", label: qsTr("Sunrise"), value: WeatherService.weather.sunrise || "--" },
-    { icon: "bedtime", label: qsTr("Sunset"), value: WeatherService.weather.sunset || "--" }
+    { icon: "humidity_low", label: qsTr("Umidade"), value: WeatherService.formatPercent(WeatherService.weather.humidity) },
+    { icon: "air", label: qsTr("Vento"), value: WeatherService.formatSpeed(WeatherService.weather.wind) },
+    { icon: "speed", label: qsTr("Pressão"), value: WeatherService.formatPressure(WeatherService.weather.pressure) },
+    { icon: "rainy", label: qsTr("Chuva"), value: WeatherService.formatPercent(WeatherService.weather.precipitationProbability) },
+    { icon: "wb_twilight", label: qsTr("Nascer do sol"), value: WeatherService.weather.sunrise || "--" },
+    { icon: "bedtime", label: qsTr("Pôr do sol"), value: WeatherService.weather.sunset || "--" }
   ]
 
   onVisibleChanged: {
@@ -146,7 +146,7 @@ PopupWindow {
               }
 
               Text {
-                text: qsTr("Feels Like %1").arg(WeatherService.formatTemp(WeatherService.weather.feelsLike))
+                text: qsTr("Sensação %1").arg(WeatherService.formatTemp(WeatherService.weather.feelsLike))
                 color: Theme.withAlpha(Theme.surfaceText, 0.5)
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSmall
@@ -319,7 +319,7 @@ PopupWindow {
         height: 36
         spacing: Theme.spaceS
         Repeater {
-          model: [qsTr("Daily"), qsTr("Hourly")]
+          model: [qsTr("Diária"), qsTr("Por hora")]
           Rectangle {
             width: 64
             height: 36
@@ -468,7 +468,7 @@ PopupWindow {
               color: Theme.surfaceText
               font.family: Theme.fontFamily
               font.pixelSize: Theme.fontSizeSmall
-              property string placeholderText: "City name or lat,lon"
+              property string placeholderText: qsTr("Buscar cidade, estado ou país")
               Text {
                 anchors.fill: parent
                 verticalAlignment: Text.AlignVCenter
@@ -489,7 +489,7 @@ PopupWindow {
             border.width: 1
             Text {
               anchors.centerIn: parent
-              text: "Set"
+              text: qsTr("Aplicar")
               color: Theme.primary
               font.family: Theme.fontFamily
               font.pixelSize: Theme.fontSizeSmall
@@ -510,7 +510,7 @@ PopupWindow {
             border.width: 1
             Text {
               anchors.centerIn: parent
-              text: "Auto IP"
+              text: qsTr("IP aprox.")
               color: Theme.secondary
               font.family: Theme.fontFamily
               font.pixelSize: Theme.fontSizeSmall - 1
@@ -572,7 +572,7 @@ PopupWindow {
                 anchors.rightMargin: 8
                 verticalAlignment: Text.AlignVCenter
                 elide: Text.ElideRight
-                text: [modelData.name, modelData.admin1, modelData.country].filter(Boolean).join(", ")
+                text: [modelData.name, modelData.admin1, modelData.country].filter(Boolean).join(" · ")
                 color: Theme.surfaceText
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSmall
