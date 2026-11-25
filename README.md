@@ -274,30 +274,48 @@ Copyright (C) 2026 mmj2023
 - `Modules/Bar/Widgets/` - reusable bar widgets, quick settings, launcher, and system monitor
 - `Modules/Dock/` - floating application dock
 
-## Hyprland autostart
+## Install and Hyprland Lua integration
 
-To start NexusDotShell automatically when you log into Hyprland, run this from
-the repository directory:
-
-```sh
-bash scripts/enable-hyprland-autostart.sh
-```
-
-The helper backs up `~/.config/hypr/hyprland.conf` before adding a clearly
-marked `exec-once` block. It refuses to add a second Quickshell startup entry
-if one is already present, so review any existing entry first. The startup
-wrapper checks Quickshell's instance list for this project before launching,
-which avoids starting another copy if NexusDotShell was already opened
-manually. Log out and back into Hyprland after enabling it.
-
-To remove only the block added by NexusDotShell, run:
+On a Hyprland setup using the native Lua configuration API, run the guided
+installer from the repository directory:
 
 ```sh
-bash scripts/disable-hyprland-autostart.sh
+bash install.sh
 ```
 
-This removal helper also creates a backup. Neither helper replaces the rest of
-the user's Hyprland configuration.
+The installer checks required commands, bootstraps the `nob` build driver,
+builds the native telemetry helpers, installs the desktop entry, and asks
+before changing the Hyprland Lua configuration. It does not install system
+packages or run privileged commands. Missing dependencies are reported for
+manual installation.
+
+The Lua integration targets `~/.config/hypr/hyprland.lua`. It creates a
+timestamped backup and appends a clearly marked block that starts
+NexusDotShell on the `hyprland.start` event and binds `SUPER + SHIFT + S` to
+a terminal-free full-output screenshot. Captures are saved under
+`~/Pictures/Nexus-Showcase/`. The screenshot shortcut requires `hyprshot`;
+on Arch Linux it may be installed with an AUR helper, for example
+`yay -S hyprshot`.
+
+To enable only the Lua integration:
+
+```sh
+bash scripts/enable-hyprland-lua.sh
+```
+
+To remove only the marked block (a backup is created first):
+
+```sh
+bash scripts/disable-hyprland-lua.sh
+```
+
+The startup wrapper checks Quickshell's instance list for this project before
+launching, avoiding a second copy if NexusDotShell was already started
+manually. Reload or restart Hyprland after enabling the integration.
+
+The older `enable-hyprland-autostart.sh` and
+`disable-hyprland-autostart.sh` helpers remain available for users whose
+configuration uses the traditional `hyprland.conf` format.
 
 ## Running
 
