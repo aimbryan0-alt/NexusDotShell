@@ -18,7 +18,24 @@ BasePill {
   content: Component {
     Item {
       implicitWidth: collapsedRow.visible ? collapsedRow.implicitWidth : expandedColumn.implicitWidth
-      implicitHeight: collapsedRow.visible ? collapsedRow.implicitHeight : expandedColumn.implicitHeight
+      implicitHeight: (collapsedRow.visible ? collapsedRow.implicitHeight : expandedColumn.implicitHeight) + 3
+
+      Rectangle {
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: Math.max(18, parent.implicitWidth - 8)
+        height: 2
+        radius: 1
+        color: Theme.withAlpha(Theme.outline, 0.28)
+
+        Rectangle {
+          width: parent.width * Math.max(0, Math.min(100, SystemStatsService.memoryUsage)) / 100
+          height: parent.height
+          radius: parent.radius
+          color: root.usageColor()
+        }
+      }
+
       Row {
         id: collapsedRow
         visible: !root.showLabel
