@@ -18,7 +18,7 @@ Item {
     color: root.color
     font.family: materialSymbolsFont.name || "Material Symbols Rounded"
     font.pixelSize: Math.round(root.size)
-    font.weight: root.filled ? 500 : 400
+    font.weight: root.filled ? 600 : 500
     font.hintingPreference: Font.PreferNoHinting
     horizontalAlignment: Text.AlignHCenter
     verticalAlignment: Text.AlignVCenter
@@ -27,7 +27,7 @@ Item {
       "FILL": root.filled ? 1 : 0,
       "GRAD": 0,
       "opsz": 24,
-      "wght": root.filled ? 500 : 400
+      "wght": root.filled ? 600 : 500
     })
   }
 
