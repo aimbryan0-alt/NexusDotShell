@@ -138,7 +138,7 @@ PanelWindow {
             font.family: Theme.monoFontFamily
             font.pixelSize: 10
             font.weight: Font.DemiBold
-            letterSpacing: 0.8
+            font.letterSpacing: 0.8
             elide: Text.ElideRight
           }
 
@@ -238,7 +238,7 @@ PanelWindow {
           color: Theme.withAlpha(Theme.primary, 0.9)
           font.family: Theme.monoFontFamily
           font.pixelSize: 8
-          letterSpacing: 0.7
+          font.letterSpacing: 0.7
           visible: LyricsService.state === "ready"
         }
       }
