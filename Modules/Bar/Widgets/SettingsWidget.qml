@@ -418,10 +418,13 @@ BasePill {
             anchors.left: parent.left
             anchors.leftMargin: 11
             anchors.verticalCenter: parent.verticalCenter
+            width: Math.max(0, parent.width - 66)
             spacing: 2
 
             Text {
+              width: parent.width
               text: "NEXUS // COMMAND CENTER"
+              elide: Text.ElideRight
               color: Theme.primary
               font.family: Theme.monoFontFamily
               font.pixelSize: Theme.fontSizeMedium
