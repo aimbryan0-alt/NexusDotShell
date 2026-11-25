@@ -2515,6 +2515,13 @@ BasePill {
                           radius: parent.radius
                           color: modelData.usage >= 80 ? Theme.error
                             : (modelData.usage >= 60 ? Theme.warning : Theme.primary)
+
+                          Behavior on width {
+                            NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
+                          }
+                          Behavior on color {
+                            ColorAnimation { duration: 180; easing.type: Easing.OutCubic }
+                          }
                         }
                       }
                     }
