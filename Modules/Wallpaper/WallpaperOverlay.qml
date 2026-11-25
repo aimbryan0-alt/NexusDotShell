@@ -13,6 +13,7 @@ PanelWindow {
 
   property var targetScreen: null
   property bool chooserOpen: false
+  property bool advancedOptionsOpen: false
   property bool appPickerOpen: false
   property bool chooserAddLayer: false
   property string chooserScope: "global"
@@ -283,6 +284,7 @@ PanelWindow {
               }
 
               Row {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 height: 36
                 spacing: Theme.spaceXS
@@ -312,6 +314,7 @@ PanelWindow {
               }
 
               Text {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 text: WallpaperService.targetLabelForScope(
                   root.selectedScope, root.targetScreen
@@ -341,6 +344,7 @@ PanelWindow {
               }
 
               Row {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 height: 36
                 spacing: Theme.spaceXS
@@ -364,6 +368,7 @@ PanelWindow {
               }
 
               Text {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 text: qsTr("Shortcut: %1").arg(WallpaperService.pendingShortcut)
                 color: Theme.surfaceText
@@ -385,6 +390,7 @@ PanelWindow {
               }
 
               Text {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 text: qsTr("Checks Lua config binds too; if a bind expression cannot be resolved, the shortcut won't be applied.")
                 color: Theme.surfaceVariantText
@@ -394,6 +400,7 @@ PanelWindow {
               }
 
               ActionButton {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: qsTr("Choose media file…")
                 onClicked: WallpaperService.chooseMediaFile(
@@ -402,6 +409,7 @@ PanelWindow {
               }
 
               ActionButton {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: qsTr("Add media file as a layer…")
                 onClicked: WallpaperService.chooseMediaFile(
@@ -410,6 +418,7 @@ PanelWindow {
               }
 
               ActionButton {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: root.selectedType === "app"
                   ? qsTr("Change app preview…")
@@ -438,12 +447,21 @@ PanelWindow {
               }
 
               ActionButton {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: qsTr("Add wallpaper folder…")
                 onClicked: WallpaperService.chooseDirectory(root.targetScreen)
               }
 
+              ActionButton {
+                width: parent.width
+                label: root.advancedOptionsOpen ? qsTr("Less options") : qsTr("More options")
+                emphasized: root.advancedOptionsOpen
+                onClicked: root.advancedOptionsOpen = !root.advancedOptionsOpen
+              }
+
               Row {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 height: 36
                 spacing: Theme.spaceXS
@@ -520,12 +538,14 @@ PanelWindow {
               }
 
               Rectangle {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 height: 1
                 color: Theme.withAlpha(Theme.outlineVariant, 0.5)
               }
 
               Text {
+                visible: root.advancedOptionsOpen
                 text: qsTr("MEDIA URL")
                 color: Theme.surfaceVariantText
                 font.family: Theme.fontFamily
@@ -534,6 +554,7 @@ PanelWindow {
               }
 
               Rectangle {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 height: 36
                 radius: Theme.hoverRadius
@@ -558,12 +579,14 @@ PanelWindow {
               }
 
               ActionButton {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: qsTr("Use URL as video/stream")
                 onClicked: applyUrl()
               }
 
               ActionButton {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: qsTr("Add URL as a layer")
                 onClicked: applyUrl(true)
@@ -690,12 +713,14 @@ PanelWindow {
               }
 
               Rectangle {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 height: 1
                 color: Theme.withAlpha(Theme.outlineVariant, 0.5)
               }
 
               ActionButton {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: SettingsData.wallpaperCycleEnabled
                   ? qsTr("Slideshow: on")
@@ -704,6 +729,7 @@ PanelWindow {
               }
 
               Row {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 height: 34
                 spacing: Theme.spaceXS
@@ -743,6 +769,7 @@ PanelWindow {
               }
 
               ActionButton {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: qsTr("Fit: ") + SettingsData.wallpaperFit
                 onClicked: SettingsData.set(
@@ -774,6 +801,7 @@ PanelWindow {
               spacing: Theme.spaceS
 
               Text {
+                visible: root.advancedOptionsOpen
                 width: parent.width - refreshButton.width
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.overviewMode
@@ -786,6 +814,7 @@ PanelWindow {
               }
 
               Rectangle {
+                visible: root.advancedOptionsOpen
                 id: refreshButton
                 width: 36
                 height: 32
