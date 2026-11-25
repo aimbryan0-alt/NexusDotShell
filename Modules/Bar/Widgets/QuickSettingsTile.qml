@@ -59,6 +59,9 @@ Rectangle {
     radius: 1
     color: Theme.tertiary
     opacity: root.active ? 0.8 : tileMouse.containsMouse ? 0.55 : 0.22
+    Behavior on opacity {
+      NumberAnimation { duration: Theme.shortDuration; easing.type: Theme.standardEasing }
+    }
   }
 
   Row {
@@ -86,6 +89,9 @@ Rectangle {
         name: root.iconName
         size: 19
         color: root.active ? Theme.primary : Theme.widgetIconColor
+        Behavior on color {
+          ColorAnimation { duration: Theme.shortDuration; easing.type: Theme.standardEasing }
+        }
       }
     }
 
