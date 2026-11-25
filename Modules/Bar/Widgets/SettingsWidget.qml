@@ -458,6 +458,140 @@ BasePill {
           }
         }
 
+        Column {
+          width: parent.width
+          spacing: 6
+
+          Row {
+            width: parent.width
+            height: 14
+
+            Text {
+              anchors.left: parent.left
+              anchors.verticalCenter: parent.verticalCenter
+              text: "SYSTEM TELEMETRY"
+              color: Theme.widgetInactiveIconColor
+              font.family: Theme.monoFontFamily
+              font.pixelSize: Theme.fontSizeSmall - 2
+              font.weight: Font.DemiBold
+              font.letterSpacing: 0.8
+            }
+
+            Text {
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              text: "LIVE // LOCAL"
+              color: Theme.tertiary
+              font.family: Theme.monoFontFamily
+              font.pixelSize: Theme.fontSizeSmall - 3
+              font.letterSpacing: 0.5
+            }
+          }
+
+          Row {
+            width: parent.width
+            spacing: 6
+
+            Repeater {
+              model: [
+                {
+                  label: "CPU",
+                  value: Math.round(SystemStatsService.cpuUsage) + "%",
+                  level: SystemStatsService.cpuUsage,
+                  tint: SystemStatsService.cpuUsage >= 85 ? Theme.error
+                    : SystemStatsService.cpuUsage >= 65 ? Theme.warning : Theme.primary
+                },
+                {
+                  label: "MEM",
+                  value: Math.round(SystemStatsService.memoryUsage) + "%",
+                  level: SystemStatsService.memoryUsage,
+                  tint: SystemStatsService.memoryUsage >= 90 ? Theme.error
+                    : SystemStatsService.memoryUsage >= 75 ? Theme.warning : Theme.secondary
+                },
+                {
+                  label: "TEMP",
+                  value: SystemStatsService.cpuTemperature > 0
+                    ? Math.round(SystemStatsService.cpuTemperature) + "°"
+                    : "--",
+                  level: SystemStatsService.cpuTemperature > 0
+                    ? Math.min(100, SystemStatsService.cpuTemperature) : 0,
+                  tint: SystemStatsService.cpuTemperature >= 85 ? Theme.error
+                    : SystemStatsService.cpuTemperature >= 70 ? Theme.warning : Theme.tertiary
+                },
+                {
+                  label: "DISK",
+                  value: Math.round(SystemStatsService.diskUsage) + "%",
+                  level: SystemStatsService.diskUsage,
+                  tint: SystemStatsService.diskUsage >= 90 ? Theme.error
+                    : SystemStatsService.diskUsage >= 75 ? Theme.warning : Theme.primary
+                }
+              ]
+
+              delegate: Rectangle {
+                required property var modelData
+                width: (parent.width - parent.spacing * 3) / 4
+                height: 54
+                radius: Theme.cornerRadius
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.62)
+                border.width: 1
+                border.color: Theme.withAlpha(modelData.tint, 0.24)
+
+                Column {
+                  anchors.fill: parent
+                  anchors.margins: 7
+                  spacing: 3
+
+                  Row {
+                    width: parent.width
+
+                    Text {
+                      text: modelData.label
+                      color: Theme.widgetInactiveIconColor
+                      font.family: Theme.monoFontFamily
+                      font.pixelSize: Math.max(8, Theme.fontSizeSmall - 3)
+                      font.weight: Font.DemiBold
+                    }
+
+                    Item { width: 1; height: 1 }
+
+                    Text {
+                      anchors.right: parent.right
+                      text: modelData.value
+                      color: modelData.tint
+                      font.family: Theme.monoFontFamily
+                      font.pixelSize: Math.max(9, Theme.fontSizeSmall - 1)
+                      font.weight: Font.Bold
+                    }
+                  }
+
+                  Rectangle {
+                    width: parent.width
+                    height: 3
+                    radius: 2
+                    color: Theme.withAlpha(Theme.outline, 0.28)
+
+                    Rectangle {
+                      width: parent.width * Math.max(0, Math.min(100, Number(modelData.level) || 0)) / 100
+                      height: parent.height
+                      radius: parent.radius
+                      color: modelData.tint
+                    }
+                  }
+
+                  Text {
+                    width: parent.width
+                    text: modelData.label === "TEMP" ? "THERMAL" : "UTILIZATION"
+                    color: Theme.widgetInactiveIconColor
+                    font.family: Theme.monoFontFamily
+                    font.pixelSize: Math.max(7, Theme.fontSizeSmall - 4)
+                    elide: Text.ElideRight
+                  }
+                }
+              }
+            }
+          }
+        }
+
         Row {
           width: parent.width
           height: 18
