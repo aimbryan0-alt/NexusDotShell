@@ -45,6 +45,10 @@ BasePill {
     root.previousSample = now
   }
 
+  readonly property string connectionLabel: root.interfaceName
+    ? (root.interfaceName.startsWith("wl") ? "WI-FI" : "LAN")
+    : "OFFLINE"
+
   function formatRate(rate) {
     const value = Math.max(0, Number(rate) || 0)
     if (value >= 1048576)
@@ -135,6 +139,28 @@ BasePill {
             font.family: Theme.monoFontFamily
             font.pixelSize: root.textSize() - 1
           }
+        }
+      }
+
+      Row {
+        spacing: 4
+        anchors.verticalCenter: parent.verticalCenter
+
+        Rectangle {
+          width: 5
+          height: 5
+          radius: 3
+          color: root.interfaceName ? Theme.primary : Theme.widgetInactiveIconColor
+          anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Text {
+          text: root.connectionLabel
+          color: root.interfaceName ? Theme.primary : Theme.widgetInactiveIconColor
+          font.family: Theme.monoFontFamily
+          font.pixelSize: 8
+          font.bold: true
+          anchors.verticalCenter: parent.verticalCenter
         }
       }
     }
