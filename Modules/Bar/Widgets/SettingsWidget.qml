@@ -1523,6 +1523,31 @@ BasePill {
                 value: root.audioReady ? root.activeSink.audio.volume : 0
                 onMoved: if (root.audioReady)
                   root.activeSink.audio.volume = value
+
+                background: Rectangle {
+                  x: volumeSlider.leftPadding
+                  y: volumeSlider.topPadding + volumeSlider.availableHeight / 2 - height / 2
+                  width: volumeSlider.availableWidth
+                  height: 4
+                  radius: Theme.pillRadius
+                  color: Theme.withAlpha(Theme.outline, 0.32)
+                  Rectangle {
+                    width: volumeSlider.visualPosition * parent.width
+                    height: parent.height
+                    radius: parent.radius
+                    color: Theme.primary
+                  }
+                }
+                handle: Rectangle {
+                  x: volumeSlider.leftPadding + volumeSlider.visualPosition * (volumeSlider.availableWidth - width)
+                  y: volumeSlider.topPadding + volumeSlider.availableHeight / 2 - height / 2
+                  width: 13
+                  height: 13
+                  radius: Theme.pillRadius
+                  color: volumeSlider.pressed ? Theme.primary : Theme.surfaceText
+                  border.width: 2
+                  border.color: Theme.primary
+                }
               }
             }
 
@@ -1624,6 +1649,7 @@ BasePill {
                 }
               }
               Slider {
+                id: microphoneSlider
                 width: parent.width - 25
                 height: 26
                 from: 0
@@ -1632,6 +1658,31 @@ BasePill {
                   ? root.activeSource.audio.volume : 0
                 onMoved: if (root.activeSource && root.activeSource.ready && root.activeSource.audio)
                   root.activeSource.audio.volume = value
+
+                background: Rectangle {
+                  x: microphoneSlider.leftPadding
+                  y: microphoneSlider.topPadding + microphoneSlider.availableHeight / 2 - height / 2
+                  width: microphoneSlider.availableWidth
+                  height: 4
+                  radius: Theme.pillRadius
+                  color: Theme.withAlpha(Theme.outline, 0.32)
+                  Rectangle {
+                    width: microphoneSlider.visualPosition * parent.width
+                    height: parent.height
+                    radius: parent.radius
+                    color: Theme.primary
+                  }
+                }
+                handle: Rectangle {
+                  x: microphoneSlider.leftPadding + microphoneSlider.visualPosition * (microphoneSlider.availableWidth - width)
+                  y: microphoneSlider.topPadding + microphoneSlider.availableHeight / 2 - height / 2
+                  width: 13
+                  height: 13
+                  radius: Theme.pillRadius
+                  color: microphoneSlider.pressed ? Theme.primary : Theme.surfaceText
+                  border.width: 2
+                  border.color: Theme.primary
+                }
               }
             }
           }
@@ -1723,12 +1774,38 @@ BasePill {
                 elide: Text.ElideRight
               }
               Slider {
+                id: brightnessSlider
                 width: parent.width
                 height: 26
                 from: 0
                 to: 100
                 value: root.brightnessControlPercent
                 onMoved: root.setBrightnessTargets(value)
+
+                background: Rectangle {
+                  x: brightnessSlider.leftPadding
+                  y: brightnessSlider.topPadding + brightnessSlider.availableHeight / 2 - height / 2
+                  width: brightnessSlider.availableWidth
+                  height: 4
+                  radius: Theme.pillRadius
+                  color: Theme.withAlpha(Theme.outline, 0.32)
+                  Rectangle {
+                    width: brightnessSlider.visualPosition * parent.width
+                    height: parent.height
+                    radius: parent.radius
+                    color: Theme.primary
+                  }
+                }
+                handle: Rectangle {
+                  x: brightnessSlider.leftPadding + brightnessSlider.visualPosition * (brightnessSlider.availableWidth - width)
+                  y: brightnessSlider.topPadding + brightnessSlider.availableHeight / 2 - height / 2
+                  width: 13
+                  height: 13
+                  radius: Theme.pillRadius
+                  color: brightnessSlider.pressed ? Theme.primary : Theme.surfaceText
+                  border.width: 2
+                  border.color: Theme.primary
+                }
               }
 
               Column {
@@ -1833,12 +1910,38 @@ BasePill {
                       }
 
                       Slider {
+                        id: deviceBrightnessSlider
                         width: parent.width
                         height: 26
                         from: 0
                         to: 100
                         value: root.brightnessSliderValue(modelData)
                         onMoved: root.setDeviceBrightness(modelData, value)
+
+                background: Rectangle {
+                  x: deviceBrightnessSlider.leftPadding
+                  y: deviceBrightnessSlider.topPadding + deviceBrightnessSlider.availableHeight / 2 - height / 2
+                  width: deviceBrightnessSlider.availableWidth
+                  height: 4
+                  radius: Theme.pillRadius
+                  color: Theme.withAlpha(Theme.outline, 0.32)
+                  Rectangle {
+                    width: deviceBrightnessSlider.visualPosition * parent.width
+                    height: parent.height
+                    radius: parent.radius
+                    color: Theme.primary
+                  }
+                }
+                handle: Rectangle {
+                  x: deviceBrightnessSlider.leftPadding + deviceBrightnessSlider.visualPosition * (deviceBrightnessSlider.availableWidth - width)
+                  y: deviceBrightnessSlider.topPadding + deviceBrightnessSlider.availableHeight / 2 - height / 2
+                  width: 13
+                  height: 13
+                  radius: Theme.pillRadius
+                  color: deviceBrightnessSlider.pressed ? Theme.primary : Theme.surfaceText
+                  border.width: 2
+                  border.color: Theme.primary
+                }
                       }
 
                       Item {
