@@ -177,7 +177,7 @@ PanelWindow {
             spacing: 2
 
             Text {
-              text: root.overviewMode ? qsTr("Wallpaper library") : qsTr("Change wallpaper")
+              text: root.overviewMode ? qsTr("Nexus Wallpaper") : qsTr("Change wallpaper")
               color: Theme.surfaceText
               font.family: Theme.fontFamily
               font.pixelSize: Theme.fontSizeMedium
