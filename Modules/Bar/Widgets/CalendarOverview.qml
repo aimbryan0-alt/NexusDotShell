@@ -87,6 +87,23 @@ PopupWindow {
             + Qt.locale().monthName(selectedDate.getMonth(), Locale.LongFormat);
     }
 
+    function upcomingEvents(limit) {
+        return SettingsData.calendarEvents
+            .filter(function(event) {
+                return event.date >= dateKey(selectedDate);
+            })
+            .slice()
+            .sort(function(a, b) {
+                return a.date.localeCompare(b.date);
+            })
+            .slice(0, limit);
+    }
+
+    function formatEventDate(dateString) {
+        const parts = dateString.split("-");
+        return parts.length === 3 ? parts[2] + "/" + parts[1] : dateString;
+    }
+
     function addEvent() {
         const title = eventTitle.trim();
         if (!title)
@@ -1070,13 +1087,14 @@ PopupWindow {
                                         anchors.fill: parent
 
                                         Column {
+                                            width: parent.width - 20
                                             anchors.centerIn: parent
-                                            spacing: 12
+                                            spacing: 7
 
                                             DmsIcon {
                                                 anchors.horizontalCenter: parent.horizontalCenter
                                                 name: "emoji_events"
-                                                size: 48
+                                                size: root.upcomingEvents(2).length > 0 ? 30 : 48
                                                 color: Theme.withAlpha(Theme.primary, 0.85)
                                             }
 
@@ -1084,17 +1102,83 @@ PopupWindow {
                                                 anchors.horizontalCenter: parent.horizontalCenter
                                                 text: qsTr("Tudo em dia")
                                                 color: Theme.widgetTextColor
-                                                font.pixelSize: 18
+                                                font.pixelSize: 16
                                             }
 
                                             Text {
-                                                width: eventColumn.width - 24
+                                                width: parent.width
                                                 text: qsTr("Nenhum evento para este dia")
                                                 color: Theme.widgetInactiveIconColor
-                                                font.pixelSize: 14
+                                                font.pixelSize: 12
                                                 horizontalAlignment: Text.AlignHCenter
                                             }
 
+                                            Text {
+                                                width: parent.width
+                                                visible: root.upcomingEvents(2).length > 0
+                                                text: qsTr("PRÓXIMOS EVENTOS")
+                                                color: Theme.primary
+                                                font.pixelSize: 10
+                                                font.weight: Font.DemiBold
+                                                topPadding: 3
+                                            }
+
+                                            Repeater {
+                                                model: root.upcomingEvents(2)
+
+                                                delegate: Rectangle {
+                                                    required property var modelData
+                                                    width: parent.width
+                                                    height: 30
+                                                    radius: Theme.cornerRadius
+                                                    color: upcomingEventMouse.containsMouse
+                                                        ? Theme.withAlpha(Theme.primary, 0.14)
+                                                        : Theme.withAlpha(Theme.surfaceContainerHigh, 0.72)
+
+                                                    Row {
+                                                        anchors.fill: parent
+                                                        anchors.leftMargin: 9
+                                                        anchors.rightMargin: 8
+                                                        spacing: 8
+
+                                                        Text {
+                                                            width: 38
+                                                            height: parent.height
+                                                            text: root.formatEventDate(modelData.date)
+                                                            color: Theme.primary
+                                                            font.pixelSize: 10
+                                                            font.weight: Font.DemiBold
+                                                            verticalAlignment: Text.AlignVCenter
+                                                        }
+
+                                                        Text {
+                                                            width: parent.width - 46
+                                                            height: parent.height
+                                                            text: modelData.title
+                                                            color: Theme.widgetTextColor
+                                                            font.pixelSize: 11
+                                                            elide: Text.ElideRight
+                                                            verticalAlignment: Text.AlignVCenter
+                                                        }
+                                                    }
+
+                                                    MouseArea {
+                                                        id: upcomingEventMouse
+                                                        anchors.fill: parent
+                                                        hoverEnabled: true
+                                                        cursorShape: Qt.PointingHandCursor
+                                                        onClicked: {
+                                                            const parts = modelData.date.split("-");
+                                                            if (parts.length === 3) {
+                                                                root.selectedDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+                                                                root.shownYear = root.selectedDate.getFullYear();
+                                                                root.shownMonth = root.selectedDate.getMonth();
+                                                                root.editingEvent = false;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
 
                                     }
