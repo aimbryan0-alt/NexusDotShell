@@ -28,6 +28,8 @@ BasePill {
   property string overflowTooltipText: "hidden tray icons"
   property int overflowTooltipX: 0
   property int overflowTooltipY: 0
+  readonly property real trayButtonSize: Math.max(24, Math.min(30, root.widgetThickness - 6))
+  readonly property real trayIconSize: Math.round(trayButtonSize * 0.68)
   readonly property real availableMenuHeight: root.parentScreen
     ? Math.max(120, root.parentScreen.height - (root.barWindow ? root.barWindow.height : Theme.barHeight) - Theme.space2() * 2)
     : 420
@@ -121,8 +123,8 @@ BasePill {
           required property var modelData
           readonly property var item: modelData
 
-          width: 28
-          height: 28
+          width: root.trayButtonSize
+          height: root.trayButtonSize
           anchors.verticalCenter: parent.verticalCenter
           radius: Theme.pillRadius
           color: hovered ? Theme.surfaceText_12 : "transparent"
@@ -135,12 +137,23 @@ BasePill {
             id: trayIcon
             anchors.centerIn: parent
             source: root._iconOf(item)
-            width: 19
-            height: 19
+            width: root.trayIconSize
+            height: root.trayIconSize
             asynchronous: true
             smooth: true
             mipmap: true
             visible: status === Image.Ready
+          }
+
+          Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottomMargin: 2
+            width: 9
+            height: 2
+            radius: 1
+            color: Theme.primary
+            opacity: hovered ? 0.9 : 0
           }
 
           Text {
@@ -179,8 +192,8 @@ BasePill {
 
       Rectangle {
         visible: root.hiddenItems.length > 0
-        width: 26
-        height: 28
+        width: root.trayButtonSize
+        height: root.trayButtonSize
         radius: Theme.pillRadius
         color: overflowMouse.containsMouse ? Theme.surfaceText_12 : "transparent"
         border.width: overflowMouse.containsMouse ? 1 : 0
@@ -386,7 +399,7 @@ BasePill {
     grabFocus: true
     color: "transparent"
     implicitWidth: Math.max(48, hiddenRow.implicitWidth + 16)
-    implicitHeight: 42
+    implicitHeight: root.trayButtonSize + 14
 
     onVisibleChanged: {
       if (!visible)
@@ -413,8 +426,8 @@ BasePill {
           model: root.hiddenItems
           delegate: Rectangle {
             required property var modelData
-            width: 28
-            height: 28
+            width: root.trayButtonSize
+            height: root.trayButtonSize
             radius: Theme.pillRadius
             color: hiddenMouse.containsMouse ? Theme.surfaceText_12 : "transparent"
             border.width: hiddenMouse.containsMouse ? 1 : 0
@@ -424,12 +437,23 @@ BasePill {
               id: hiddenTrayIcon
               anchors.centerIn: parent
               source: root._iconOf(modelData)
-              width: 19
-              height: 19
+              width: root.trayIconSize
+              height: root.trayIconSize
               asynchronous: true
               smooth: true
               mipmap: true
               visible: status === Image.Ready
+            }
+
+            Rectangle {
+              anchors.bottom: parent.bottom
+              anchors.horizontalCenter: parent.horizontalCenter
+              anchors.bottomMargin: 2
+              width: 9
+              height: 2
+              radius: 1
+              color: Theme.primary
+              opacity: hiddenMouse.containsMouse ? 0.9 : 0
             }
 
             Text {
