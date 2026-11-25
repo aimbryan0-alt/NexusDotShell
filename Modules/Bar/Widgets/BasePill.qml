@@ -11,8 +11,8 @@ Item {
   id: root
 
   property QtObject screen: null
-  property real widgetThickness: Theme.widgetThickness
-  property real barThickness: Theme.barThickness
+  property real widgetThickness: Theme.widgetThickness * 0.95
+  property real barThickness: Theme.barThickness * 0.95
   property real barSpacing: 0
   property bool vertical: false
   property color backgroundTint: "transparent"
