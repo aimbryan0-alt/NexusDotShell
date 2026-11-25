@@ -110,7 +110,7 @@ BasePill {
 
   content: Component {
     Row {
-      spacing: 2
+      spacing: 3
 
       Repeater {
         // Use the actual SNI objects rather than the collection wrapper so
@@ -121,11 +121,13 @@ BasePill {
           required property var modelData
           readonly property var item: modelData
 
-          width: 26
-          height: 26
+          width: 28
+          height: 28
           anchors.verticalCenter: parent.verticalCenter
           radius: Theme.pillRadius
           color: hovered ? Theme.surfaceText_12 : "transparent"
+          border.width: hovered ? 1 : 0
+          border.color: Theme.withAlpha(Theme.primary, 0.38)
 
           property bool hovered: false
 
@@ -133,8 +135,8 @@ BasePill {
             id: trayIcon
             anchors.centerIn: parent
             source: root._iconOf(item)
-            width: 18
-            height: 18
+            width: 19
+            height: 19
             asynchronous: true
             smooth: true
             mipmap: true
@@ -177,10 +179,12 @@ BasePill {
 
       Rectangle {
         visible: root.hiddenItems.length > 0
-        width: 24
-        height: 26
+        width: 26
+        height: 28
         radius: Theme.pillRadius
         color: overflowMouse.containsMouse ? Theme.surfaceText_12 : "transparent"
+        border.width: overflowMouse.containsMouse ? 1 : 0
+        border.color: Theme.withAlpha(Theme.primary, 0.38)
 
         Canvas {
           id: overflowChevron
@@ -409,17 +413,19 @@ BasePill {
           model: root.hiddenItems
           delegate: Rectangle {
             required property var modelData
-            width: 26
-            height: 26
+            width: 28
+            height: 28
             radius: Theme.pillRadius
             color: hiddenMouse.containsMouse ? Theme.surfaceText_12 : "transparent"
+            border.width: hiddenMouse.containsMouse ? 1 : 0
+            border.color: Theme.withAlpha(Theme.primary, 0.38)
 
             IconImage {
               id: hiddenTrayIcon
               anchors.centerIn: parent
               source: root._iconOf(modelData)
-              width: 18
-              height: 18
+              width: 19
+              height: 19
               asynchronous: true
               smooth: true
               mipmap: true
