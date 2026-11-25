@@ -723,13 +723,55 @@ BasePill {
         height: parent.height - 34
         visible: SystemStatsService.gpus.length === 0
 
-        Text {
+        Rectangle {
           anchors.centerIn: parent
-          text: SystemStatsService.gpuStatsError.length > 0
-            ? SystemStatsService.gpuStatsError
-            : qsTr("No graphics devices detected")
-          color: Theme.widgetInactiveIconColor
-          font.pixelSize: 12
+          width: Math.min(parent.width - 24, 340)
+          height: 112
+          radius: Theme.cornerRadius
+          color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.48)
+          border.width: 1
+          border.color: Theme.withAlpha(Theme.outline, 0.28)
+
+          Rectangle {
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            width: 2
+            radius: 1
+            color: Theme.primary
+            opacity: 0.72
+          }
+
+          Column {
+            anchors.centerIn: parent
+            spacing: 5
+
+            DmsIcon {
+              anchors.horizontalCenter: parent.horizontalCenter
+              name: "developer_board"
+              size: 23
+              color: Theme.primary
+            }
+
+            Text {
+              anchors.horizontalCenter: parent.horizontalCenter
+              text: qsTr("GPU // NO DEVICE")
+              color: Theme.widgetTextColor
+              font.family: Theme.monoFontFamily
+              font.pixelSize: 11
+              font.weight: Font.DemiBold
+            }
+
+            Text {
+              anchors.horizontalCenter: parent.horizontalCenter
+              text: SystemStatsService.gpuStatsError.length > 0
+                ? SystemStatsService.gpuStatsError
+                : qsTr("No graphics devices detected")
+              color: Theme.widgetInactiveIconColor
+              font.pixelSize: 10
+              elide: Text.ElideRight
+            }
+          }
         }
       }
     }
@@ -1536,16 +1578,71 @@ BasePill {
           }
         }
 
-        Text {
-          anchors.centerIn: parent
+        Item {
+          anchors.fill: parent
           visible: processListView.count === 0
-          text: SystemStatsService.processListError.length > 0
-            ? SystemStatsService.processListError
-            : SystemStatsService.processes.length === 0
-            ? qsTr("Waiting for process data…")
-            : qsTr("No matching processes")
-          color: Theme.widgetInactiveIconColor
-          font.pixelSize: 12
+
+          Rectangle {
+            anchors.centerIn: parent
+            width: Math.min(parent.width - 24, 360)
+            height: 104
+            radius: Theme.cornerRadius
+            color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.42)
+            border.width: 1
+            border.color: Theme.withAlpha(Theme.outline, 0.26)
+
+            Rectangle {
+              anchors.left: parent.left
+              anchors.top: parent.top
+              anchors.bottom: parent.bottom
+              width: 2
+              radius: 1
+              color: Theme.primary
+              opacity: 0.72
+            }
+
+            Row {
+              anchors.centerIn: parent
+              spacing: 12
+
+              DmsIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                name: SystemStatsService.processListError.length > 0
+                  ? "warning" : (SystemStatsService.processes.length === 0 ? "terminal" : "search")
+                size: 25
+                color: SystemStatsService.processListError.length > 0 ? Theme.warning : Theme.primary
+              }
+
+              Column {
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 4
+
+                Text {
+                  text: SystemStatsService.processListError.length > 0
+                    ? qsTr("PROCESS FEED // ERROR")
+                    : SystemStatsService.processes.length === 0
+                      ? qsTr("PROCESS FEED // SYNC")
+                      : qsTr("PROCESS QUERY // EMPTY")
+                  color: Theme.widgetTextColor
+                  font.family: Theme.monoFontFamily
+                  font.pixelSize: 10
+                  font.weight: Font.DemiBold
+                }
+
+                Text {
+                  width: Math.min(250, processPage.width - 100)
+                  text: SystemStatsService.processListError.length > 0
+                    ? SystemStatsService.processListError
+                    : SystemStatsService.processes.length === 0
+                      ? qsTr("Waiting for process data…")
+                      : qsTr("No processes match the current filters.")
+                  color: Theme.widgetInactiveIconColor
+                  font.pixelSize: 10
+                  wrapMode: Text.WordWrap
+                }
+              }
+            }
+          }
         }
       }
     }
