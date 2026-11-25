@@ -503,7 +503,7 @@ BasePill {
 
   content: Component {
     Row {
-      spacing: 4
+      spacing: 5
 
       Repeater {
         model: WorkspacesService.workspaceIds
@@ -512,27 +512,30 @@ BasePill {
           required property int modelData
           readonly property bool isActive: modelData === root.activeId
           readonly property bool isOccupied: WorkspacesService.occupiedIds.indexOf(modelData) !== -1
+          readonly property bool isHovered: workspaceMouseArea.containsMouse
 
-          width: isActive ? 30 : 25
-          height: 24
+          width: isActive ? 34 : 27
+          height: 26
           anchors.verticalCenter: parent.verticalCenter
           radius: height / 2
           color: isActive
-            ? Theme.withAlpha(Theme.primary, 0.19)
-            : (workspaceMouseArea.containsMouse
-              ? Theme.withAlpha(Theme.primary, 0.11)
+            ? Theme.withAlpha(Theme.primary, 0.22)
+            : (isHovered
+              ? Theme.withAlpha(Theme.primary, 0.13)
               : (isOccupied
-                ? Theme.withAlpha(Theme.surfaceContainerHighest, 0.72)
-                : Theme.withAlpha(Theme.surfaceVariant, 0.28)))
-          border.width: isActive ? 1.2 : (workspaceMouseArea.containsMouse ? 1 : 0)
+                ? Theme.withAlpha(Theme.surfaceContainerHighest, 0.76)
+                : Theme.withAlpha(Theme.surfaceVariant, 0.22)))
+          border.width: isActive ? 1.2 : (isHovered ? 1 : (isOccupied ? 0.6 : 0))
           border.color: isActive
-            ? Theme.withAlpha(Theme.primary, 0.9)
-            : Theme.withAlpha(Theme.primary, workspaceMouseArea.containsMouse ? 0.42 : 0)
-          opacity: isActive ? 1.0 : (isOccupied ? 0.82 : 0.52)
+            ? Theme.withAlpha(Theme.primary, 0.92)
+            : (isHovered
+              ? Theme.withAlpha(Theme.primary, 0.48)
+              : Theme.withAlpha(Theme.tertiary, isOccupied ? 0.28 : 0))
+          opacity: isActive ? 1.0 : (isOccupied ? 0.88 : 0.58)
 
           Behavior on width {
             NumberAnimation {
-              duration: 140
+              duration: 150
               easing.type: Easing.OutCubic
             }
           }
@@ -541,6 +544,9 @@ BasePill {
               duration: 150
               easing.type: Easing.OutCubic
             }
+          }
+          Behavior on border.color {
+            ColorAnimation { duration: 150 }
           }
           Behavior on opacity {
             NumberAnimation {
@@ -553,10 +559,11 @@ BasePill {
             anchors.centerIn: parent
             anchors.verticalCenterOffset: -1
             text: String(modelData).padStart(2, "0")
-            color: isActive ? Theme.primary : Theme.withAlpha(Theme.surfaceText, 0.9)
+            color: isActive ? Theme.primary : Theme.withAlpha(Theme.surfaceText, isOccupied ? 0.96 : 0.76)
             font.family: Theme.monoFontFamily
             font.pixelSize: Math.max(10, Theme.fontSizeSmall - 1)
             font.bold: isActive || isOccupied
+            font.letterSpacing: isActive ? 0.35 : 0
             opacity: isActive ? 1.0 : 0.95
           }
 
@@ -564,11 +571,17 @@ BasePill {
             anchors.bottom: parent.bottom
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottomMargin: 3
-            width: isActive ? 9 : 4
+            width: isActive ? 11 : (isOccupied ? 6 : 3)
             height: 2
             radius: 1
             color: isActive ? Theme.primary : Theme.tertiary
-            opacity: isActive || isOccupied ? 0.9 : 0
+            opacity: isActive ? 1.0 : (isOccupied ? 0.72 : (isHovered ? 0.42 : 0))
+            Behavior on width {
+              NumberAnimation { duration: 140; easing.type: Easing.OutCubic }
+            }
+            Behavior on opacity {
+              NumberAnimation { duration: 140 }
+            }
           }
 
           MouseArea {
