@@ -2133,7 +2133,9 @@ BasePill {
           visible: root.overviewTab === "overview"
 
           Grid {
-            anchors.fill: parent
+            anchors.top: parent.top
+            width: parent.width
+            height: Math.max(210, parent.height * 0.66)
             columns: 2
             columnSpacing: 10
             rowSpacing: 10
@@ -2222,7 +2224,7 @@ BasePill {
 
                   UsageHistoryGraph {
                     width: parent.width
-                    height: 34
+                    height: 40
                     visible: modelData.id !== "temperature"
                     values: modelData.id === "cpu" ? SystemStatsService.cpuHistory
                       : modelData.id === "memory" ? SystemStatsService.memoryHistory
@@ -2266,7 +2268,14 @@ BasePill {
                     width: parent.width
                     visible: modelData.id === "gpu"
                     text: SystemStatsService.gpus.length > 0
-                      ? SystemStatsService.gpus[0].name : qsTr("No graphics device data")
+                      ? SystemStatsService.gpus[0].name + "  ·  " +
+                        (SystemStatsService.gpus[0].memoryUsage >= 0
+                          ? (SystemStatsService.gpus[0].memoryTotal > 0
+                            ? qsTr("VRAM %1 / %2 MiB").arg(Math.round(SystemStatsService.gpus[0].memoryUsage))
+                              .arg(Math.round(SystemStatsService.gpus[0].memoryTotal))
+                            : qsTr("%1 MiB GPU memory").arg(Math.round(SystemStatsService.gpus[0].memoryUsage)))
+                          : qsTr("VRAM unavailable"))
+                      : qsTr("No graphics device data")
                     color: Theme.widgetInactiveIconColor
                     font.pixelSize: 9
                     elide: Text.ElideRight
@@ -2289,6 +2298,109 @@ BasePill {
                     : modelData.id === "memory" ? "memory"
                     : modelData.id === "gpu" ? "gpu" : "processor"
                 }
+              }
+            }
+          }
+
+          Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            height: Math.max(112, parent.height - parent.height * 0.66 - 8)
+            radius: Theme.cornerRadius
+            color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.62)
+            border.width: 1
+            border.color: Theme.withAlpha(Theme.primary, 0.2)
+
+            Column {
+              anchors.fill: parent
+              anchors.margins: 10
+              spacing: 6
+
+              Row {
+                width: parent.width
+                height: 18
+                spacing: 6
+
+                DmsIcon {
+                  name: "activity"
+                  size: 14
+                  color: Theme.primary
+                  anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Text {
+                  text: "TOP PROCESSES"
+                  color: Theme.primary
+                  font.family: Theme.monoFontFamily
+                  font.pixelSize: 10
+                  font.bold: true
+                  font.letterSpacing: 0.8
+                  anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Item { width: 1; height: 1 }
+
+                Text {
+                  text: qsTr("%1 running").arg(SystemStatsService.processCount)
+                  color: Theme.widgetInactiveIconColor
+                  font.pixelSize: 9
+                  anchors.verticalCenter: parent.verticalCenter
+                }
+              }
+
+              Repeater {
+                model: SystemStatsService.processes.slice()
+                  .sort((a, b) => b.cpu - a.cpu).slice(0, 3)
+
+                delegate: Row {
+                  required property var modelData
+                  width: parent.width
+                  height: 22
+                  spacing: 8
+
+                  Rectangle {
+                    width: 4
+                    height: 4
+                    radius: 2
+                    color: index === 0 ? Theme.primary : Theme.withAlpha(Theme.primary, 0.45)
+                    anchors.verticalCenter: parent.verticalCenter
+                  }
+
+                  Text {
+                    width: Math.max(80, parent.width - 120)
+                    text: modelData.name
+                    color: Theme.widgetTextColor
+                    font.pixelSize: 10
+                    elide: Text.ElideRight
+                    anchors.verticalCenter: parent.verticalCenter
+                  }
+
+                  Item { width: 1; height: 1 }
+
+                  Text {
+                    text: modelData.cpu.toFixed(1) + "%"
+                    color: Theme.primary
+                    font.family: Theme.monoFontFamily
+                    font.pixelSize: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                  }
+
+                  Text {
+                    text: modelData.memoryPercent.toFixed(1) + "%"
+                    color: Theme.widgetInactiveIconColor
+                    font.family: Theme.monoFontFamily
+                    font.pixelSize: 9
+                    anchors.verticalCenter: parent.verticalCenter
+                  }
+                }
+              }
+
+              Text {
+                visible: SystemStatsService.processCount === 0
+                text: qsTr("Collecting process activity…")
+                color: Theme.widgetInactiveIconColor
+                font.pixelSize: 10
               }
             }
           }
