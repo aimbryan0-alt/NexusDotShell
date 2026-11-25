@@ -402,11 +402,11 @@ PopupWindow {
 
                                 Text {
                                     text: root.selectedDayForecast()
-                                        ? WeatherService.formatTemp(root.selectedDayForecast().tempMin) + " / " + WeatherService.formatTemp(root.selectedDayForecast().tempMax)
+                                        ? WeatherService.formatTemp(Math.round(root.selectedDayForecast().tempMin)) + " / " + WeatherService.formatTemp(Math.round(root.selectedDayForecast().tempMax))
                                         : WeatherService.currentTempText()
                                     color: Theme.widgetTextColor
                                     font.family: Theme.monoFontFamily
-                                    font.pixelSize: 23
+                                    font.pixelSize: root.selectedDayForecast() ? 17 : 23
                                     font.weight: Font.Medium
                                 }
 
