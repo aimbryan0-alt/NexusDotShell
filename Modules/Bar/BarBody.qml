@@ -157,12 +157,25 @@ Item {
     spacing: root.spacing
   }
 
+  // Keep the clock centered when space allows, but never let it overlap
+  // the left or right groups. The player sits beside the clock only when
+  // there is enough room; otherwise the clock keeps priority.
+  readonly property real centerAvailableWidth:
+    Math.max(0, rightRow.x - (leftRow.x + leftRow.width))
+  readonly property bool centerFits:
+    centerAvailableWidth >= centerRow.width + root.spacing * 2
+  readonly property bool playerFits:
+    centerAvailableWidth >= centerRow.width + playerRow.width + root.spacing * 3
+
   Row {
     id: centerRow
-    x: Math.max(0, Math.min((root.width - width) / 2, rightRow.x - root.spacing - width))
+    x: Math.max(
+      leftRow.x + leftRow.width + root.spacing + (playerRow.visible ? playerRow.width + root.spacing : 0),
+      Math.min((root.width - width) / 2, rightRow.x - root.spacing - width)
+    )
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
-    visible: rightRow.x >= width + root.spacing
+    visible: root.centerFits
   }
 
   Row {
@@ -171,7 +184,7 @@ Item {
     anchors.rightMargin: root.spacing
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
-    visible: centerRow.visible
+    visible: root.centerFits && root.playerFits
   }
 
   Row {
