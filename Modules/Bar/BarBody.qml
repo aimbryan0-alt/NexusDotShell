@@ -176,7 +176,7 @@ Item {
     )
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
-    visible: root.centerFits
+    visible: true
   }
 
   Row {
