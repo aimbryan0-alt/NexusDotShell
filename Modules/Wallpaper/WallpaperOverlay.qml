@@ -261,7 +261,7 @@ PanelWindow {
 
           Flickable {
             id: options
-            width: root.overviewMode ? 220 : 0
+            width: root.overviewMode ? 190 : 0
             height: parent.height
             contentWidth: width
             contentHeight: optionsContent.implicitHeight
@@ -836,7 +836,7 @@ PanelWindow {
             Rectangle {
               id: layerGraph
               width: parent.width
-              height: 178
+              height: 150
               visible: root.overviewMode
               radius: Theme.cornerRadius
               color: Theme.withAlpha(Theme.surfaceContainer, 0.72)
