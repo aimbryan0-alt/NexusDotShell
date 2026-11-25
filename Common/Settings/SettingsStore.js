@@ -208,6 +208,29 @@ function migrateToVersion(obj, targetVersion) {
         // Keep any future/third-party widgets rather than silently deleting them.
         settings.barRightWidgets = orderedWidgets.concat(sourceWidgets);
     }
+    if (currentVersion < 14) {
+        // Restore natural left-to-right ordering for the original adaptive
+        // lanes. The player is routed to its dedicated far-right Row.
+        var orderedRightIds = [
+            "systemTray", "networkMonitor", "cpuUsage", "cpuTemperature",
+            "memUsage", "diskUsage", "battery", "notepadButton",
+            "notificationButton", "wallpaperCarousel", "clock", "player"
+        ];
+        var existingRight = Array.isArray(settings.barRightWidgets)
+            ? settings.barRightWidgets.slice()
+            : Util.cloneDef(SpecModule.SPEC["barRightWidgets"].def);
+        var orderedRight = [];
+        orderedRightIds.forEach(function(id) {
+            var index = existingRight.findIndex(function(widget) {
+                return widget && widget.id === id;
+            });
+            if (index >= 0)
+                orderedRight.push(existingRight.splice(index, 1)[0]);
+            else
+                orderedRight.push({ id: id, enabled: true });
+        });
+        settings.barRightWidgets = orderedRight.concat(existingRight);
+    }
     settings.configVersion = targetVersion;
     return settings;
 }
