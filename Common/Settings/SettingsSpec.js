@@ -71,22 +71,22 @@ var SPEC = {
         ]
     },
     barRightWidgets: {
-        // Row uses RightToLeft: this array is the reverse of the visual
-        // left-to-right order. Keep the complete Nexus Core together, then
-        // notes/notifications, wallpaper cover, clock, and music at the end.
+        // Natural left-to-right order: complete system core, notes and
+        // notifications, wallpaper cover, then clock. Music uses its own
+        // dedicated far-right slot in BarBody.
         def: [
-            { id: "player", enabled: true },
-            { id: "clock", enabled: true },
-            { id: "wallpaperCarousel", enabled: true },
-            { id: "notificationButton", enabled: true },
-            { id: "notepadButton", enabled: true },
-            { id: "battery", enabled: true },
-            { id: "diskUsage", enabled: true },
-            { id: "memUsage", enabled: true },
-            { id: "cpuTemperature", enabled: true },
-            { id: "cpuUsage", enabled: true },
+            { id: "systemTray", enabled: true },
             { id: "networkMonitor", enabled: true },
-            { id: "systemTray", enabled: true }
+            { id: "cpuUsage", enabled: true },
+            { id: "cpuTemperature", enabled: true },
+            { id: "memUsage", enabled: true },
+            { id: "diskUsage", enabled: true },
+            { id: "battery", enabled: true },
+            { id: "notepadButton", enabled: true },
+            { id: "notificationButton", enabled: true },
+            { id: "wallpaperCarousel", enabled: true },
+            { id: "clock", enabled: true },
+            { id: "player", enabled: true }
         ]
     },
     barTransparency: { def: 0 },
