@@ -157,8 +157,10 @@ Item {
     id: leftRow
     anchors.left: parent.left
     anchors.leftMargin: Math.max(0, root.innerPadding)
+    width: Math.min(implicitWidth, root.width * 0.34)
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
+    clip: true
   }
 
   // Keep the music pill and clock together in the center group. This avoids
@@ -179,7 +181,9 @@ Item {
     id: rightRow
     anchors.right: parent.right
     anchors.rightMargin: Math.max(0, root.innerPadding)
+    width: Math.min(implicitWidth, root.width * 0.36)
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
+    clip: true
   }
 }
