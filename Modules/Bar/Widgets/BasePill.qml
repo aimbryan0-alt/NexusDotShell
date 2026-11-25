@@ -83,6 +83,18 @@ Item {
       opacity: root.isMouseHovered ? 0.72 : 0.16
     }
 
+    // Offset signal dash: a static glitch cue with no animation or polling.
+    Rectangle {
+      anchors.top: background.top
+      anchors.right: background.right
+      anchors.rightMargin: 12
+      width: 9
+      height: 2
+      radius: 1
+      color: Theme.tertiary
+      opacity: root.isMouseHovered ? 0.95 : 0.42
+    }
+
     Loader {
       id: contentLoader
       anchors.centerIn: parent
