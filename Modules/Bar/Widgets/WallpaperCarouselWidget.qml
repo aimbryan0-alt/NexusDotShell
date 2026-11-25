@@ -46,7 +46,7 @@ BasePill {
       Rectangle {
         width: 26
         height: 26
-        radius: 10
+        radius: 13
         clip: true
         color: Theme.withAlpha(Theme.primary, 0.12)
         border.width: 1
