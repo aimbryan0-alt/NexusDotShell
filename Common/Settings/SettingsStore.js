@@ -139,7 +139,7 @@ function migrateToVersion(obj, targetVersion) {
                 enabled: true
             });
         }
-        ["controlCenterButton", "notepadButton"].forEach(function(id) {
+        ["notepadButton", "controlCenterButton"].forEach(function(id) {
             var index = restoredRightWidgets.findIndex(function(widget) {
                 return widget && widget.id === id;
             });
