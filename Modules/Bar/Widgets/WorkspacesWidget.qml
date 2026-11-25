@@ -513,48 +513,40 @@ BasePill {
           readonly property bool isActive: modelData === root.activeId
           readonly property bool isOccupied: WorkspacesService.occupiedIds.indexOf(modelData) !== -1
 
-          width: isActive ? 32 : 27
-          height: 25
+          width: isActive ? 30 : 25
+          height: 24
           anchors.verticalCenter: parent.verticalCenter
-          radius: 8
+          radius: height / 2
           color: isActive
-            ? Theme.withAlpha(Theme.primary, 0.2)
-            : (isOccupied
-              ? Theme.withAlpha(Theme.surfaceContainerHighest, 0.88)
-              : Theme.withAlpha(Theme.surfaceVariant, 0.42))
-          border.width: isActive ? 1.4 : (isOccupied ? 1 : 0)
+            ? Theme.withAlpha(Theme.primary, 0.19)
+            : (workspaceMouseArea.containsMouse
+              ? Theme.withAlpha(Theme.primary, 0.11)
+              : (isOccupied
+                ? Theme.withAlpha(Theme.surfaceContainerHighest, 0.72)
+                : Theme.withAlpha(Theme.surfaceVariant, 0.28)))
+          border.width: isActive ? 1.2 : (workspaceMouseArea.containsMouse ? 1 : 0)
           border.color: isActive
-            ? Theme.primary
-            : Theme.withAlpha(Theme.tertiary, isOccupied ? 0.42 : 0)
-          opacity: isActive ? 1.0 : (isOccupied ? 0.88 : 0.58)
+            ? Theme.withAlpha(Theme.primary, 0.9)
+            : Theme.withAlpha(Theme.primary, workspaceMouseArea.containsMouse ? 0.42 : 0)
+          opacity: isActive ? 1.0 : (isOccupied ? 0.82 : 0.52)
 
           Behavior on width {
             NumberAnimation {
-              duration: 150
+              duration: 140
               easing.type: Easing.OutCubic
             }
           }
           Behavior on color {
             ColorAnimation {
-              duration: 180
+              duration: 150
               easing.type: Easing.OutCubic
             }
           }
           Behavior on opacity {
             NumberAnimation {
-              duration: 180
+              duration: 150
               easing.type: Easing.OutCubic
             }
-          }
-
-          Rectangle {
-            anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: isActive ? 15 : 7
-            height: 2
-            radius: 1
-            color: isActive ? Theme.primary : Theme.tertiary
-            opacity: isActive ? 1 : (isOccupied ? 0.72 : 0)
           }
 
           Text {
@@ -580,8 +572,10 @@ BasePill {
           }
 
           MouseArea {
+            id: workspaceMouseArea
             z: 1
             anchors.fill: parent
+            hoverEnabled: true
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             preventStealing: true
             cursorShape: Qt.PointingHandCursor
