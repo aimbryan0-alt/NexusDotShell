@@ -283,39 +283,37 @@ installer from the repository directory:
 bash install.sh
 ```
 
-The installer checks required commands, bootstraps the `nob` build driver,
-builds the native telemetry helpers, installs the desktop entry, and asks
-before changing the Hyprland Lua configuration. It does not install system
-packages or run privileged commands. Missing dependencies are reported for
-manual installation.
+The installer verifies the required commands, builds the native telemetry
+helpers, installs the desktop entry, and installs a short `nexus` launcher in
+`~/.local/bin`. It then asks before modifying the detected
+`~/.config/hypr/hyprland.lua` configuration. It creates a timestamped backup
+before adding the autostart and screenshot binding. It does not install system
+packages or run privileged commands.
 
-The Lua integration targets `~/.config/hypr/hyprland.lua`. It creates a
-timestamped backup and appends a clearly marked block that starts
-NexusDotShell on the `hyprland.start` event and binds `SUPER + SHIFT + S` to
-a terminal-free full-output screenshot. Captures are saved under
-`~/Pictures/Nexus-Showcase/`. The screenshot shortcut requires `hyprshot`;
-on Arch Linux it may be installed with an AUR helper, for example
-`yay -S hyprshot`.
+After installation, launch the shell manually with:
 
-To enable only the Lua integration:
+```sh
+nexus
+```
+
+The Hyprland Lua integration starts NexusDotShell on the `hyprland.start`
+event and binds `SUPER + SHIFT + S` to a terminal-free full-output screenshot.
+Captures are saved under `~/Pictures/Nexus-Showcase/`. The screenshot shortcut
+requires `hyprshot`; on Arch Linux it may be installed with an AUR helper,
+for example `yay -S hyprshot`.
+
+To enable or remove only the Lua integration:
 
 ```sh
 bash scripts/enable-hyprland-lua.sh
-```
-
-To remove only the marked block (a backup is created first):
-
-```sh
 bash scripts/disable-hyprland-lua.sh
 ```
 
-The startup wrapper checks Quickshell's instance list for this project before
-launching, avoiding a second copy if NexusDotShell was already started
-manually. Reload or restart Hyprland after enabling the integration.
-
-The older `enable-hyprland-autostart.sh` and
-`disable-hyprland-autostart.sh` helpers remain available for users whose
-configuration uses the traditional `hyprland.conf` format.
+The removal helper deletes only the marked NexusDotShell block and creates a
+backup first. The startup wrapper checks whether this project is already
+running before launching another instance. The older
+`enable-hyprland-autostart.sh` and `disable-hyprland-autostart.sh` helpers
+remain available for traditional `hyprland.conf` configurations.
 
 ## Running
 
