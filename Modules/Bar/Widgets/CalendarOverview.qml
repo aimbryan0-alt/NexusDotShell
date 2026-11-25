@@ -55,7 +55,10 @@ PopupWindow {
                 "number": day.getDate(),
                 "inMonth": day.getMonth() === shownMonth,
                 "isToday": sameDay(day, today),
-                "isSelected": sameDay(day, selectedDate)
+                "isSelected": sameDay(day, selectedDate),
+                "hasEvent": SettingsData.calendarEvents.some(function(event) {
+                    return event.date === dateKey(day);
+                })
             });
         }
         return days;
@@ -564,10 +567,22 @@ PopupWindow {
 
                             Text {
                                 anchors.centerIn: parent
+                                anchors.verticalCenterOffset: modelData.hasEvent ? -2 : 0
                                 text: modelData.number
                                 color: modelData.isSelected ? Theme.onPrimary : modelData.inMonth ? Theme.widgetTextColor : Theme.widgetInactiveIconColor
                                 font.pixelSize: 13
                                 font.weight: modelData.isToday || modelData.isSelected ? Font.DemiBold : Font.Normal
+                            }
+
+                            Rectangle {
+                                width: 4
+                                height: 4
+                                radius: 2
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.bottom: parent.bottom
+                                anchors.bottomMargin: 3
+                                color: modelData.isSelected ? Theme.onPrimary : Theme.primary
+                                visible: modelData.hasEvent
                             }
 
                             MouseArea {
@@ -848,10 +863,10 @@ PopupWindow {
                         Text {
                             width: parent.width - 70
                             height: parent.height
-                            text: qsTr("Events")
+                            text: qsTr("NEXUS · AGENDA")
                             color: Theme.widgetTextColor
-                            font.pixelSize: 17
-                            font.weight: Font.Medium
+                            font.pixelSize: 15
+                            font.weight: Font.DemiBold
                             verticalAlignment: Text.AlignVCenter
                             elide: Text.ElideRight
                         }

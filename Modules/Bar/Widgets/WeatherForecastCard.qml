@@ -52,7 +52,7 @@ Rectangle {
     { label: qsTr("Umidade"), text: root.humidityText, icon: "humidity_low" },
     { label: qsTr("Vento"), text: root.windText, icon: "air" },
     { label: qsTr("Pressão"), text: root.pressureText, icon: "speed" },
-    { label: qsTr("Chuva"), text: root.precipitationText, icon: "rainy" }
+    { label: qsTr("Chuva"), text: qsTr("%1 · %2").arg(root.precipitationText).arg(WeatherService.formatRain(root.forecastData?.precipitationMm)), icon: "rainy" }
   ]
 
   color: isCurrent ? Theme.withAlpha(Theme.primary, 0.11) : Theme.nestedSurface
@@ -102,7 +102,7 @@ Rectangle {
     Row {
       spacing: Theme.spacingXXS
       anchors.horizontalCenter: parent.horizontalCenter
-      visible: root.daily && root.forecastData != null
+      visible: root.forecastData != null && (root.daily || root.dense)
       DmsIcon {
         name: "rainy"
         size: 11
