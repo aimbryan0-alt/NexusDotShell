@@ -20,7 +20,7 @@ Item {
   readonly property int innerPadding: Math.max(6,
     typeof SettingsData !== "undefined" ? SettingsData.barInnerPadding : 6)
   // Keep side groups close to Nexus Center without touching its centered position.
-  readonly property int centerGap: Math.max(root.spacing, Theme.barThickness)
+  readonly property int centerGap: Math.max(10, root.spacing + 8)
 
   Component { id: launcherButtonComp; LauncherButton {} }
   Component { id: submapComp; SubmapWidget {} }
@@ -141,7 +141,7 @@ Item {
     }
     if (precedingWidgets > 0)
       usedWidth += root.spacing
-    return Math.max(0, centerRow.x - root.centerGap - leftRow.x - usedWidth)
+    return Math.min(156, Math.max(0, centerRow.x - root.centerGap - leftRow.x - usedWidth))
   }
 
   Component.onCompleted: {
