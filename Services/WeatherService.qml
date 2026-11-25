@@ -172,6 +172,27 @@ Singleton {
     return ((isDay !== false) ? _dayIcons : _nightIcons)[String(code)] || "cloud"
   }
   function weatherCondition(code) { return _conditions[String(code)] || "Unknown" }
+  function _parseJsonResponse(raw, source) {
+    const body = String(raw === undefined || raw === null ? "" : raw)
+      .replace(/^\\uFEFF/, "").trim()
+    if (!body)
+      throw new Error(source + ": resposta vazia; verifique a conexão e a disponibilidade da API")
+
+    let parsed
+    try {
+      parsed = JSON.parse(body)
+    } catch (error) {
+      throw new Error(source + ": JSON inválido (" + String(error)
+        + "). Início da resposta: " + body.slice(0, 180))
+    }
+
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
+      throw new Error(source + ": formato JSON inesperado")
+    if (parsed.error)
+      throw new Error(source + ": " + (parsed.reason || parsed.message || "a API retornou um erro"))
+    return parsed
+  }
+
   function _useF() { return (typeof SettingsData !== "undefined") ? (SettingsData.useFahrenheit ?? false) : false }
   function currentTempText() {
     if (!weather.available) return "--"
@@ -255,7 +276,7 @@ Singleton {
       return
     root.locationSearchPending = false
     try {
-      const response = JSON.parse(text.trim())
+      const response = root._parseJsonResponse(text, "Busca de cidades")
       root.locationSuggestions = (response.results || []).slice(0, 5).map(result => ({
         name: result.name || "",
         admin1: result.admin1 || "",
@@ -335,7 +356,7 @@ Singleton {
             || SettingsData.weatherLocation !== geocodeFetcher.requestedLocation)
           return
         try {
-          const d = JSON.parse(text.trim())
+          const d = root._parseJsonResponse(text, "Geocodificação")
           const r = (d.results||[])[0]
           if (!r) throw new Error("No geocoding results")
           root.location = {city:r.name, country:r.country||"", latitude:r.latitude, longitude:r.longitude}
@@ -402,8 +423,9 @@ Singleton {
     stdout: StdioCollector {
       onStreamFinished: {
         try {
-          const data = JSON.parse(text.trim())
-          if (!data.current || !data.daily) throw new Error("Missing weather fields")
+          const data = root._parseJsonResponse(text, "Previsão do tempo")
+          if (!data.current || !data.daily || !Array.isArray(data.daily.time))
+            throw new Error("Previsão do tempo: resposta sem os campos current/daily.time esperados")
           const cur = data.current, daily = data.daily, hourly = data.hourly || {}
           const tC = cur.temperature_2m||0, fC = cur.apparent_temperature||tC
 
@@ -464,6 +486,7 @@ Singleton {
         } catch(e) {
           root.weather = Object.assign({}, root.weather, {loading:false})
           root.lastFetchError = String(e)
+          console.warn("WeatherService:", root.lastFetchError)
           root.retryAttempts++
           if (root.retryAttempts < 3) retryTimer.restart()
         }
