@@ -15,10 +15,10 @@ Item {
   property QtObject barWindow: null
 
   // Keep groups readable even when older settings contain zero/negative spacing.
-  readonly property int spacing: Math.max(4,
-    typeof SettingsData !== "undefined" ? SettingsData.barSpacing : 4)
-  readonly property int innerPadding: Math.max(4,
-    typeof SettingsData !== "undefined" ? SettingsData.barInnerPadding : 4)
+  readonly property int spacing: Math.max(2,
+    typeof SettingsData !== "undefined" ? SettingsData.barSpacing : 3)
+  readonly property int innerPadding: Math.max(6,
+    typeof SettingsData !== "undefined" ? SettingsData.barInnerPadding : 6)
 
   Component { id: launcherButtonComp; LauncherButton {} }
   Component { id: submapComp; SubmapWidget {} }
@@ -156,7 +156,7 @@ Item {
   Row {
     id: leftRow
     anchors.left: parent.left
-    anchors.leftMargin: Math.max(0, root.innerPadding)
+    anchors.leftMargin: root.innerPadding
     width: Math.max(0, Math.min(implicitWidth,
       centerRow.x - root.spacing - x))
     anchors.verticalCenter: parent.verticalCenter
@@ -164,11 +164,10 @@ Item {
     clip: true
   }
 
-  // Nexus Center is the single, fixed focal point of the bar.
-  // Side groups use only the space around it and cannot push it away.
+  // Nexus Center remains mathematically centered and independent of side groups.
   Row {
     id: centerRow
-    width: implicitWidth
+    width: Math.min(implicitWidth, Math.max(0, root.width * 0.34))
     x: Math.round((root.width - width) / 2)
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
@@ -176,10 +175,15 @@ Item {
     visible: width > 0
   }
 
+  // The right group hugs the right edge when it fits. On narrow displays it
+  // uses only the space left after Nexus Center instead of drifting off-screen.
   Row {
     id: rightRow
-    x: centerRow.x + centerRow.width + root.spacing
-    width: Math.max(0, root.width - x - Math.max(0, root.innerPadding))
+    x: Math.max(
+      centerRow.x + centerRow.width + root.spacing,
+      root.width - implicitWidth - root.innerPadding
+    )
+    width: Math.max(0, root.width - x - root.innerPadding)
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
     clip: true
