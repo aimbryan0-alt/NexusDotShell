@@ -173,8 +173,8 @@ Singleton {
   }
   function weatherCondition(code) { return _conditions[String(code)] || "Unknown" }
   function _parseJsonResponse(raw, source) {
-    const body = String(raw === undefined || raw === null ? "" : raw)
-      .replace(/^\\uFEFF/, "").trim()
+    const rawText = String(raw === undefined || raw === null ? "" : raw)
+    const body = (rawText.charCodeAt(0) === 0xFEFF ? rawText.slice(1) : rawText).trim()
     if (!body)
       throw new Error(source + ": resposta vazia; verifique a conexão e a disponibilidade da API")
 
