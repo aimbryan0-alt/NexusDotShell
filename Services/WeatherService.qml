@@ -449,6 +449,7 @@ Singleton {
             rawSunrise: daily.sunrise?.[0]||"", rawSunset: daily.sunset?.[0]||"",
             pressure:cur.surface_pressure||0,
             precipitationProbability:daily.precipitation_probability_max?.[0]||0,
+            precipitationMm:daily.precipitation_sum?.[0]??0,
             isDay:Boolean(cur.is_day),
             forecast:forecast, hourlyForecast:hourlyForecast
           }
