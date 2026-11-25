@@ -40,12 +40,12 @@ BasePill {
 
   content: Component {
     Row {
-      spacing: 6
+      spacing: 0
       anchors.verticalCenter: parent.verticalCenter
 
       Rectangle {
-        width: 34
-        height: 25
+        width: 23
+        height: 23
         radius: 6
         clip: true
         color: Theme.withAlpha(Theme.primary, 0.12)
@@ -84,28 +84,7 @@ BasePill {
         }
       }
 
-      Column {
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: 1
 
-        Text {
-          text: "SCENES"
-          color: Theme.primary
-          font.family: Theme.monoFontFamily
-          font.pixelSize: 8
-          font.bold: true
-        }
-
-        Text {
-          text: root.images.length > 0
-            ? (String(root.imageIndex + 1).padStart(2, "0") + " / "
-              + String(root.images.length).padStart(2, "0"))
-            : "OPEN"
-          color: Theme.widgetInactiveIconColor
-          font.family: Theme.monoFontFamily
-          font.pixelSize: 8
-        }
-      }
     }
   }
 }
