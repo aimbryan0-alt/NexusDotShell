@@ -2224,6 +2224,37 @@ BasePill {
                     graphColor: modelData.id === "memory" ? Theme.secondary : Theme.primary
                   }
 
+                  // Compact live-load rail complements the history graph.
+                  Rectangle {
+                    width: parent.width
+                    height: 5
+                    radius: 3
+                    color: Theme.withAlpha(Theme.outline, 0.24)
+
+                    Rectangle {
+                      width: parent.width * Math.max(0, Math.min(100,
+                        modelData.id === "cpu" ? SystemStatsService.cpuUsage
+                          : modelData.id === "memory" ? SystemStatsService.memoryUsage
+                          : modelData.id === "gpu"
+                            ? (SystemStatsService.gpus.length > 0
+                              ? SystemStatsService.gpus[0].utilization : 0)
+                            : SystemStatsService.cpuTemperature)) / 100
+                      height: parent.height
+                      radius: parent.radius
+                      color: modelData.id === "temperature"
+                        ? (SystemStatsService.cpuTemperature >= 85 ? Theme.error
+                          : SystemStatsService.cpuTemperature >= 70 ? Theme.warning : Theme.secondary)
+                        : modelData.id === "memory" ? Theme.secondary
+                        : modelData.id === "gpu" ? Theme.tertiary : Theme.primary
+                      Behavior on width {
+                        NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
+                      }
+                      Behavior on color {
+                        ColorAnimation { duration: 180; easing.type: Easing.OutCubic }
+                      }
+                    }
+                  }
+
                   Text {
                     width: parent.width
                     visible: modelData.id === "gpu"
