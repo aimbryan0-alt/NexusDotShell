@@ -1,0 +1,3 @@
+module qs.Modules.DesktopWidgets
+DesktopWidgets 1.0 DesktopWidgets.qml
+LyricsHud 1.0 LyricsHud.qml
