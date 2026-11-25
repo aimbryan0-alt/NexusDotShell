@@ -167,7 +167,7 @@ Item {
   // Nexus Center remains mathematically centered and independent of side groups.
   Row {
     id: centerRow
-    width: Math.min(implicitWidth, Math.max(0, root.width * 0.34))
+    width: implicitWidth
     x: Math.round((root.width - width) / 2)
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
