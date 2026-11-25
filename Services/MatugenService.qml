@@ -118,6 +118,7 @@ Singleton {
         ? "matugen image '" + p.sourceImage.replace(/'/g, "'\\''") + "'"
         : "matugen color hex " + p.sourceColor)
       + " --config '" + root.configPath + "' --type " + p.scheme + " --mode " + p.mode
+      + (p.sourceImage ? " --prefer saturation" : "")
     matugenProc.command = ["bash", "-c", script]
     matugenProc.running = true
   }
