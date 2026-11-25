@@ -20,7 +20,7 @@ BasePill {
   backgroundTint: root.artworkPaletteReady
     ? Theme.withAlpha(root.sampledArtworkColor, 0.1)
     : "transparent"
-  readonly property real controlSize: Math.round(root.textSize() * 1.5)
+  readonly property real controlSize: Math.round(root.textSize() * 1.65)
   readonly property color playerPillAccentColor: root.artworkPaletteReady
     ? Theme.blend(Theme.primary, root.sampledArtworkColor, 0.22)
     : Theme.primary
@@ -1085,8 +1085,8 @@ BasePill {
         id: playerContent
         visible: root.hasMedia
         width: Math.max(
-          Math.min(180, Math.max(trackLabelMetrics.advanceWidth, 3 * root.controlSize + 4)),
-          3 * root.controlSize + 4 + 2 * (30 + Theme.spaceXS)
+          Math.min(220, Math.max(trackLabelMetrics.advanceWidth, 3 * root.controlSize + 6)),
+          3 * root.controlSize + 6 + 2 * (34 + Theme.spaceXS)
         )
         spacing: 0
         anchors.horizontalCenter: parent.horizontalCenter
@@ -1111,7 +1111,7 @@ BasePill {
           Item {
             id: visualizer
             visible: root.player && root.player.isPlaying
-            width: 30
+            width: 34
             height: root.controlSize
             clip: true
             anchors.right: controls.left
