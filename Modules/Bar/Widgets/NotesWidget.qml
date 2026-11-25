@@ -1545,11 +1545,11 @@ BasePill {
 
               Repeater {
                 model: [
-                  { id: "save", label: qsTr("Save"), icon: "save" },
-                  { id: "open", label: qsTr("Open"), icon: "folder_open" },
-                  { id: "new", label: qsTr("New"), icon: "note_add" },
+                  { id: "save", label: qsTr("Salvar"), icon: "save" },
+                  { id: "open", label: qsTr("Abrir"), icon: "folder_open" },
+                  { id: "new", label: qsTr("Nova"), icon: "note_add" },
                   { id: "autosave", label: qsTr("Auto"), icon: "sync" },
-                  { id: "preview", label: root.markdownPreview ? qsTr("Edit") : qsTr("Preview"), icon: root.markdownPreview ? "edit" : "visibility" }
+                  { id: "preview", label: root.markdownPreview ? qsTr("Editar") : qsTr("Prévia"), icon: root.markdownPreview ? "edit" : "visibility" }
                 ]
 
                 delegate: Rectangle {
@@ -1558,25 +1558,27 @@ BasePill {
                   readonly property bool hovered: actionMouse.containsMouse
                   readonly property bool active: (modelData.id === "autosave" && SettingsData.notesAutoSave)
                     || (modelData.id === "preview" && root.markdownPreview)
-                  width: actionLayout.implicitWidth + 18
-                  height: 38
+                  width: actionLayout.implicitWidth + 20
+                  height: 36
                   anchors.verticalCenter: parent.verticalCenter
-                  radius: 12
-                  color: active ? Theme.withAlpha(Theme.primary, 0.16)
-                    : hovered ? Theme.withAlpha(Theme.primary, 0.1)
-                    : Theme.withAlpha(Theme.surfaceContainerHigh, 0.34)
-                  border.width: active ? 1 : 0
-                  border.color: Theme.withAlpha(Theme.primary, 0.42)
+                  radius: 18
+                  color: modelData.id === "save"
+                    ? (hovered ? Theme.withAlpha(Theme.primary, 0.24) : Theme.withAlpha(Theme.primary, 0.15))
+                    : active ? Theme.withAlpha(Theme.primary, 0.14)
+                    : hovered ? Theme.withAlpha(Theme.primary, 0.09)
+                    : Theme.withAlpha(Theme.surfaceContainerHigh, 0.22)
+                  border.width: modelData.id === "save" || active ? 1 : 0
+                  border.color: Theme.withAlpha(Theme.primary, modelData.id === "save" ? 0.48 : 0.34)
 
                   Row {
                     id: actionLayout
                     anchors.centerIn: parent
-                    spacing: 6
+                    spacing: 5
 
                     DmsIcon {
                       anchors.verticalCenter: parent.verticalCenter
                       name: actionButton.modelData.icon
-                      size: 17
+                      size: 16
                       color: actionButton.active || actionButton.hovered
                         ? Theme.primary : Theme.widgetInactiveIconColor
                     }
@@ -1584,11 +1586,11 @@ BasePill {
                     Text {
                       anchors.verticalCenter: parent.verticalCenter
                       text: actionButton.modelData.id === "autosave" && SettingsData.notesAutoSave
-                        ? qsTr("Auto ✓") : actionButton.modelData.label
+                        ? qsTr("Auto ON") : actionButton.modelData.label
                       color: actionButton.active ? Theme.primary : Theme.widgetTextColor
                       font.family: Theme.fontFamily
                       font.pixelSize: Theme.fontSizeSmall
-                      font.weight: actionButton.active ? Font.DemiBold : Font.Medium
+                      font.weight: actionButton.modelData.id === "save" || actionButton.active ? Font.DemiBold : Font.Medium
                     }
                   }
 

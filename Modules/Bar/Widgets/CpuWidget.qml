@@ -2023,7 +2023,7 @@ BasePill {
 
             Text {
               width: parent.width
-              text: "NEXUS // CORE"
+              text: "NEXUS CORE"
               color: Theme.widgetTextColor
               font.pixelSize: 15
               font.weight: Font.Bold
@@ -2034,7 +2034,7 @@ BasePill {
 
             Text {
               width: parent.width
-              text: qsTr("CPU · MEMORY · GRAPHICS  /  %1 CORES").arg(SystemStatsService.cpuCoreCount)
+              text: qsTr("SYSTEM MONITOR · %1 NÚCLEOS").arg(SystemStatsService.cpuCoreCount)
               color: Theme.widgetInactiveIconColor
               font.family: Theme.monoFontFamily
               font.pixelSize: 10
@@ -2074,11 +2074,11 @@ BasePill {
 
           Repeater {
             model: [
-              { "id": "overview", "text": qsTr("Overview"), "icon": "dashboard" },
+              { "id": "overview", "text": qsTr("Geral"), "icon": "dashboard" },
               { "id": "processor", "text": qsTr("CPU"), "icon": "memory" },
               { "id": "memory", "text": qsTr("RAM"), "icon": "developer_board" },
               { "id": "gpu", "text": qsTr("GPU"), "icon": "videogame_asset" },
-              { "id": "processes", "text": qsTr("Tasks"), "icon": "view_list" }
+              { "id": "processes", "text": qsTr("Processos"), "icon": "view_list" }
             ]
 
             delegate: Rectangle {
@@ -2144,10 +2144,10 @@ BasePill {
 
             Repeater {
               model: [
-                { "id": "cpu", "title": qsTr("PROCESSOR"), "icon": "memory" },
-                { "id": "memory", "title": qsTr("MEMORY"), "icon": "developer_board" },
-                { "id": "gpu", "title": qsTr("GRAPHICS"), "icon": "videogame_asset" },
-                { "id": "temperature", "title": qsTr("CPU TEMP"), "icon": "device_thermostat" }
+                { "id": "cpu", "title": qsTr("PROCESSADOR"), "icon": "memory" },
+                { "id": "memory", "title": qsTr("MEMÓRIA"), "icon": "developer_board" },
+                { "id": "gpu", "title": qsTr("GRÁFICOS"), "icon": "videogame_asset" },
+                { "id": "temperature", "title": qsTr("TEMPERATURA"), "icon": "device_thermostat" }
               ]
 
               delegate: Rectangle {
@@ -2226,7 +2226,7 @@ BasePill {
 
                   UsageHistoryGraph {
                     width: parent.width
-                    height: 40
+                    height: 30
                     visible: modelData.id !== "temperature"
                     values: modelData.id === "cpu" ? SystemStatsService.cpuHistory
                       : modelData.id === "memory" ? SystemStatsService.memoryHistory
@@ -2332,7 +2332,7 @@ BasePill {
                 }
 
                 Text {
-                  text: "TOP PROCESSES"
+                  text: qsTr("MAIOR USO DE CPU")
                   color: Theme.primary
                   font.family: Theme.monoFontFamily
                   font.pixelSize: 10
@@ -2344,7 +2344,7 @@ BasePill {
                 Item { width: 1; height: 1 }
 
                 Text {
-                  text: qsTr("%1 running").arg(SystemStatsService.processCount)
+                  text: qsTr("%1 ativos").arg(SystemStatsService.processCount)
                   color: Theme.widgetInactiveIconColor
                   font.pixelSize: 9
                   anchors.verticalCenter: parent.verticalCenter
