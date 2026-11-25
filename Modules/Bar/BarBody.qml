@@ -36,6 +36,7 @@ Item {
   Component { id: settingsComp; SettingsWidget {} }
   Component { id: notepadComp; NotesWidget {} }
   Component { id: notificationComp; NotificationWidget {} }
+  Component { id: wallpaperCarouselComp; WallpaperCarouselWidget {} }
 
   function registryFor(id) {
     switch (id) {
@@ -55,6 +56,7 @@ Item {
     case "controlCenterButton": return settingsComp
     case "notepadButton": return notepadComp
     case "notificationButton": return notificationComp
+    case "wallpaperCarousel": return wallpaperCarouselComp
     default: return null
     }
   }
