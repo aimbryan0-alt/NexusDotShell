@@ -25,7 +25,7 @@ PopupWindow {
   grabFocus: true
   color: "transparent"
   surfaceFormat.opaque: false
-  implicitWidth: Math.min(860, Math.max(380, Screen.width - Theme.spaceXL * 2))
+  implicitWidth: Math.min(780, Math.max(380, Screen.width - Theme.spaceXL * 2))
   implicitHeight: column.implicitHeight + Theme.spaceL * 2 +
     (locationSuggestions.length > 0 ? Math.min(160, locationSuggestionList.contentHeight) + Theme.spaceL : 0)
 
@@ -94,11 +94,21 @@ PopupWindow {
       Rectangle {
         id: heroCard
         width: parent.width
-        height: 148
+        height: 136
         radius: Theme.cornerRadius
         color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.6)
         border.width: 1
-        border.color: Theme.withAlpha(Theme.outline, 0.18)
+        border.color: Theme.withAlpha(Theme.primary, 0.22)
+
+        Rectangle {
+          anchors.left: parent.left
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          width: 2
+          radius: 1
+          color: Theme.primary
+          opacity: 0.78
+        }
 
         Item {
           anchors.fill: parent
@@ -112,7 +122,7 @@ PopupWindow {
             DmsIcon {
               anchors.verticalCenter: parent.verticalCenter
               name: WeatherService.weatherIcon(WeatherService.weather.wCode, WeatherService.weather.isDay)
-              size: 48
+              size: 42
               color: Theme.primary
             }
 
@@ -234,7 +244,7 @@ PopupWindow {
             fillColor: "transparent"
             PathPolyline {
               path: {
-                const points = WeatherService.getEcliptic(new Date()) || []
+                const points = WeatherService.getEcliptic(new Date(), 24) || []
                 return points.map(point => Qt.point(
                   point.h * (skyCard.width - Theme.spaceS * 2),
                   (1 - point.v) * (skyCard.height - Theme.spaceS * 2) / 2
