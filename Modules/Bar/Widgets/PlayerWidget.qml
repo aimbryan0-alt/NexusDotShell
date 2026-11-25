@@ -381,7 +381,7 @@ BasePill {
                 font.family: Theme.monoFontFamily
                 font.pixelSize: 10
                 font.weight: Font.DemiBold
-                letterSpacing: 0.4
+                font.letterSpacing: 0.4
               }
 
               MouseArea {
