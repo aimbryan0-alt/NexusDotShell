@@ -67,14 +67,13 @@ var SPEC = {
     },
     barCenterWidgets: {
         def: [
-            { id: "player", enabled: true },
-            { id: "clock", enabled: true },
-            
+            { id: "controlCenterButton", enabled: true }
         ]
     },
     barRightWidgets: {
         def: [
-            { id: "controlCenterButton", enabled: true },
+            { id: "player", enabled: true },
+            { id: "clock", enabled: true },
             { id: "notepadButton", enabled: true },
             { id: "clipboard", enabled: true },
             { id: "notificationButton", enabled: true },
