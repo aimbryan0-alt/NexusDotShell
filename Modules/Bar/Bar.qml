@@ -136,8 +136,8 @@ Item {
       anchors.fill: parent
       anchors.leftMargin: 8
       anchors.rightMargin: 8
-      anchors.topMargin: 3
-      anchors.bottomMargin: 3
+      anchors.topMargin: 2
+      anchors.bottomMargin: 2
       radius: 13
       color: Theme.withAlpha(
         Theme.surfaceContainerLowest,
