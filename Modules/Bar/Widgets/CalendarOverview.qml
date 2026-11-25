@@ -116,6 +116,10 @@ PopupWindow {
         return null;
     }
 
+    function selectedDateIsToday() {
+        return sameDay(selectedDate, today);
+    }
+
     function addEvent() {
         const title = eventTitle.trim();
         if (!title)
@@ -387,10 +391,11 @@ PopupWindow {
 
                             DmsIcon {
                                 anchors.verticalCenter: parent.verticalCenter
-                                name: WeatherService.weatherIcon(
-                                    root.selectedDayForecast() ? root.selectedDayForecast().wCode : WeatherService.weather.wCode,
-                                    true
-                                )
+                                name: root.selectedDayForecast()
+                                    ? WeatherService.weatherIcon(root.selectedDayForecast().wCode, true)
+                                    : root.selectedDateIsToday()
+                                        ? WeatherService.weatherIcon(WeatherService.weather.wCode, WeatherService.weather.isDay)
+                                        : "cloud"
                                 size: 34
                                 color: Theme.primary
                             }
@@ -403,7 +408,7 @@ PopupWindow {
                                 Text {
                                     text: root.selectedDayForecast()
                                         ? WeatherService.formatTemp(Math.round(root.selectedDayForecast().tempMin)) + " / " + WeatherService.formatTemp(Math.round(root.selectedDayForecast().tempMax))
-                                        : WeatherService.currentTempText()
+                                        : root.selectedDateIsToday() ? WeatherService.currentTempText() : "--"
                                     color: Theme.widgetTextColor
                                     font.family: Theme.monoFontFamily
                                     font.pixelSize: root.selectedDayForecast() ? 17 : 23
@@ -414,7 +419,9 @@ PopupWindow {
                                     width: parent.width
                                     text: root.selectedDayForecast()
                                         ? WeatherService.weatherCondition(root.selectedDayForecast().wCode)
-                                        : WeatherService.weather.available ? WeatherService.weatherCondition(WeatherService.weather.wCode) : qsTr("Weather unavailable")
+                                        : root.selectedDateIsToday() && WeatherService.weather.available
+                                            ? WeatherService.weatherCondition(WeatherService.weather.wCode)
+                                            : qsTr("Sem previsão para esta data")
                                     color: Theme.widgetTextColor
                                     font.pixelSize: 11
                                     elide: Text.ElideRight
@@ -433,9 +440,9 @@ PopupWindow {
                                     width: parent.width
                                     text: root.selectedDayForecast()
                                         ? qsTr("Chuva %1 · %2").arg(WeatherService.formatPercent(root.selectedDayForecast().precipitationProbability)).arg(WeatherService.formatRain(root.selectedDayForecast().precipitationMm))
-                                        : WeatherService.weather.available
-                                            ? qsTr("Previsão indisponível para esta data")
-                                            : qsTr("Previsão de chuva indisponível")
+                                        : root.selectedDateIsToday() && WeatherService.weather.available
+                                            ? qsTr("Chuva %1 · %2").arg(WeatherService.formatPercent(WeatherService.weather.precipitationProbability)).arg(WeatherService.formatRain(WeatherService.weather.precipitationMm))
+                                            : qsTr("Previsão indisponível para esta data")
                                     color: Theme.widgetInactiveIconColor
                                     font.pixelSize: 10
                                     elide: Text.ElideRight
