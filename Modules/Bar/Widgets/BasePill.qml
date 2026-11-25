@@ -70,6 +70,13 @@ Item {
         root.isMouseHovered ? Theme.primary : Theme.outlineVariant,
         root.isMouseHovered ? 0.48 : 0.16
       )
+
+      Behavior on color {
+        ColorAnimation { duration: 140; easing.type: Easing.OutCubic }
+      }
+      Behavior on border.color {
+        ColorAnimation { duration: 140; easing.type: Easing.OutCubic }
+      }
     }
 
     // Quiet macOS-like glass pill; the Nexus accent appears on interaction.

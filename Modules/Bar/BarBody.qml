@@ -14,8 +14,11 @@ Item {
   property QtObject screen: null
   property QtObject barWindow: null
 
-  readonly property int spacing: typeof SettingsData !== "undefined" ? SettingsData.barSpacing : 0
-  readonly property int innerPadding: typeof SettingsData !== "undefined" ? SettingsData.barInnerPadding : 0
+  // Keep groups readable even when older settings contain zero/negative spacing.
+  readonly property int spacing: Math.max(4,
+    typeof SettingsData !== "undefined" ? SettingsData.barSpacing : 4)
+  readonly property int innerPadding: Math.max(4,
+    typeof SettingsData !== "undefined" ? SettingsData.barInnerPadding : 4)
 
   Component { id: launcherButtonComp; LauncherButton {} }
   Component { id: submapComp; SubmapWidget {} }
@@ -100,7 +103,6 @@ Item {
           })
         }
         root._created.push(obj)
-        console.info("MQBAR created:", entry.id, "parent=", hostRow.objectName, "w=", obj.width, "h=", obj.height, "vis=", obj.visible)
       } else {
         console.error("MQBAR failed to create obj for:", entry.id)
       }
@@ -115,8 +117,6 @@ Item {
     root.fillRow(SettingsData.barLeftWidgets, leftRow)
     root.fillRow(SettingsData.barCenterWidgets, centerRow)
     root.fillRow(SettingsData.barRightWidgets, rightRow)
-    console.info("MQBAR done. leftRow children=", leftRow.data.length, "centerRow children=", centerRow.data.length, "rightRow children=", rightRow.data.length)
-    console.info("MQBAR leftRow w=", leftRow.width, "centerRow w=", centerRow.width, "rightRow w=", rightRow.width)
   }
 
   function titleSpaceFor(titleWidget) {
