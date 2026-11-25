@@ -13,6 +13,7 @@ PanelWindow {
 
   property var targetScreen: null
   property bool chooserOpen: false
+  property bool advancedOptionsOpen: false
   property bool appPickerOpen: false
   property bool chooserAddLayer: false
   property string chooserScope: "global"
@@ -341,6 +342,7 @@ PanelWindow {
               }
 
               Row {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 height: 36
                 spacing: Theme.spaceXS
@@ -363,6 +365,7 @@ PanelWindow {
                 }
               }
 
+                visible: root.advancedOptionsOpen
               Text {
                 width: parent.width
                 text: qsTr("Shortcut: %1").arg(WallpaperService.pendingShortcut)
@@ -371,6 +374,7 @@ PanelWindow {
                 font.pixelSize: Theme.fontSizeSmall
                 elide: Text.ElideRight
               }
+                visible: root.advancedOptionsOpen
 
               Text {
                 width: parent.width
@@ -382,6 +386,7 @@ PanelWindow {
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.Wrap
+                visible: root.advancedOptionsOpen
               }
 
               Text {
@@ -390,6 +395,7 @@ PanelWindow {
                 color: Theme.surfaceVariantText
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSmall
+                visible: root.advancedOptionsOpen
                 wrapMode: Text.Wrap
               }
 
@@ -397,6 +403,7 @@ PanelWindow {
                 width: parent.width
                 label: qsTr("Choose media file…")
                 onClicked: WallpaperService.chooseMediaFile(
+                visible: root.advancedOptionsOpen
                   root.targetScreen, SettingsData.wallpaperApplyScope
                 )
               }
@@ -404,6 +411,7 @@ PanelWindow {
               ActionButton {
                 width: parent.width
                 label: qsTr("Add media file as a layer…")
+                visible: root.advancedOptionsOpen
                 onClicked: WallpaperService.chooseMediaFile(
                   root.targetScreen, SettingsData.wallpaperApplyScope, true
                 )
@@ -415,6 +423,7 @@ PanelWindow {
                   ? qsTr("Change app preview…")
                   : qsTr("Use app preview…")
                 onClicked: {
+                visible: root.advancedOptionsOpen
                   WallpaperService.error = ""
                   WallpaperService.refreshAppWindows()
                   root.appPickerOpen = true
@@ -430,17 +439,28 @@ PanelWindow {
                   )
                   : qsTr("App preview unavailable. Choose an open window.")
                 color: root.selectedAppWindow
+                visible: root.advancedOptionsOpen
                   ? Theme.surfaceVariantText
                   : Theme.error
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.Wrap
+                visible: root.advancedOptionsOpen
               }
 
               ActionButton {
                 width: parent.width
                 label: qsTr("Add wallpaper folder…")
                 onClicked: WallpaperService.chooseDirectory(root.targetScreen)
+              }
+
+              ActionButton {
+                width: parent.width
+                label: root.advancedOptionsOpen
+                  ? qsTr("Hide advanced settings")
+                  : qsTr("Advanced settings")
+                emphasized: root.advancedOptionsOpen
+                onClicked: root.advancedOptionsOpen = !root.advancedOptionsOpen
               }
 
               Row {
@@ -510,11 +530,13 @@ PanelWindow {
                     font.pixelSize: Theme.fontSizeMedium
                   }
 
+                visible: root.advancedOptionsOpen
                   MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: WallpaperService.setColor(colorInput.text,
                       SettingsData.wallpaperApplyScope, root.targetScreen, true)
+                visible: root.advancedOptionsOpen
                   }
                 }
               }
@@ -522,6 +544,7 @@ PanelWindow {
               Rectangle {
                 width: parent.width
                 height: 1
+                visible: root.advancedOptionsOpen
                 color: Theme.withAlpha(Theme.outlineVariant, 0.5)
               }
 
@@ -545,16 +568,19 @@ PanelWindow {
                   anchors.leftMargin: Theme.spaceS
                   anchors.rightMargin: Theme.spaceXS
                   verticalAlignment: TextInput.AlignVCenter
+                visible: root.advancedOptionsOpen
                   color: Theme.surfaceText
                   font.family: Theme.monoFontFamily
                   font.pixelSize: Theme.fontSizeSmall
                   text: root.selectedSource.startsWith("http")
                     ? root.selectedSource
+                visible: root.advancedOptionsOpen
                     : ""
                   selectByMouse: true
                   clip: true
                   onAccepted: applyUrl()
                 }
+                visible: root.advancedOptionsOpen
               }
 
               ActionButton {
@@ -563,6 +589,7 @@ PanelWindow {
                 onClicked: applyUrl()
               }
 
+                visible: root.advancedOptionsOpen
               ActionButton {
                 width: parent.width
                 label: qsTr("Add URL as a layer")
@@ -663,6 +690,7 @@ PanelWindow {
 
                   contentItem: Text {
                     text: modelData.label
+                visible: root.advancedOptionsOpen
                     color: Theme.surfaceText
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeSmall
@@ -672,11 +700,13 @@ PanelWindow {
 
                   background: Rectangle {
                     radius: Theme.hoverRadius
+                visible: root.advancedOptionsOpen
                     color: parent.highlighted
                       ? Theme.withAlpha(Theme.primary, 0.2)
                       : "transparent"
                   }
                 }
+                visible: root.advancedOptionsOpen
               }
 
               Text {
@@ -684,6 +714,7 @@ PanelWindow {
                 width: parent.width
                 text: qsTr("Best available selects the highest video stream; caps fall back to a lower resolution when needed.")
                 color: Theme.surfaceVariantText
+                visible: root.advancedOptionsOpen
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.Wrap
@@ -722,6 +753,7 @@ PanelWindow {
                   width: 64
                   height: parent.height
                   radius: Theme.hoverRadius
+                visible: root.advancedOptionsOpen
                   color: Theme.surfaceContainerHigh
 
                   TextInput {
@@ -730,6 +762,7 @@ PanelWindow {
                     horizontalAlignment: TextInput.AlignHCenter
                     verticalAlignment: TextInput.AlignVCenter
                     text: String(SettingsData.wallpaperIntervalMinutes)
+                visible: root.advancedOptionsOpen
                     color: Theme.surfaceText
                     font.family: Theme.monoFontFamily
                     font.pixelSize: Theme.fontSizeSmall
@@ -751,6 +784,7 @@ PanelWindow {
                 )
               }
 
+                visible: root.advancedOptionsOpen
               Text {
                 width: parent.width
                 visible: WallpaperService.error.length > 0
@@ -762,6 +796,7 @@ PanelWindow {
               }
             }
           }
+                visible: root.advancedOptionsOpen
 
           Column {
             width: parent.width - options.width - (root.overviewMode ? parent.spacing : 0)
