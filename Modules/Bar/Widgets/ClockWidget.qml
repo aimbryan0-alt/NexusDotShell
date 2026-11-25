@@ -108,7 +108,6 @@ BasePill {
               onClicked: WallpaperService.openOverview(root.parentScreen)
             }
           }
-        }
 
           Item {
             id: worldClockButton
@@ -155,6 +154,7 @@ BasePill {
             }
           }
 
+        }
         Row {
           id: dateRow
           anchors.horizontalCenter: parent.horizontalCenter
