@@ -2523,6 +2523,18 @@ BasePill {
               height: 150
               radius: Theme.cornerRadius
               color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.72)
+              border.width: 1
+              border.color: Theme.withAlpha(Theme.secondary, 0.22)
+
+              Rectangle {
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: 2
+                radius: 1
+                color: Theme.secondary
+                opacity: 0.62
+              }
 
               Column {
                 anchors.fill: parent
@@ -2617,6 +2629,8 @@ BasePill {
               height: 62
               radius: Theme.cornerRadius
               color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.64)
+              border.width: 1
+              border.color: Theme.withAlpha(Theme.primary, 0.2)
 
               Item {
                 anchors.fill: parent
