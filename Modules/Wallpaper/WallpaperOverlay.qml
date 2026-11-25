@@ -154,7 +154,7 @@ PanelWindow {
       width: Math.min(parent.width - Theme.spaceXL * 2, 980)
       height: Math.min(parent.height - Theme.spaceXL * 2, 680)
       anchors.centerIn: parent
-      radius: Theme.cornerRadius
+      radius: 22
       color: Theme.withAlpha(
         Theme.widgetBaseBackgroundColor,
         SettingsData.barWidgetTransparency
@@ -891,7 +891,7 @@ PanelWindow {
 
                     Rectangle {
                       anchors.fill: parent
-                      radius: Theme.cornerRadius
+                      radius: 18
                       color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.92)
                       border.width: 1
                       border.color: Theme.withAlpha(Theme.outlineVariant, 0.65)
@@ -1113,7 +1113,7 @@ PanelWindow {
                     Rectangle {
                       width: parent.width
                       height: 44
-                      radius: Theme.cornerRadius
+                      radius: 16
                       color: Theme.withAlpha(
                         Theme.widgetBaseBackgroundColor,
                         SettingsData.barWidgetTransparency
@@ -2194,7 +2194,7 @@ PanelWindow {
     signal clicked
 
     height: 36
-    radius: Theme.cornerRadius
+    radius: 16
     opacity: enabled ? 1 : 0.55
     color: actionMouse.containsMouse
       ? Theme.withAlpha(Theme.primary, 0.2)
