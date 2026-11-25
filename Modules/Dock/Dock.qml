@@ -43,7 +43,8 @@ Item {
   }
   readonly property var dockWindows: {
     const windows = root.monitorWindows.filter(window =>
-      !root.pinnedEntries.some(entry => root.matchesPinnedWindow(entry, window))
+      window && window.wayland
+        && !root.pinnedEntries.some(entry => root.matchesPinnedWindow(entry, window))
     )
     if (!SettingsData.dockGroupByApp)
       return windows.map(window => window.wayland)
@@ -214,8 +215,9 @@ Item {
 
         delegate: Item {
           required property var modelData
-          readonly property var appWindow: modelData
+          readonly property var appWindow: modelData || null
           readonly property real iconSize: root.baseIconSize
+          visible: !!appWindow
 
           width: iconMouse.containsMouse ? iconSize + 7 : iconSize
           height: iconSize + 7
@@ -229,10 +231,10 @@ Item {
             radius: 15
             color: iconMouse.containsMouse
               ? Theme.withAlpha(Theme.primary, 0.2)
-              : appWindow.activated
+              : appWindow && appWindow.activated
                 ? Theme.withAlpha(Theme.primary, 0.08)
                 : "transparent"
-            border.width: iconMouse.containsMouse || appWindow.activated ? 1 : 0
+            border.width: iconMouse.containsMouse || (appWindow && appWindow.activated) ? 1 : 0
             border.color: Theme.withAlpha(Theme.primary,
               iconMouse.containsMouse ? 0.9 : 0.68)
           }
@@ -241,7 +243,7 @@ Item {
             anchors.centerIn: parent
             width: iconSize - 8
             height: iconSize - 8
-            source: Theme.getAppIcon(appWindow.appId)
+            source: appWindow ? Theme.getAppIcon(appWindow.appId || "") : ""
             asynchronous: true
           }
 
@@ -249,11 +251,11 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 1
-            width: appWindow.activated ? 13 : 4
+            width: appWindow && appWindow.activated ? 13 : 4
             height: 3
             radius: 2
             color: Theme.primary
-            opacity: appWindow.activated ? 1 : 0.42
+            opacity: appWindow && appWindow.activated ? 1 : 0.42
           }
 
           MouseArea {
@@ -261,11 +263,15 @@ Item {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onClicked: appWindow.activate()
+            enabled: !!appWindow
+            onClicked: {
+              if (appWindow)
+                appWindow.activate()
+            }
           }
 
-          ToolTip.visible: iconMouse.containsMouse && !!appWindow.title
-          ToolTip.text: appWindow.title || appWindow.appId || "Application"
+          ToolTip.visible: !!appWindow && iconMouse.containsMouse && !!(appWindow.title || appWindow.appId)
+          ToolTip.text: appWindow ? (appWindow.title || appWindow.appId || "Application") : "Application"
           ToolTip.delay: 450
         }
       }
