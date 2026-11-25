@@ -60,13 +60,15 @@ PanelWindow {
     height: 190
 
     anchors {
+      verticalCenter: SettingsData.lyricsHudPosition === "right-center"
+        || SettingsData.lyricsHudPosition === "left-center"
       top: SettingsData.lyricsHudPosition === "top-left"
-        || SettingsData.lyricsHudPosition === "top-right"
       bottom: SettingsData.lyricsHudPosition === "bottom-left"
         || SettingsData.lyricsHudPosition === "bottom-right"
       left: SettingsData.lyricsHudPosition === "top-left"
         || SettingsData.lyricsHudPosition === "bottom-left"
-      right: SettingsData.lyricsHudPosition === "top-right"
+        || SettingsData.lyricsHudPosition === "left-center"
+      right: SettingsData.lyricsHudPosition === "right-center"
         || SettingsData.lyricsHudPosition === "bottom-right"
       margins: 30
     }
@@ -152,7 +154,7 @@ PanelWindow {
               anchors.margins: -5
               cursorShape: Qt.PointingHandCursor
               onClicked: {
-                const positions = ["bottom-right", "bottom-left", "top-left", "top-right"]
+                const positions = ["right-center", "left-center", "bottom-right", "bottom-left"]
                 const index = positions.indexOf(SettingsData.lyricsHudPosition)
                 SettingsData.set("lyricsHudPosition", positions[(index + 1) % positions.length])
               }
