@@ -297,7 +297,7 @@ nexus
 ```
 
 The Hyprland Lua integration starts NexusDotShell on the `hyprland.start`
-event and binds `SUPER + SHIFT + S` to a terminal-free full-output screenshot.
+event and binds `SUPER + ALT + S` to a terminal-free full-output screenshot.
 Captures are saved under `~/Pictures/Nexus-Showcase/`. The screenshot shortcut
 requires `hyprshot`; on Arch Linux it may be installed with an AUR helper,
 for example `yay -S hyprshot`.
