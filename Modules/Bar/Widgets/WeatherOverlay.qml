@@ -90,6 +90,52 @@ PopupWindow {
       anchors.margins: Theme.spaceL
       spacing: Theme.spaceS
 
+      Row {
+        width: parent.width
+        height: 30
+        spacing: Theme.spaceS
+
+        Rectangle {
+          width: 3
+          height: 22
+          radius: 1
+          color: Theme.secondary
+          anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Column {
+          anchors.verticalCenter: parent.verticalCenter
+          spacing: 0
+
+          Text {
+            text: "NEXUS // ATMOS"
+            color: Theme.secondary
+            font.family: Theme.monoFontFamily
+            font.pixelSize: Theme.fontSizeSmall
+            font.bold: true
+            font.letterSpacing: 1.1
+          }
+
+          Text {
+            text: WeatherService.weather.city || qsTr("Monitoramento climático")
+            color: Theme.withAlpha(Theme.surfaceText, 0.55)
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeSmall - 2
+            elide: Text.ElideRight
+          }
+        }
+
+        Item { width: Math.max(0, parent.width - 210); height: 1 }
+
+        Text {
+          anchors.verticalCenter: parent.verticalCenter
+          text: WeatherService.weather.loading ? "SYNC…" : "LIVE / WX"
+          color: Theme.withAlpha(Theme.secondary, 0.9)
+          font.family: Theme.monoFontFamily
+          font.pixelSize: Theme.fontSizeSmall - 2
+        }
+      }
+
       // Current conditions and the six key weather readings.
       Rectangle {
         id: heroCard
@@ -98,7 +144,7 @@ PopupWindow {
         radius: Theme.cornerRadius
         color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.6)
         border.width: 1
-        border.color: Theme.withAlpha(Theme.primary, 0.22)
+        border.color: Theme.withAlpha(Theme.secondary, 0.28)
 
         Rectangle {
           anchors.left: parent.left
@@ -106,8 +152,8 @@ PopupWindow {
           anchors.bottom: parent.bottom
           width: 2
           radius: 1
-          color: Theme.primary
-          opacity: 0.78
+          color: Theme.secondary
+          opacity: 0.86
         }
 
         Item {

@@ -865,7 +865,7 @@ BasePill {
             width: parent.width - 84
             height: parent.height
             leftPadding: 16
-            text: "NEXUS  //  NOTES"
+            text: "🌳  NEXUS NOTES"
             color: Theme.widgetTextColor
             font.family: Theme.fontFamily
             font.pixelSize: Math.round(Theme.fontSizeMedium * 1.05)
@@ -1650,7 +1650,7 @@ BasePill {
             width: parent.width * 0.32
             height: parent.height
             text: NotesService.currentText.length === 0
-              ? qsTr("Empty")
+              ? qsTr("🌱 Cultivando ideias")
               : qsTr("%1 characters · %2 lines")
                 .arg(NotesService.currentText.length)
                 .arg(NotesService.currentText.split("\n").length)

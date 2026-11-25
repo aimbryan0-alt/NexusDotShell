@@ -70,7 +70,7 @@ BasePill {
             anchors.centerIn: parent
 
             DmsIcon {
-              name: "memory"
+              name: "speed"
               size: root.iconSize()
               color: root.usageColor()
               anchors.verticalCenter: parent.verticalCenter

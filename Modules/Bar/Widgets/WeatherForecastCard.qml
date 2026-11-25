@@ -55,8 +55,9 @@ Rectangle {
     { label: qsTr("Chuva"), text: qsTr("%1 · %2").arg(root.precipitationText).arg(WeatherService.formatRain(root.forecastData?.precipitationMm)), icon: "rainy" }
   ]
 
-  color: isCurrent ? Theme.withAlpha(Theme.primary, 0.11) : Theme.nestedSurface
-  border.color: isCurrent ? Theme.withAlpha(Theme.primary, 0.38) : Theme.withAlpha(Theme.outline, 0.10)
+  readonly property color forecastAccent: daily ? Theme.primary : Theme.secondary
+  color: isCurrent ? Theme.withAlpha(forecastAccent, 0.14) : Theme.nestedSurface
+  border.color: isCurrent ? Theme.withAlpha(forecastAccent, 0.48) : Theme.withAlpha(Theme.outline, 0.12)
   border.width: 1
 
   Behavior on color {
@@ -72,7 +73,7 @@ Rectangle {
     anchors.top: parent.top
     height: 2
     radius: 1
-    color: isCurrent ? Theme.primary : Theme.withAlpha(Theme.primary, 0.16)
+    color: isCurrent ? root.forecastAccent : Theme.withAlpha(root.forecastAccent, 0.24)
   }
 
   Column {
@@ -91,7 +92,7 @@ Rectangle {
     DmsIcon {
       name: root.forecastData ? WeatherService.weatherIcon(root.forecastData.wCode || 0, root.forecastData.isDay ?? true) : "cloud"
       size: 22
-      color: root.isCurrent ? Theme.primary : Theme.withAlpha(Theme.primary, 0.72)
+      color: root.isCurrent ? root.forecastAccent : Theme.withAlpha(root.forecastAccent, 0.78)
       anchors.horizontalCenter: parent.horizontalCenter
       visible: root.forecastData != null
     }

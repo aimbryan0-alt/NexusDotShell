@@ -11,6 +11,9 @@ import qs.Services
 BasePill {
   id: root
 
+  // Hide the tray capsule when there are no status icons to show.
+  visible: root.visibleItems.length > 0 || root.hiddenItems.length > 0
+
   property var barWindow: null
   property var parentScreen: null
   property var openMenuItem: null
