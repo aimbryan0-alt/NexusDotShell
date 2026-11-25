@@ -150,8 +150,8 @@ PanelWindow {
     Rectangle {
       id: panel
       visible: root.overlayVisible && root.overviewMode
-      width: Math.min(parent.width - Theme.spaceXL * 2, 1120)
-      height: Math.min(parent.height - Theme.spaceXL * 2, 760)
+      width: Math.min(parent.width - Theme.spaceXL * 2, 980)
+      height: Math.min(parent.height - Theme.spaceXL * 2, 680)
       anchors.centerIn: parent
       radius: Theme.cornerRadius
       color: Theme.withAlpha(
@@ -260,7 +260,7 @@ PanelWindow {
 
           Flickable {
             id: options
-            width: root.overviewMode ? 270 : 0
+            width: root.overviewMode ? 220 : 0
             height: parent.height
             contentWidth: width
             contentHeight: optionsContent.implicitHeight
