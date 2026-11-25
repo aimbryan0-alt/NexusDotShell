@@ -432,22 +432,41 @@ BasePill {
 
         Item {
           width: parent.width
-          height: 44
+          height: 48
 
           Rectangle {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
-            width: 3
-            height: 30
+            width: 34
+            height: 34
+            radius: 10
+            color: Theme.withAlpha(Theme.primary, 0.13)
+            border.width: 1
+            border.color: Theme.withAlpha(Theme.primary, 0.42)
+
+            DmsIcon {
+              anchors.centerIn: parent
+              name: "tune"
+              size: 19
+              color: Theme.primary
+            }
+          }
+
+          Rectangle {
+            anchors.left: parent.left
+            anchors.top: parent.top
+            width: 2
+            height: 8
             radius: 1
-            color: Theme.primary
+            color: Theme.tertiary
+            opacity: 0.8
           }
 
           Column {
             anchors.left: parent.left
-            anchors.leftMargin: 11
+            anchors.leftMargin: 43
             anchors.verticalCenter: parent.verticalCenter
-            width: Math.max(0, parent.width - 66)
+            width: Math.max(0, parent.width - 108)
             spacing: 2
 
             Text {
@@ -462,11 +481,42 @@ BasePill {
             }
 
             Text {
-              text: "SYSTEM CONTROL  /  LIVE STATUS"
+              text: "SYSTEM CONTROL  /  LIVE TELEMETRY"
               color: Theme.widgetInactiveIconColor
               font.family: Theme.monoFontFamily
               font.pixelSize: Theme.fontSizeSmall - 2
               font.letterSpacing: 0.7
+            }
+          }
+
+          Rectangle {
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            width: 48
+            height: 19
+            radius: Theme.pillRadius
+            color: Theme.withAlpha(Theme.secondary, 0.12)
+            border.width: 1
+            border.color: Theme.withAlpha(Theme.secondary, 0.34)
+
+            Row {
+              anchors.centerIn: parent
+              spacing: 4
+              Rectangle {
+                width: 5
+                height: 5
+                radius: 3
+                color: Theme.secondary
+                anchors.verticalCenter: parent.verticalCenter
+              }
+              Text {
+                text: "LIVE"
+                color: Theme.secondary
+                font.family: Theme.monoFontFamily
+                font.pixelSize: 8
+                font.bold: true
+                anchors.verticalCenter: parent.verticalCenter
+              }
             }
           }
 
@@ -525,6 +575,7 @@ BasePill {
               model: [
                 {
                   label: "CPU",
+                  icon: "memory",
                   description: "PROCESSOR LOAD",
                   value: Math.round(SystemStatsService.cpuUsage) + "%",
                   level: SystemStatsService.cpuUsage,
@@ -533,6 +584,7 @@ BasePill {
                 },
                 {
                   label: "RAM",
+                  icon: "developer_board",
                   description: "MEMORY IN USE",
                   value: Math.round(SystemStatsService.memoryUsage) + "%",
                   level: SystemStatsService.memoryUsage,
@@ -541,6 +593,7 @@ BasePill {
                 },
                 {
                   label: "TEMP",
+                  icon: "device_thermostat",
                   description: "CPU TEMPERATURE",
                   value: SystemStatsService.cpuTemperature > 0
                     ? Math.round(SystemStatsService.cpuTemperature) + "°C"
@@ -552,6 +605,7 @@ BasePill {
                 },
                 {
                   label: "DISK",
+                  icon: "database",
                   description: "STORAGE USED",
                   value: Math.round(SystemStatsService.diskUsage) + "%",
                   level: SystemStatsService.diskUsage,
@@ -563,9 +617,9 @@ BasePill {
               delegate: Rectangle {
                 required property var modelData
                 width: (parent.width - parent.spacing * 3) / 4
-                height: 58
+                height: 62
                 radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.62)
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.72)
                 border.width: 1
                 border.color: Theme.withAlpha(modelData.tint, 0.24)
 
@@ -589,6 +643,13 @@ BasePill {
 
                   Row {
                     width: parent.width
+
+                    DmsIcon {
+                      anchors.verticalCenter: parent.verticalCenter
+                      name: modelData.icon
+                      size: 11
+                      color: modelData.tint
+                    }
 
                     Text {
                       text: modelData.label
@@ -645,7 +706,7 @@ BasePill {
           Text {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
-            text: "CONNECTIVITY"
+            text: "DEVICE LINKS"
             color: Theme.widgetInactiveIconColor
             font.family: Theme.monoFontFamily
             font.pixelSize: Theme.fontSizeSmall - 2
@@ -656,7 +717,7 @@ BasePill {
           Text {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            text: "01  /  NETWORK + AUDIO"
+            text: "01  /  CONNECTION MATRIX"
             color: Theme.tertiary
             font.family: Theme.monoFontFamily
             font.pixelSize: Theme.fontSizeSmall - 2
@@ -1730,7 +1791,7 @@ BasePill {
             Text {
               anchors.right: parent.right
               anchors.verticalCenter: parent.verticalCenter
-              text: "02  /  ENERGY"
+              text: "02  /  DISPLAY & ENERGY"
               color: Theme.tertiary
               font.family: Theme.monoFontFamily
               font.pixelSize: Theme.fontSizeSmall - 2
