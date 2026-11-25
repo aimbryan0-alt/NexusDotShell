@@ -74,17 +74,18 @@ var SPEC = {
     },
     barRightWidgets: {
         def: [
+            { id: "controlCenterButton", enabled: true },
+            { id: "notepadButton", enabled: true },
             { id: "clipboard", enabled: true },
             { id: "notificationButton", enabled: true },
+            { id: "wallpaperCarousel", enabled: true },
             { id: "systemTray", enabled: true },
             { id: "networkMonitor", enabled: true },
             { id: "cpuUsage", enabled: true },
             { id: "cpuTemperature", enabled: true },
             { id: "memUsage", enabled: true },
             { id: "diskUsage", enabled: true },
-            { id: "battery", enabled: true },
-            { id: "notepadButton", enabled: true },
-            { id: "controlCenterButton", enabled: true }
+            { id: "battery", enabled: true }
         ]
     },
     barTransparency: { def: 0 },
