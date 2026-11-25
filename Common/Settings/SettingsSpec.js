@@ -76,7 +76,6 @@ var SPEC = {
         def: [
             { id: "clipboard", enabled: true },
             { id: "notificationButton", enabled: true },
-            { id: "wallpaperCarousel", enabled: true },
             { id: "systemTray", enabled: true },
             { id: "networkMonitor", enabled: true },
             { id: "cpuUsage", enabled: true },
