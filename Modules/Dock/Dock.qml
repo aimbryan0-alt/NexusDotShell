@@ -150,6 +150,10 @@ Item {
           readonly property real iconSize: root.baseIconSize
           width: iconSize + 10
           height: iconSize + 10
+          scale: favoriteMouse.containsMouse ? 1.055 : 1.0
+          Behavior on scale {
+            NumberAnimation { duration: 135; easing.type: Easing.OutCubic }
+          }
           Rectangle {
             anchors.fill: parent
             radius: 14
@@ -161,6 +165,8 @@ Item {
             border.width: favoriteMouse.containsMouse ? 1 : root.runningWindowFor(entry) ? 1 : 0
             border.color: Theme.withAlpha(Theme.primary,
               favoriteMouse.containsMouse ? 0.82 : 0.48)
+            Behavior on color { ColorAnimation { duration: 145 } }
+            Behavior on border.color { ColorAnimation { duration: 145 } }
           }
           IconImage {
             anchors.centerIn: parent
@@ -177,6 +183,8 @@ Item {
             radius: 2
             color: Theme.primary
             opacity: root.runningWindowFor(entry) ? 1 : 0.42
+            Behavior on width { NumberAnimation { duration: 145 } }
+            Behavior on opacity { NumberAnimation { duration: 145 } }
           }
           MouseArea {
             id: favoriteMouse
@@ -223,6 +231,10 @@ Item {
 
           width: iconSize + 10
           height: iconSize + 10
+          scale: iconMouse.containsMouse ? 1.055 : 1.0
+          Behavior on scale {
+            NumberAnimation { duration: 135; easing.type: Easing.OutCubic }
+          }
 
           Behavior on width {
             NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
@@ -239,6 +251,8 @@ Item {
             border.width: iconMouse.containsMouse || (appWindow && appWindow.activated) ? 1 : 0
             border.color: Theme.withAlpha(Theme.primary,
               iconMouse.containsMouse ? 0.82 : 0.48)
+            Behavior on color { ColorAnimation { duration: 145 } }
+            Behavior on border.color { ColorAnimation { duration: 145 } }
           }
 
           IconImage {
@@ -258,6 +272,8 @@ Item {
             radius: 2
             color: Theme.primary
             opacity: appWindow && appWindow.activated ? 1 : 0.42
+            Behavior on width { NumberAnimation { duration: 145 } }
+            Behavior on opacity { NumberAnimation { duration: 145 } }
           }
 
           MouseArea {
