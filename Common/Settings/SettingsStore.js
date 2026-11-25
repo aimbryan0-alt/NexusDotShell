@@ -152,6 +152,35 @@ function migrateToVersion(obj, targetVersion) {
         });
         settings.barRightWidgets = restoredRightWidgets;
     }
+    if (currentVersion < 12) {
+        var centerWidgetsV12 = Array.isArray(settings.barCenterWidgets)
+            ? settings.barCenterWidgets.slice() : [];
+        var rightWidgetsV12 = Array.isArray(settings.barRightWidgets)
+            ? settings.barRightWidgets.slice() : [];
+        var leftWidgetsV12 = Array.isArray(settings.barLeftWidgets)
+            ? settings.barLeftWidgets.slice() : [];
+
+        // Keep Nexus Center alone in the true center; preserve other center
+        // widgets by moving them into the right-side group.
+        centerWidgetsV12.forEach(function(widget) {
+            if (!widget || widget.id === "controlCenterButton") return;
+            if (!rightWidgetsV12.some(function(existing) {
+                return existing && existing.id === widget.id;
+            }))
+                rightWidgetsV12.push(widget);
+        });
+
+        leftWidgetsV12 = leftWidgetsV12.filter(function(widget) {
+            return !widget || widget.id !== "controlCenterButton";
+        });
+        rightWidgetsV12 = rightWidgetsV12.filter(function(widget) {
+            return !widget || widget.id !== "controlCenterButton";
+        });
+
+        settings.barLeftWidgets = leftWidgetsV12;
+        settings.barCenterWidgets = [{ id: "controlCenterButton", enabled: true }];
+        settings.barRightWidgets = rightWidgetsV12;
+    }
     settings.configVersion = targetVersion;
     return settings;
 }
