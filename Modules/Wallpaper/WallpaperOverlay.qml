@@ -178,7 +178,7 @@ PanelWindow {
             spacing: 2
 
             Text {
-              text: root.overviewMode ? qsTr("Nexus Wallpaper") : qsTr("Change wallpaper")
+              text: root.overviewMode ? qsTr("NEXUS // WALLPAPER") : qsTr("NEXUS // QUICK SWITCH")
               color: Theme.surfaceText
               font.family: Theme.fontFamily
               font.pixelSize: Theme.fontSizeMedium
@@ -904,7 +904,7 @@ PanelWindow {
                         anchors.top: parent.top
                         anchors.margins: Theme.spaceXS
                         height: 62
-                        radius: Theme.hoverRadius
+                        radius: 14
                         color: modelData.type === "color"
                           ? Qt.color(modelData.source)
                           : Theme.surfaceContainer
@@ -1104,7 +1104,7 @@ PanelWindow {
                     readonly property int groupContentHeight: collapsed
                       ? 0
                       : directoryGroup.modelData.items.length > 0
-                        ? Math.ceil(directoryGroup.modelData.items.length / 4) * 108
+                        ? Math.ceil(directoryGroup.modelData.items.length / 4) * 116
                         : 36
                     width: wallpaperGroups.width
                     height: 44 + (groupContentHeight > 0 ? Theme.spaceXS + groupContentHeight : 0)
@@ -1223,7 +1223,7 @@ PanelWindow {
                         contentY: directoryItemsViewport.scrollOffset
                         property int columnCount: 4
                         cellWidth: width / columnCount
-                        cellHeight: 108
+                        cellHeight: 116
                         cacheBuffer: 0
                         model: directoryGroup.collapsed
                           ? []
@@ -2085,36 +2085,59 @@ PanelWindow {
         Rectangle {
           anchors.fill: parent
           anchors.margins: Theme.spaceXS
-          radius: Theme.cornerRadius
+          radius: 16
           color: parent.parent.selectedInStack
-            ? Theme.withAlpha(Theme.primary, 0.22)
+            ? Theme.withAlpha(Theme.primary, 0.14)
             : Theme.withAlpha(
               Theme.widgetBaseBackgroundColor,
-              SettingsData.barWidgetTransparency
+              SettingsData.barWidgetTransparency * 0.72
             )
-          border.width: parent.parent.selectedInStack ? 2 : 1
-          border.color: parent.parent.selectedInStack
-            ? Theme.primary
-            : Theme.withAlpha(Theme.outlineVariant, 0.65)
-          clip: true
+          border.width: parent.parent.selectedInStack ? 1 : 0
+          border.color: Theme.primary
 
-          Image {
-            anchors.fill: parent
-            source: parent.parent.previewActivated
-              && WallpaperService.typeForSource(parent.parent.modelData) === "image"
-              ? parent.parent.modelData
-              : ""
-            fillMode: Image.PreserveAspectCrop
-            sourceSize: Qt.size(160, 80)
-            asynchronous: true
-            cache: false
-            opacity: status === Image.Ready ? 1 : 0
+          Rectangle {
+            id: wallpaperThumbCircle
+            width: 76
+            height: 76
+            radius: 38
+            anchors.top: parent.top
+            anchors.topMargin: 5
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: Theme.surfaceContainerHigh
+            border.width: parent.parent.selectedInStack ? 2 : 1
+            border.color: parent.parent.selectedInStack
+              ? Theme.primary
+              : Theme.withAlpha(Theme.outlineVariant, 0.75)
+            clip: true
 
-            Behavior on opacity {
-              NumberAnimation {
-                duration: 90
-                easing.type: Theme.standardEasing
+            Image {
+              anchors.fill: parent
+              source: parent.parent.parent.previewActivated
+                && WallpaperService.typeForSource(parent.parent.parent.modelData) === "image"
+                ? parent.parent.parent.modelData
+                : ""
+              fillMode: Image.PreserveAspectCrop
+              sourceSize: Qt.size(128, 128)
+              asynchronous: true
+              cache: false
+              opacity: status === Image.Ready ? 1 : 0
+
+              Behavior on opacity {
+                NumberAnimation {
+                  duration: 110
+                  easing.type: Theme.standardEasing
+                }
               }
+            }
+
+            DmsIcon {
+              anchors.centerIn: parent
+              visible: WallpaperService.typeForSource(
+                parent.parent.parent.modelData
+              ) !== "image"
+              name: "wallpaper"
+              size: 27
+              color: Theme.primary
             }
           }
 
@@ -2122,8 +2145,9 @@ PanelWindow {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            anchors.margins: Theme.spaceXS
-            height: 28
+            anchors.bottomMargin: 4
+            height: 25
+            horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             text: String(parent.parent.modelData).split("/").pop()
             color: Theme.surfaceText
@@ -2146,11 +2170,11 @@ PanelWindow {
 
           ActionButton {
             visible: root.overviewMode
-            width: 32
-            height: 32
+            width: 26
+            height: 26
             anchors.top: parent.top
             anchors.right: parent.right
-            anchors.margins: Theme.spaceS
+            anchors.margins: Theme.spaceXS
             label: "+"
             emphasized: true
             onClicked: WallpaperService.addLayer(
