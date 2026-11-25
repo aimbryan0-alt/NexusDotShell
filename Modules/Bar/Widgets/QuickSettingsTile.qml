@@ -38,6 +38,17 @@ Rectangle {
     opacity: root.active ? 0.9 : tileMouse.containsMouse ? 0.5 : 0
   }
 
+  Rectangle {
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.rightMargin: 12
+    width: 11
+    height: 2
+    radius: 1
+    color: Theme.tertiary
+    opacity: root.active ? 0.8 : tileMouse.containsMouse ? 0.55 : 0.22
+  }
+
   Row {
     anchors.fill: parent
     anchors.margins: 10
