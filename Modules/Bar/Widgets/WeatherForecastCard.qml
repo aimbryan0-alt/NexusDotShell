@@ -55,13 +55,22 @@ Rectangle {
     { label: "Precipitation", text: root.precipitationText, icon: "rainy" }
   ]
 
-  color: isCurrent ? Theme.withAlpha(Theme.primary, 0.1) : Theme.nestedSurface
-  border.color: isCurrent ? Theme.withAlpha(Theme.primary, 0.3) : "transparent"
+  color: isCurrent ? Theme.withAlpha(Theme.primary, 0.11) : Theme.nestedSurface
+  border.color: isCurrent ? Theme.withAlpha(Theme.primary, 0.38) : Theme.withAlpha(Theme.outline, 0.10)
   border.width: 1
+
+  Rectangle {
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    height: 2
+    radius: 1
+    color: isCurrent ? Theme.primary : Theme.withAlpha(Theme.primary, 0.16)
+  }
 
   Column {
     anchors.centerIn: parent
-    spacing: Theme.spacingXS
+    spacing: Theme.spaceS
 
     Text {
       text: root.forecastData != null ? root.dateText : "--"
@@ -74,8 +83,8 @@ Rectangle {
 
     DmsIcon {
       name: root.forecastData ? WeatherService.weatherIcon(root.forecastData.wCode || 0, root.forecastData.isDay ?? true) : "cloud"
-      size: 24
-      color: root.isCurrent ? Theme.primary : Theme.withAlpha(Theme.primary, 0.8)
+      size: 22
+      color: root.isCurrent ? Theme.primary : Theme.withAlpha(Theme.primary, 0.72)
       anchors.horizontalCenter: parent.horizontalCenter
       visible: root.forecastData != null
     }
@@ -83,9 +92,9 @@ Rectangle {
     Text {
       text: root.daily ? root.minMaxTempText : root.tempText
       font.family: Theme.monoFontFamily
-      font.pixelSize: Theme.fontSizeSmall
+      font.pixelSize: Theme.fontSizeSmall + 1
       color: root.isCurrent ? Theme.primary : Theme.surfaceText
-      font.weight: Font.Medium
+      font.weight: Font.DemiBold
       anchors.horizontalCenter: parent.horizontalCenter
       visible: root.forecastData != null
     }
