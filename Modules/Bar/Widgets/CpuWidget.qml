@@ -128,6 +128,22 @@ BasePill {
             color: root.cpuHovered ? Theme.withAlpha(Theme.primary, 0.12) : "transparent"
             z: -1
           }
+
+          Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: Math.max(18, parent.width - 8)
+            height: 2
+            radius: 1
+            color: Theme.withAlpha(Theme.outline, 0.28)
+
+            Rectangle {
+              width: parent.width * Math.max(0, Math.min(100, SystemStatsService.cpuUsage)) / 100
+              height: parent.height
+              radius: parent.radius
+              color: root.usageColor()
+            }
+          }
         }
 
         Rectangle {
@@ -213,6 +229,22 @@ BasePill {
             radius: Theme.hoverRadius
             color: root.memoryHovered ? Theme.withAlpha(Theme.primary, 0.12) : "transparent"
             z: -1
+          }
+
+          Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: Math.max(18, parent.width - 8)
+            height: 2
+            radius: 1
+            color: Theme.withAlpha(Theme.outline, 0.28)
+
+            Rectangle {
+              width: parent.width * Math.max(0, Math.min(100, SystemStatsService.memoryUsage)) / 100
+              height: parent.height
+              radius: parent.radius
+              color: root.memoryColor()
+            }
           }
         }
 
