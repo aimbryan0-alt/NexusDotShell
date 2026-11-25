@@ -67,9 +67,8 @@ var SPEC = {
         ]
     },
     barCenterWidgets: {
-        def: [
-            { id: "controlCenterButton", enabled: true }
-        ]
+        // Nexus Center is placed last in the right-side lane.
+        def: []
     },
     barRightWidgets: {
         // Right side: complete system core, notes, notifications, wallpaper and clock.
@@ -85,7 +84,8 @@ var SPEC = {
             { id: "notepadButton", enabled: true },
             { id: "notificationButton", enabled: true },
             { id: "wallpaperCarousel", enabled: true },
-            { id: "clock", enabled: true }
+            { id: "clock", enabled: true },
+            { id: "controlCenterButton", enabled: true }
         ]
     },
     barTransparency: { def: 0 },
