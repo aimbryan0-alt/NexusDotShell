@@ -204,7 +204,13 @@ Singleton {
       if (p.length===2) {
         const lat = parseFloat(p[0]), lon = parseFloat(p[1])
         if (!isNaN(lat) && !isNaN(lon)) {
-          root.location = {city: city||"Local Weather", country:"", latitude:lat, longitude:lon}
+          const locationParts = city.split(",").map(part => part.trim()).filter(Boolean)
+          root.location = {
+            city: locationParts[0] || "Local Weather",
+            country: locationParts.slice(1).join(", "),
+            latitude: lat,
+            longitude: lon
+          }
           fetchWeather(lat, lon); return
         }
       }

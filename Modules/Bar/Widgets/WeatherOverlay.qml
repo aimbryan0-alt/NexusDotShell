@@ -70,7 +70,7 @@ PopupWindow {
     WeatherService.searchLocations("")
     locInput.text = ""
     SettingsData.set("weatherCoordinates", location.latitude + "," + location.longitude)
-    SettingsData.set("weatherLocation", location.name)
+    SettingsData.set("weatherLocation", [location.name, location.admin1, location.country].filter(Boolean).join(", "))
     WeatherService.updateLocation()
   }
 
@@ -641,7 +641,7 @@ PopupWindow {
     if (typeof SettingsData !== "undefined") {
       const c = SettingsData.weatherCoordinates || ""
       const l = SettingsData.weatherLocation || ""
-      locInput.placeholderText = (c || l) ? (c || l) : "City name or lat,lon"
+      locInput.placeholderText = (l || c) ? (l || c) : qsTr("Buscar cidade, estado ou país")
     }
   }
 }
