@@ -114,20 +114,20 @@ BasePill {
         Row {
           id: dateRow
           anchors.horizontalCenter: parent.horizontalCenter
-          spacing: 4
+          spacing: 6
 
           Text {
             text: ClockService.dateString
             color: Theme.widgetInactiveIconColor
             font.family: Theme.monoFontFamily
-            font.pixelSize: Math.round(root.textSize() * 0.7)
+            font.pixelSize: Math.round(root.textSize() * 0.76)
           }
 
           Text {
             text: ClockService.weekdayString
             color: Theme.widgetInactiveIconColor
             font.family: Theme.monoFontFamily
-            font.pixelSize: Math.round(root.textSize() * 0.7)
+            font.pixelSize: Math.round(root.textSize() * 0.76)
           }
         }
       }
