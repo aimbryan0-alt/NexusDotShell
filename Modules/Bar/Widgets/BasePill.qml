@@ -94,6 +94,20 @@ Item {
       opacity: root.isMouseHovered ? 0.82 : 0
     }
 
+    // A second, restrained accent anchors the pill without adding polling.
+    Rectangle {
+      anchors.bottom: background.bottom
+      anchors.horizontalCenter: background.horizontalCenter
+      width: Math.min(background.width - 24, Math.max(18, background.width * 0.24))
+      height: 1
+      radius: 1
+      color: Theme.primary
+      opacity: root.isMouseHovered ? 0.58 : 0.06
+      Behavior on opacity {
+        NumberAnimation { duration: 140 }
+      }
+    }
+
     Loader {
       id: contentLoader
       anchors.centerIn: parent
