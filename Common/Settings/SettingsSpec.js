@@ -76,6 +76,7 @@ var SPEC = {
             { id: "notificationButton", enabled: true },
             { id: "wallpaperCarousel", enabled: true },
             { id: "systemTray", enabled: true },
+            { id: "networkMonitor", enabled: true },
             { id: "cpuUsage", enabled: true },
             { id: "cpuTemperature", enabled: true },
             { id: "memUsage", enabled: true },

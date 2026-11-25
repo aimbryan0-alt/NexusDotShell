@@ -111,6 +111,20 @@ function migrateToVersion(obj, targetVersion) {
         });
         settings.barRightWidgets = rightWidgetsWithNotepad;
     }
+    if (currentVersion < 10 && Array.isArray(settings.barRightWidgets) &&
+        !settings.barRightWidgets.some(function(widget) {
+            return widget && widget.id === "networkMonitor";
+        })) {
+        var rightWidgetsWithNetwork = settings.barRightWidgets.slice();
+        var trayIndex = rightWidgetsWithNetwork.findIndex(function(widget) {
+            return widget && widget.id === "systemTray";
+        });
+        rightWidgetsWithNetwork.splice(trayIndex >= 0 ? trayIndex + 1 : rightWidgetsWithNetwork.length, 0, {
+            id: "networkMonitor",
+            enabled: true
+        });
+        settings.barRightWidgets = rightWidgetsWithNetwork;
+    }
     settings.configVersion = targetVersion;
     return settings;
 }
