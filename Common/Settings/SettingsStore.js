@@ -184,6 +184,30 @@ function migrateToVersion(obj, targetVersion) {
         settings.barCenterWidgets = [{ id: "controlCenterButton", enabled: true }];
         settings.barRightWidgets = rightWidgetsV12;
     }
+    if (currentVersion < 13) {
+        // Reorder the right lane for the intended visual sequence.
+        // Row.layoutDirection is RightToLeft, so the array is stored in reverse.
+        var orderedIds = [
+            "player", "clock", "wallpaperCarousel", "notificationButton",
+            "notepadButton", "battery", "diskUsage", "memUsage",
+            "cpuTemperature", "cpuUsage", "networkMonitor", "systemTray"
+        ];
+        var sourceWidgets = Array.isArray(settings.barRightWidgets)
+            ? settings.barRightWidgets.slice()
+            : Util.cloneDef(SpecModule.SPEC["barRightWidgets"].def);
+        var orderedWidgets = [];
+        orderedIds.forEach(function(id) {
+            var index = sourceWidgets.findIndex(function(widget) {
+                return widget && widget.id === id;
+            });
+            if (index >= 0)
+                orderedWidgets.push(sourceWidgets.splice(index, 1)[0]);
+            else
+                orderedWidgets.push({ id: id, enabled: true });
+        });
+        // Keep any future/third-party widgets rather than silently deleting them.
+        settings.barRightWidgets = orderedWidgets.concat(sourceWidgets);
+    }
     settings.configVersion = targetVersion;
     return settings;
 }
