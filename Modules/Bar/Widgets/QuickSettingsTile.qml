@@ -40,20 +40,30 @@ Rectangle {
 
   Row {
     anchors.fill: parent
-    anchors.margins: 9
-    spacing: 8
+    anchors.margins: 10
+    spacing: 9
 
-    DmsIcon {
+    Rectangle {
+      width: 30
+      height: 30
+      radius: 9
       anchors.verticalCenter: parent.verticalCenter
-      name: root.iconName
-      size: 24
-      color: root.active ? Theme.primary : Theme.widgetIconColor
+      color: Theme.withAlpha(root.active ? Theme.primary : Theme.surfaceContainerHighest, root.active ? 0.2 : 0.62)
+      border.width: 1
+      border.color: Theme.withAlpha(root.active ? Theme.primary : Theme.outlineVariant, root.active ? 0.42 : 0.24)
+
+      DmsIcon {
+        anchors.centerIn: parent
+        name: root.iconName
+        size: 19
+        color: root.active ? Theme.primary : Theme.widgetIconColor
+      }
     }
 
     Column {
       anchors.verticalCenter: parent.verticalCenter
-      width: parent.width - 34
-      spacing: 2
+      width: parent.width - 40
+      spacing: 3
 
       Text {
         width: parent.width
