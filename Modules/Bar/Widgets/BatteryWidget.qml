@@ -116,6 +116,9 @@ BasePill {
           size: root.iconSize(-4)
           color: root._charging ? Theme.primary : (root._low ? Theme.error : Theme.widgetIconColor)
           anchors.verticalCenter: parent.verticalCenter
+          Behavior on color {
+            ColorAnimation { duration: 160; easing.type: Easing.OutCubic }
+          }
         }
 
         Text {
@@ -124,6 +127,20 @@ BasePill {
           color: root._low ? Theme.error : Theme.widgetTextColor
           font.family: Theme.monoFontFamily
           font.pixelSize: root.textSize()
+          Behavior on color {
+            ColorAnimation { duration: 160; easing.type: Easing.OutCubic }
+          }
+        }
+
+        Rectangle {
+          width: 4
+          height: 4
+          radius: 2
+          anchors.verticalCenter: parent.verticalCenter
+          visible: root._actuallyCharging
+          color: Theme.primary
+          opacity: visible ? 1 : 0
+          Behavior on opacity { NumberAnimation { duration: 160 } }
         }
       }
 
@@ -141,6 +158,9 @@ BasePill {
               ? Theme.primary
               : (root.accessoryLevel(modelData) <= 20 ? Theme.error : Theme.widgetIconColor)
             anchors.verticalCenter: parent.verticalCenter
+            Behavior on color {
+              ColorAnimation { duration: 160; easing.type: Easing.OutCubic }
+            }
           }
 
           Text {
@@ -149,6 +169,9 @@ BasePill {
             color: root.accessoryLevel(modelData) <= 20 ? Theme.error : Theme.widgetTextColor
             font.family: Theme.monoFontFamily
             font.pixelSize: root.textSize()
+            Behavior on color {
+              ColorAnimation { duration: 160; easing.type: Easing.OutCubic }
+            }
           }
         }
       }
