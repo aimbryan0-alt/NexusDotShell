@@ -80,6 +80,13 @@ PopupWindow {
         });
     }
 
+    function selectedDateLabel() {
+        const day = selectedDate.getDay() === 0 ? 7 : selectedDate.getDay();
+        return Qt.locale().dayName(day, Locale.LongFormat) + ", "
+            + selectedDate.getDate() + " "
+            + Qt.locale().monthName(selectedDate.getMonth(), Locale.LongFormat);
+    }
+
     function addEvent() {
         const title = eventTitle.trim();
         if (!title)
@@ -899,9 +906,22 @@ PopupWindow {
 
                     }
 
+                    Text {
+                        width: parent.width
+                        height: 18
+                        text: root.selectedDateLabel()
+                            + (root.eventsForSelectedDate().length > 0
+                                ? "  ·  " + root.eventsForSelectedDate().length + " " + qsTr("event(s)")
+                                : "  ·  " + qsTr("Agenda livre"))
+                        color: Theme.widgetInactiveIconColor
+                        font.pixelSize: 11
+                        font.weight: Font.Medium
+                        elide: Text.ElideRight
+                    }
+
                     Item {
                         width: parent.width
-                        height: parent.height - 150
+                        height: parent.height - 180
 
                         Flickable {
                             id: eventFlickable
@@ -926,7 +946,7 @@ PopupWindow {
                                     TextField {
                                         width: parent.width - 84
                                         height: 38
-                                        placeholderText: qsTr("Event for ") + root.dateKey(root.selectedDate)
+                                        placeholderText: qsTr("Novo evento para ") + root.dateKey(root.selectedDate)
                                         text: root.eventTitle
                                         color: Theme.widgetTextColor
                                         placeholderTextColor: Theme.widgetInactiveIconColor
@@ -952,7 +972,7 @@ PopupWindow {
 
                                         Text {
                                             anchors.centerIn: parent
-                                            text: qsTr("Add")
+                                            text: qsTr("Adicionar")
                                             color: Theme.onPrimary
                                             font.pixelSize: 13
                                         }
@@ -973,18 +993,37 @@ PopupWindow {
                                         required property var modelData
 
                                         width: eventColumn.width
-                                        height: 44
+                                        height: 48
                                         radius: Theme.cornerRadius
-                                        color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.68)
+                                        color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.72)
+                                        border.width: 1
+                                        border.color: Theme.withAlpha(Theme.outline, 0.12)
+
+                                        Rectangle {
+                                            width: 3
+                                            height: parent.height - 14
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: 1
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            radius: 2
+                                            color: Theme.primary
+                                        }
 
                                         Row {
                                             anchors.fill: parent
-                                            anchors.leftMargin: 12
+                                            anchors.leftMargin: 14
                                             anchors.rightMargin: 8
                                             spacing: 8
 
+                                            DmsIcon {
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                name: "radio_button_checked"
+                                                size: 12
+                                                color: Theme.primary
+                                            }
+
                                             Text {
-                                                width: parent.width - 42
+                                                width: parent.width - 58
                                                 height: parent.height
                                                 text: modelData.title
                                                 color: Theme.widgetTextColor
@@ -1043,14 +1082,14 @@ PopupWindow {
 
                                             Text {
                                                 anchors.horizontalCenter: parent.horizontalCenter
-                                                text: qsTr("You're all caught up")
+                                                text: qsTr("Tudo em dia")
                                                 color: Theme.widgetTextColor
                                                 font.pixelSize: 18
                                             }
 
                                             Text {
                                                 width: eventColumn.width - 24
-                                                text: qsTr("No events for this day")
+                                                text: qsTr("Nenhum evento para este dia")
                                                 color: Theme.widgetInactiveIconColor
                                                 font.pixelSize: 14
                                                 horizontalAlignment: Text.AlignHCenter
