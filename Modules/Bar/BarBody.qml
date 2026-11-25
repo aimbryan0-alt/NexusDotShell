@@ -90,7 +90,7 @@ Item {
         console.error("MQBAR component error for", entry.id, ":", comp.errorString())
       }
       if (comp === null) { console.info("MQBAR skip (no comp):", entry.id); continue }
-      var targetRow = entry.id === "player" ? playerRow : hostRow
+      var targetRow = hostRow
       var initProps = {
         "screen": root.screen,
         "parentScreen": root.screen,
@@ -139,7 +139,7 @@ Item {
     }
     if (precedingWidgets > 0)
       usedWidth += root.spacing
-    return Math.max(0, playerRow.x - root.spacing - leftRow.x - usedWidth)
+    return Math.max(0, centerRow.x - root.spacing - leftRow.x - usedWidth)
   }
 
   Component.onCompleted: {
@@ -161,34 +161,22 @@ Item {
     spacing: root.spacing
   }
 
-  // Keep the clock centered when space allows, but never let it overlap
-  // the left or right groups. The player sits beside the clock only when
-  // there is enough room; otherwise the clock keeps priority.
+  // Keep the music pill and clock together in the center group. This avoids
+  // hiding the player whenever the bar becomes too narrow for a second row.
   readonly property real centerAvailableWidth:
     Math.max(0, rightRow.x - (leftRow.x + leftRow.width))
   readonly property bool centerFits:
     centerAvailableWidth >= centerRow.width + root.spacing * 2
-  readonly property bool playerFits:
-    centerAvailableWidth >= centerRow.width + playerRow.width + root.spacing * 3
 
   Row {
     id: centerRow
     x: Math.max(
-      leftRow.x + leftRow.width + root.spacing + (playerRow.visible ? playerRow.width + root.spacing : 0),
+      leftRow.x + leftRow.width + root.spacing,
       Math.min((root.width - width) / 2, rightRow.x - root.spacing - width)
     )
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
     visible: root.centerFits
-  }
-
-  Row {
-    id: playerRow
-    anchors.right: centerRow.left
-    anchors.rightMargin: root.spacing
-    anchors.verticalCenter: parent.verticalCenter
-    spacing: root.spacing
-    visible: root.centerFits && root.playerFits
   }
 
   Row {
