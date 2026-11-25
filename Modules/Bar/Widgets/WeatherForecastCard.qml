@@ -59,6 +59,13 @@ Rectangle {
   border.color: isCurrent ? Theme.withAlpha(Theme.primary, 0.38) : Theme.withAlpha(Theme.outline, 0.10)
   border.width: 1
 
+  Behavior on color {
+    ColorAnimation { duration: 180; easing.type: Easing.OutCubic }
+  }
+  Behavior on border.color {
+    ColorAnimation { duration: 180; easing.type: Easing.OutCubic }
+  }
+
   Rectangle {
     anchors.left: parent.left
     anchors.right: parent.right

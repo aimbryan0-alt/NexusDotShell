@@ -37,6 +37,46 @@ BasePill {
         }
       }
 
+      // Thermal thresholds mirror the widget's warning and critical colors.
+      Row {
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 0
+        anchors.left: parent.left
+        anchors.leftMargin: Math.max(9, (parent.implicitWidth - (parent.implicitWidth - 8)) / 2)
+        width: Math.max(18, parent.implicitWidth - 8)
+        height: 2
+        spacing: 0
+        z: 1
+
+        Item {
+          width: parent.width * 0.69
+          height: 2
+          Rectangle {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            width: 1
+            height: 4
+            radius: 1
+            color: Theme.warning
+            opacity: 0.72
+          }
+        }
+
+        Item {
+          width: parent.width * 0.16
+          height: 2
+          Rectangle {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            width: 1
+            height: 4
+            radius: 1
+            color: Theme.error
+            opacity: 0.78
+          }
+        }
+      }
+
       Row {
         id: compactRow
         visible: !root.showLabel
