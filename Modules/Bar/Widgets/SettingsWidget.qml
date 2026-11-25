@@ -367,6 +367,35 @@ BasePill {
       border.color: Theme.withAlpha(Theme.primary, 0.34)
 
       Rectangle {
+        anchors.fill: parent
+        anchors.margins: 1
+        radius: Theme.cornerRadius
+        gradient: Gradient {
+          GradientStop {
+            position: 0
+            color: Theme.withAlpha(Theme.surfaceText, 0.055)
+          }
+          GradientStop {
+            position: 0.48
+            color: Theme.withAlpha(Theme.surfaceText, 0.016)
+          }
+          GradientStop {
+            position: 1
+            color: Theme.withAlpha(Theme.surfaceText, 0)
+          }
+        }
+      }
+
+      Rectangle {
+        anchors.fill: parent
+        anchors.margins: 1
+        radius: Theme.cornerRadius
+        color: "transparent"
+        border.width: 1
+        border.color: Theme.withAlpha(Theme.outlineVariant, 0.16)
+      }
+
+      Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
