@@ -880,6 +880,18 @@ BasePill {
                 width: wifiNetworkList.width
                 height: networkRow.height + (passwordRow.visible ? passwordRow.height + 6 : 0)
 
+                Rectangle {
+                  anchors.fill: parent
+                  radius: Theme.hoverRadius
+                  color: modelData.connected
+                    ? Theme.withAlpha(Theme.primary, 0.10)
+                    : Theme.withAlpha(Theme.surfaceContainerHighest, 0.28)
+                  border.width: 1
+                  border.color: modelData.connected
+                    ? Theme.withAlpha(Theme.primary, 0.32)
+                    : Theme.withAlpha(Theme.outlineVariant, 0.22)
+                }
+
                 Row {
                   id: networkRow
                   y: 0
@@ -1095,7 +1107,6 @@ BasePill {
                 font.pixelSize: Theme.fontSizeSmall - 1
                 MouseArea {
                   anchors.fill: parent
-                  anchors.margins: -6
                   cursorShape: Qt.PointingHandCursor
                   onClicked: root.refreshBluetoothDevices()
                 }
@@ -1366,6 +1377,19 @@ BasePill {
                 required property var modelData
                 width: btDeviceList.width
                 height: 34
+
+                Rectangle {
+                  anchors.fill: parent
+                  radius: Theme.hoverRadius
+                  color: modelData.connected
+                    ? Theme.withAlpha(Theme.primary, 0.10)
+                    : Theme.withAlpha(Theme.surfaceContainerHighest, 0.28)
+                  border.width: 1
+                  border.color: modelData.connected
+                    ? Theme.withAlpha(Theme.primary, 0.32)
+                    : Theme.withAlpha(Theme.outlineVariant, 0.22)
+                }
+
                 Row {
                   anchors.fill: parent
                   spacing: 7
