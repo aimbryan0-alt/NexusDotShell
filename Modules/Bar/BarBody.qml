@@ -12,11 +12,11 @@ Item {
   property QtObject screen: null
   property QtObject barWindow: null
 
-  readonly property int spacing: Math.max(3,
+  readonly property int spacing: Math.max(2,
     typeof SettingsData !== "undefined" ? SettingsData.barSpacing : 3)
-  readonly property int innerPadding: Math.max(8,
+  readonly property int innerPadding: Math.max(6,
     typeof SettingsData !== "undefined" ? SettingsData.barInnerPadding : 8)
-  readonly property int laneGap: Math.max(8, root.spacing + 5)
+  readonly property int laneGap: Math.max(8, root.spacing + 4)
 
   Component { id: launcherButtonComp; LauncherButton {} }
   Component { id: submapComp; SubmapWidget {} }
