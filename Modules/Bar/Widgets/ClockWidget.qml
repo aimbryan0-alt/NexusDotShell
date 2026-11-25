@@ -62,6 +62,9 @@ BasePill {
             font.family: Theme.monoFontFamily
             font.pixelSize: root.textSize()
             font.bold: true
+            Behavior on color {
+              ColorAnimation { duration: 160; easing.type: Easing.OutCubic }
+            }
           }
 
           Item {
@@ -80,6 +83,9 @@ BasePill {
               color: wallpaperButtonMouse.containsMouse
                 ? Theme.withAlpha(Theme.primary, 0.12)
                 : "transparent"
+              Behavior on color {
+                ColorAnimation { duration: 140; easing.type: Easing.OutCubic }
+              }
             }
 
             DmsIcon {
@@ -179,6 +185,9 @@ BasePill {
           anchors.fill: parent
           radius: Theme.hoverRadius
           color: weatherMa.containsMouse ? Theme.withAlpha(Theme.primary, 0.12) : "transparent"
+          Behavior on color {
+            ColorAnimation { duration: 140; easing.type: Easing.OutCubic }
+          }
         }
 
         Row {
@@ -191,6 +200,9 @@ BasePill {
             name: WeatherService.weatherIcon(WeatherService.weather.wCode, WeatherService.weather.isDay)
             size: Math.round(root.textSize() * 0.9)
             color: Theme.widgetIconColor
+            Behavior on color {
+              ColorAnimation { duration: 160; easing.type: Easing.OutCubic }
+            }
           }
 
           Text {
