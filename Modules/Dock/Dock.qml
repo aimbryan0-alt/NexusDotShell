@@ -28,6 +28,15 @@ Item {
     const tail = full.split(".").pop()
     return full ? [full, tail] : []
   }
+  function desktopEntryForAppId(appId) {
+    const aliases = root.appAliases(appId)
+    if (aliases.length === 0 || !DesktopEntries.applications)
+      return null
+    const entries = DesktopEntries.applications.values || []
+    return entries.find(entry =>
+      root.appAliases(entry.id).some(alias => aliases.indexOf(alias) !== -1)
+    ) || null
+  }
   function matchesPinnedWindow(entry, window) {
     if (!entry || !window)
       return false
@@ -255,16 +264,31 @@ Item {
             id: iconMouse
             anchors.fill: parent
             hoverEnabled: true
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
             cursorShape: Qt.PointingHandCursor
             enabled: !!appWindow
-            onClicked: {
-              if (appWindow)
-                appWindow.activate()
+            onClicked: function(mouse) {
+              if (!appWindow)
+                return
+              if (mouse.button === Qt.RightButton) {
+                const entry = root.desktopEntryForAppId(appWindow.appId)
+                if (!entry)
+                  return
+                const pinned = Array.isArray(SettingsData.dockPinnedApps)
+                  ? SettingsData.dockPinnedApps : []
+                const entryId = String(entry.id)
+                if (pinned.indexOf(entryId) === -1)
+                  SettingsData.set("dockPinnedApps", pinned.concat([entryId]))
+                return
+              }
+              appWindow.activate()
             }
           }
 
           ToolTip.visible: !!appWindow && iconMouse.containsMouse && !!(appWindow.title || appWindow.appId)
-          ToolTip.text: appWindow ? (appWindow.title || appWindow.appId || "Application") : "Application"
+          ToolTip.text: appWindow
+            ? (appWindow.title || appWindow.appId || "Application") + " · right-click to pin"
+            : "Application"
           ToolTip.delay: 450
         }
       }
