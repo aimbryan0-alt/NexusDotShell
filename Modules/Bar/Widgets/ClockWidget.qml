@@ -55,7 +55,7 @@ BasePill {
 
         Item {
           id: timeRow
-          implicitWidth: timeLabel.implicitWidth + Theme.spaceXS * 2 + wallpaperButton.width + worldClockButton.width
+          implicitWidth: timeLabel.implicitWidth + Theme.spaceXS + wallpaperButton.width
           implicitHeight: Math.max(timeLabel.implicitHeight, Theme.iconSizeSmall)
 
           Text {
@@ -109,50 +109,6 @@ BasePill {
             }
           }
 
-          Item {
-            id: worldClockButton
-            anchors.left: wallpaperButton.right
-            anchors.leftMargin: Theme.spaceXS
-            anchors.verticalCenter: parent.verticalCenter
-            width: Theme.iconSizeSmall
-            height: Theme.iconSizeSmall
-
-            Rectangle {
-              anchors.fill: parent
-              anchors.topMargin: Theme.hoverVerticalInset
-              anchors.bottomMargin: Theme.hoverVerticalInset
-              radius: Theme.hoverRadius
-              color: worldClockMouse.containsMouse
-                ? Theme.withAlpha(Theme.primary, 0.12)
-                : "transparent"
-              Behavior on color {
-                ColorAnimation { duration: 140; easing.type: Easing.OutCubic }
-              }
-            }
-
-            DmsIcon {
-              anchors.centerIn: parent
-              name: "public"
-              size: root.iconSize(-3)
-              color: worldClockMouse.containsMouse ? Theme.primary : Theme.widgetIconColor
-            }
-
-            MouseArea {
-              id: worldClockMouse
-              anchors.fill: parent
-              hoverEnabled: true
-              cursorShape: Qt.PointingHandCursor
-              onClicked: {
-                if (!root.barWindow)
-                  return
-                const localPos = worldClockButton.mapToItem(root.barWindow.contentItem, 0, 0)
-                worldClockOverlay.toggle(
-                  localPos.x + worldClockButton.width / 2,
-                  root.barWindow.height
-                )
-              }
-            }
-          }
 
         }
         Row {

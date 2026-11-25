@@ -37,7 +37,6 @@ Item {
   Component { id: notepadComp; NotesWidget {} }
   Component { id: notificationComp; NotificationWidget {} }
   Component { id: wallpaperCarouselComp; WallpaperCarouselWidget {} }
-  Component { id: networkComp; NetworkWidget {} }
 
   function registryFor(id) {
     switch (id) {
@@ -58,7 +57,6 @@ Item {
     case "notepadButton": return notepadComp
     case "notificationButton": return notificationComp
     case "wallpaperCarousel": return wallpaperCarouselComp
-    case "networkMonitor": return networkComp
     default: return null
     }
   }
