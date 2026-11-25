@@ -259,11 +259,11 @@ BasePill {
 
   content: Component {
     Row {
-      spacing: 5
+      spacing: 3
 
       DmsIcon {
         name: root.wifiDevice && root.wifiDevice.connected ? "wifi" : "wifi_off"
-        size: root.iconSize(-4)
+        size: root.iconSize(-6)
         color: root.wifiDevice && root.wifiDevice.connected ? Theme.primary : Theme.widgetInactiveIconColor
         filled: !!root.wifiDevice && root.wifiDevice.connected
         anchors.verticalCenter: parent.verticalCenter
@@ -273,7 +273,7 @@ BasePill {
         name: root.adapter && !root.adapter.enabled
           ? "bluetooth_disabled"
           : (root.bluetoothDevices.some(device => device.connected) ? "bluetooth_connected" : "bluetooth")
-        size: root.iconSize(-4)
+        size: root.iconSize(-6)
         color: root.bluetoothDevices.some(device => device.connected)
           ? Theme.primary
           : (root.adapter && root.adapter.enabled ? Theme.widgetIconColor : Theme.widgetInactiveIconColor)
@@ -283,7 +283,7 @@ BasePill {
 
       DmsIcon {
         name: root.volumeIcon()
-        size: root.iconSize(-4)
+        size: root.iconSize(-6)
         color: root.audioReady && !root.activeSink.audio.muted
           && root.activeSink.audio.volume > 0 ? Theme.primary : Theme.widgetInactiveIconColor
         filled: root.audioReady && !root.activeSink.audio.muted
