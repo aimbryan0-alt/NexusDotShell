@@ -617,7 +617,8 @@ PopupWindow {
       SettingsData.set("weatherCoordinates", "")
     }
     locInput.text = ""
-    WeatherService.forceRefresh()
+    // WeatherService debounces the location/coordinate setting signals and
+    // resolves the final selection once both values have been stored.
   }
 
   Component.onCompleted: {

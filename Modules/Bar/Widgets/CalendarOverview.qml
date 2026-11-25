@@ -383,6 +383,16 @@ PopupWindow {
                                     elide: Text.ElideRight
                                 }
 
+                                Text {
+                                    width: parent.width
+                                    text: WeatherService.weather.available
+                                        ? qsTr("Rain %1").arg(WeatherService.formatPercent(WeatherService.weather.precipitationProbability))
+                                        : qsTr("Rain forecast unavailable")
+                                    color: Theme.widgetInactiveIconColor
+                                    font.pixelSize: 10
+                                    elide: Text.ElideRight
+                                }
+
                             }
 
                         }

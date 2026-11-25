@@ -99,6 +99,25 @@ Rectangle {
       visible: root.forecastData != null
     }
 
+    Row {
+      spacing: Theme.spacingXXS
+      anchors.horizontalCenter: parent.horizontalCenter
+      visible: root.daily && root.forecastData != null
+      DmsIcon {
+        name: "rainy"
+        size: 11
+        color: Theme.withAlpha(Theme.primary, 0.82)
+        anchors.verticalCenter: parent.verticalCenter
+      }
+      Text {
+        text: root.precipitationText + " rain"
+        font.family: Theme.monoFontFamily
+        font.pixelSize: Theme.fontSizeSmall - 3
+        color: Theme.withAlpha(Theme.surfaceText, 0.68)
+        anchors.verticalCenter: parent.verticalCenter
+      }
+    }
+
     Text {
       text: root.feelsLikeText
       font.family: Theme.monoFontFamily

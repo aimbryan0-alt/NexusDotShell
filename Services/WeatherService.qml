@@ -212,7 +212,7 @@ Singleton {
   function geocodeCity(city) {
     geocodeFetcher.requestedLocation = city
     geocodeFetcher.command = ["curl","-sf","--max-time","10",
-      "https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(city)+"&count=1&language=en&format=json"]
+      "https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(city)+"&count=5&language=pt&format=json"]
     geocodeFetcher.running = true
   }
 
@@ -335,7 +335,7 @@ Singleton {
         "curl", "-fsS", "--max-time", "8", "--get",
         "--data-urlencode", "name=" + root._locationSearchQuery,
         "--data-urlencode", "count=5",
-        "--data-urlencode", "language=en",
+        "--data-urlencode", "language=pt",
         "--data-urlencode", "format=json",
         "https://geocoding-api.open-meteo.com/v1/search"
       ]
@@ -434,6 +434,13 @@ Singleton {
     }
   }
 
+  Timer {
+    id: locationUpdateDelay
+    interval: 160
+    repeat: false
+    onTriggered: root.updateLocation()
+  }
+
   Timer { id:pollTimer; interval:900000; running:root.refCount>0; repeat:true; triggeredOnStart:true; onTriggered:root.fetchWeather() }
   Timer { id:retryTimer; interval:30000; running:false; repeat:false; onTriggered:root.fetchWeather() }
 
@@ -441,11 +448,11 @@ Singleton {
     if (typeof SettingsData !== "undefined") {
       SettingsData.weatherLocationChanged.connect(function() {
         root.location=null; root.lastFetchTime=0
-        if (root.refCount>0) root.updateLocation()
+        if (root.refCount>0) locationUpdateDelay.restart()
       })
       SettingsData.weatherCoordinatesChanged.connect(function() {
         root.location=null; root.lastFetchTime=0
-        if (root.refCount>0) root.updateLocation()
+        if (root.refCount>0) locationUpdateDelay.restart()
       })
     }
   }
