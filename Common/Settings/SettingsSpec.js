@@ -30,7 +30,7 @@ var SPEC = {
     calendarBirthYear: { def: -1 },
     calendarLifeExpectancy: { def: 90 },
     lyricsHudEnabled: { def: false },
-    lyricsHudPosition: { def: "bottom-right" },
+    lyricsHudPosition: { def: "right-center" },
     notesAutoSave: { def: false },
     notesShowLineNumbers: { def: false },
     notesExpanded: { def: false },
