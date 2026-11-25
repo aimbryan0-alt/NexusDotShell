@@ -57,7 +57,7 @@ Item {
     case "controlCenterButton": return settingsComp
     case "notepadButton": return notepadComp
     case "notificationButton": return notificationComp
-    case "wallpaperCarousel": return null
+    case "wallpaperCarousel": return wallpaperCarouselComp
     case "networkMonitor": return networkComp
     default: return null
     }
@@ -157,7 +157,7 @@ Item {
     id: leftRow
     anchors.left: parent.left
     anchors.leftMargin: Math.max(0, root.innerPadding)
-    width: Math.min(implicitWidth, root.width * 0.34)
+    width: Math.min(implicitWidth, root.width * 0.26)
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
     clip: true
@@ -181,7 +181,7 @@ Item {
     id: rightRow
     anchors.right: parent.right
     anchors.rightMargin: Math.max(0, root.innerPadding)
-    width: Math.min(implicitWidth, root.width * 0.36)
+    width: Math.min(implicitWidth, root.width * 0.52)
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
     clip: true
