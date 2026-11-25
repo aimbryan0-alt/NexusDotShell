@@ -22,8 +22,8 @@ PopupWindow {
   grabFocus: true
   color: "transparent"
   surfaceFormat.opaque: false
-  implicitWidth: 760
-  implicitHeight: 560
+  implicitWidth: 820
+  implicitHeight: 600
 
   function filterApps(query) {
     const needle = String(query || "").trim().toLowerCase()
@@ -97,8 +97,8 @@ PopupWindow {
 
     Column {
       anchors.fill: parent
-      anchors.margins: 22
-      spacing: 16
+      anchors.margins: 24
+      spacing: 18
 
       Item {
         width: parent.width
@@ -171,7 +171,7 @@ PopupWindow {
       TextField {
         id: searchField
         width: parent.width
-        height: 48
+        height: 52
         placeholderText: "Buscar aplicativos, ferramentas e utilitários..."
         selectByMouse: true
         color: Theme.surfaceText
@@ -197,9 +197,9 @@ PopupWindow {
       GridView {
         id: grid
         width: parent.width
-        height: parent.height - 42 - 48 - 32
-        cellWidth: 132
-        cellHeight: 112
+        height: parent.height - 46 - 52 - 36
+        cellWidth: 140
+        cellHeight: 120
         clip: true
         focus: true
         model: root.filteredApps
@@ -228,8 +228,8 @@ PopupWindow {
               anchors.top: parent.top
               anchors.topMargin: 10
               anchors.horizontalCenter: parent.horizontalCenter
-              width: 54
-              height: 54
+              width: 58
+              height: 58
               radius: 18
               color: Theme.withAlpha(Theme.primary, 0.075)
               border.width: 1
@@ -237,8 +237,8 @@ PopupWindow {
 
               IconImage {
                 anchors.centerIn: parent
-                width: 38
-                height: 38
+                width: 42
+                height: 42
                 source: modelData.icon ? Quickshell.iconPath(modelData.icon) : ""
                 asynchronous: true
               }
