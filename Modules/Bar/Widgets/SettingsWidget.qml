@@ -301,7 +301,7 @@ BasePill {
       return
     }
     const point = root.mapToItem(root.barWindow.contentItem, 0, root.height)
-    const width = Math.min(380, root.parentScreen ? root.parentScreen.width - 24 : 380)
+    const width = Math.min(440, root.parentScreen ? root.parentScreen.width - 24 : 440)
     root.popupX = Math.round(Math.max(8, Math.min(
       (root.parentScreen ? root.parentScreen.width : root.barWindow.width) - width - 8,
       point.x + root.width / 2 - width / 2
@@ -330,7 +330,7 @@ BasePill {
     grabFocus: true
     color: "transparent"
     surfaceFormat.opaque: false
-    implicitWidth: Math.min(380, root.parentScreen ? root.parentScreen.width - 24 : 380)
+    implicitWidth: Math.min(440, root.parentScreen ? root.parentScreen.width - 24 : 440)
     implicitHeight: Math.min(
       settingsColumn.implicitHeight + 28,
       Math.max(240, root.parentScreen ? root.parentScreen.height - root.popupY - 16 : 700)
@@ -403,33 +403,45 @@ BasePill {
 
         Item {
           width: parent.width
-          height: 32
+          height: 44
 
           Rectangle {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             width: 3
-            height: 18
+            height: 30
             radius: 1
             color: Theme.primary
           }
 
-          Text {
+          Column {
             anchors.left: parent.left
             anchors.leftMargin: 11
             anchors.verticalCenter: parent.verticalCenter
-            text: "NEXUS // QUICK SETTINGS"
-            color: Theme.primary
-            font.family: Theme.monoFontFamily
-            font.pixelSize: Theme.fontSizeMedium - 1
-            font.weight: Font.DemiBold
-            font.letterSpacing: 0.8
+            spacing: 2
+
+            Text {
+              text: "NEXUS // COMMAND CENTER"
+              color: Theme.primary
+              font.family: Theme.monoFontFamily
+              font.pixelSize: Theme.fontSizeMedium
+              font.weight: Font.DemiBold
+              font.letterSpacing: 1.0
+            }
+
+            Text {
+              text: "SYSTEM CONTROL  /  LIVE STATUS"
+              color: Theme.widgetInactiveIconColor
+              font.family: Theme.monoFontFamily
+              font.pixelSize: Theme.fontSizeSmall - 2
+              font.letterSpacing: 0.7
+            }
           }
 
           Text {
             anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            text: "CLOSE"
+            anchors.top: parent.top
+            text: "CLOSE  ×"
             color: Theme.primary
             font.family: Theme.monoFontFamily
             font.pixelSize: Theme.fontSizeSmall - 1
@@ -445,7 +457,33 @@ BasePill {
 
         Row {
           width: parent.width
-          height: 68
+          height: 18
+
+          Text {
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            text: "QUICK ACCESS"
+            color: Theme.widgetInactiveIconColor
+            font.family: Theme.monoFontFamily
+            font.pixelSize: Theme.fontSizeSmall - 2
+            font.weight: Font.DemiBold
+            font.letterSpacing: 1.0
+          }
+
+          Text {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            text: "01  /  CONNECTIVITY"
+            color: Theme.tertiary
+            font.family: Theme.monoFontFamily
+            font.pixelSize: Theme.fontSizeSmall - 2
+            font.letterSpacing: 0.5
+          }
+        }
+
+        Row {
+          width: parent.width
+          height: 76
           spacing: 8
 
           QuickSettingsTile {
