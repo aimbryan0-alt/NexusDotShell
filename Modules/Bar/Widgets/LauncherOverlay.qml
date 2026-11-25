@@ -180,7 +180,7 @@ PopupWindow {
         leftPadding: 16
         rightPadding: 16
         background: Rectangle {
-          radius: 10
+          radius: 14
           color: Theme.withAlpha(Theme.surfaceContainerHighest, 0.72)
           border.width: searchField.activeFocus ? 1 : 0.6
           border.color: Theme.withAlpha(Theme.primary, searchField.activeFocus ? 0.9 : 0.24)
@@ -217,7 +217,7 @@ PopupWindow {
           Rectangle {
             anchors.fill: parent
             anchors.margins: 5
-            radius: 15
+            radius: 19
             color: appMouse.containsMouse || grid.currentIndex === index
               ? Theme.withAlpha(Theme.primary, 0.14)
               : Theme.withAlpha(Theme.surfaceContainerHigh, 0.38)
@@ -230,7 +230,7 @@ PopupWindow {
               anchors.horizontalCenter: parent.horizontalCenter
               width: 54
               height: 54
-              radius: 15
+              radius: 18
               color: Theme.withAlpha(Theme.primary, 0.075)
               border.width: 1
               border.color: Theme.withAlpha(Theme.primary, 0.12)
