@@ -59,19 +59,14 @@ PanelWindow {
     width: 520
     height: 190
 
-    anchors {
-      verticalCenter: SettingsData.lyricsHudPosition === "right-center"
-        || SettingsData.lyricsHudPosition === "left-center"
-      top: SettingsData.lyricsHudPosition === "top-left"
-      bottom: SettingsData.lyricsHudPosition === "bottom-left"
-        || SettingsData.lyricsHudPosition === "bottom-right"
-      left: SettingsData.lyricsHudPosition === "top-left"
-        || SettingsData.lyricsHudPosition === "bottom-left"
-        || SettingsData.lyricsHudPosition === "left-center"
-      right: SettingsData.lyricsHudPosition === "right-center"
-        || SettingsData.lyricsHudPosition === "bottom-right"
-      margins: 30
-    }
+    x: SettingsData.lyricsHudPosition === "right-center"
+      || SettingsData.lyricsHudPosition === "bottom-right"
+      ? parent.width - width - 30 : 30
+    y: SettingsData.lyricsHudPosition === "right-center"
+      || SettingsData.lyricsHudPosition === "left-center"
+      ? (parent.height - height) / 2
+      : SettingsData.lyricsHudPosition === "top-left"
+        ? 30 : parent.height - height - 30
 
     Rectangle {
       anchors.fill: parent
