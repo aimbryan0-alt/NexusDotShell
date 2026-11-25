@@ -64,8 +64,8 @@ Item {
 
         Rectangle {
           id: switcherCard
-          readonly property int cardWidth: 220
-          readonly property int cardHeight: 206
+          readonly property int cardWidth: 236
+          readonly property int cardHeight: 224
           readonly property int listWidth: Math.max(1, Math.min(
             overlay.width - Theme.spaceXL * 2,
             Math.max(cardWidth, Math.min(WindowSwitcherService.windows.length, 5)
@@ -176,7 +176,7 @@ Item {
 
                   Rectangle {
                     width: parent.width
-                    height: 150
+                    height: 164
                     color: "transparent"
                     clip: true
 
@@ -208,7 +208,7 @@ Item {
                   Row {
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    height: parent.height - 150
+                    height: parent.height - 164
                     spacing: Theme.spaceS
                     anchors.leftMargin: Theme.spaceS
                     anchors.rightMargin: Theme.spaceS
