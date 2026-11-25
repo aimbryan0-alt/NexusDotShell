@@ -10,8 +10,8 @@ END_MARKER="-- <<< NexusDotShell integration <<<"
 
 if [[ ! -f "$HYPR_LUA" ]]; then printf 'Hyprland Lua config not found: %s\n' "$HYPR_LUA" >&2; exit 1; fi
 if ! grep -Eq 'local[[:space:]]+mainMod[[:space:]]*=' "$HYPR_LUA"; then echo "Could not find local mainMod; refusing to add a keybind." >&2; exit 1; fi
-if grep -Fq "$BEGIN_MARKER" "$HYPR_LUA"; then echo "NexusDotShell Lua integration is already configured."; exit 0; fi
-if grep -Eq 'hl\.bind\(.*(SUPER|mainMod).*SHIFT.*S' "$HYPR_LUA"; then echo "SUPER + SHIFT + S appears to be in use. Resolve the conflict first." >&2; exit 1; fi
+if grep -Fq -- "$BEGIN_MARKER" "$HYPR_LUA"; then echo "NexusDotShell Lua integration is already configured."; exit 0; fi
+if grep -Eq 'hl\.bind\(.*(SUPER|mainMod).*ALT.*S' "$HYPR_LUA"; then echo "SUPER + ALT + S appears to be in use. Resolve the conflict first." >&2; exit 1; fi
 if grep -Eiq 'hl\.on\(["'\'']hyprland\.start|quickshell.*(-p|--path)|start-hyprland\.sh' "$HYPR_LUA"; then echo "A possible Quickshell autostart already exists. Review it first." >&2; exit 1; fi
 
 backup="$HYPR_LUA.bak.$(date +%Y%m%d-%H%M%S)"
@@ -29,7 +29,7 @@ hl.on("hyprland.start", function()
 end)
 
 -- Capture the full output without opening a terminal.
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("bash " .. {json.dumps(capture)}))
+hl.bind(mainMod .. " + ALT + S", hl.dsp.exec_cmd("bash " .. {json.dumps(capture)}))
 {end}
 '''
 path.write_text(text.rstrip() + "\n\n" + block.lstrip())
