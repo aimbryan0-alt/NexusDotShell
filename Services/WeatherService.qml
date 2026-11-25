@@ -338,6 +338,7 @@ Singleton {
           const r = (d.results||[])[0]
           if (!r) throw new Error("No geocoding results")
           root.location = {city:r.name, country:r.country||"", latitude:r.latitude, longitude:r.longitude}
+          SettingsData.set("weatherLocation", [r.name, r.admin1, r.country].filter(Boolean).join(", "))
           SettingsData.set("weatherCoordinates", r.latitude + "," + r.longitude)
           root.fetchWeather()
         } catch(e) { root.lastFetchError = "Geocoding failed: "+String(e) }
