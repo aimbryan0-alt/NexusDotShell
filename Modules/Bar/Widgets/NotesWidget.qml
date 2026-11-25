@@ -849,7 +849,7 @@ BasePill {
       radius: Theme.cornerRadius
       color: Theme.withAlpha(Theme.widgetBaseBackgroundColor, SettingsData.barWidgetTransparency)
       border.width: 1
-      border.color: Theme.withAlpha(Theme.outline, 0.35)
+      border.color: Theme.withAlpha(Theme.primary, 0.42)
 
       Column {
         anchors.fill: parent
@@ -865,10 +865,12 @@ BasePill {
             width: parent.width - 84
             height: parent.height
             leftPadding: 16
-            text: qsTr("Notepad")
+            text: "NEXUS  //  NOTES"
             color: Theme.widgetTextColor
             font.family: Theme.fontFamily
-            font.pixelSize: Math.round(Theme.fontSizeMedium * 1.3)
+            font.pixelSize: Math.round(Theme.fontSizeMedium * 1.05)
+            font.bold: true
+            font.letterSpacing: 1.2
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
           }
@@ -924,7 +926,7 @@ BasePill {
           id: headerDivider
           width: parent.width
           height: 1
-          color: Theme.withAlpha(Theme.outline, 0.3)
+          color: Theme.withAlpha(Theme.primary, 0.42)
         }
 
         Row {
@@ -963,8 +965,10 @@ BasePill {
                   color: NotesService.currentIndex === index
                     ? Theme.withAlpha(Theme.primary, 0.16)
                     : "transparent"
-                  border.width: NotesService.currentIndex === index ? 0 : 1
-                  border.color: Theme.withAlpha(Theme.outline, 0.2)
+                  border.width: NotesService.currentIndex === index ? 1 : 1
+                  border.color: NotesService.currentIndex === index
+                    ? Theme.withAlpha(Theme.primary, 0.75)
+                    : Theme.withAlpha(Theme.outline, 0.22)
 
                   Text {
                     id: tabTitle
@@ -1202,9 +1206,11 @@ BasePill {
             - tabsBar.height - searchBar.height - optionsBar.height - actionBar.height - statusBar.height)
           x: 16
           radius: Theme.cornerRadius
-          color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.72)
-          border.width: noteEditor.activeFocus ? 1 : 0
-          border.color: Theme.primary
+          color: Theme.withAlpha(Theme.surfaceContainer, 0.94)
+          border.width: 1
+          border.color: noteEditor.activeFocus
+            ? Theme.withAlpha(Theme.primary, 0.9)
+            : Theme.withAlpha(Theme.outline, 0.28)
           clip: true
 
           Flickable {
@@ -1555,8 +1561,10 @@ BasePill {
                   anchors.verticalCenter: parent.verticalCenter
                   radius: Theme.hoverRadius
                   color: actionButton.modelData.id === "autosave" && SettingsData.notesAutoSave
-                    ? Theme.withAlpha(Theme.primary, 0.16)
-                    : (hovered ? Theme.withAlpha(Theme.primary, 0.13) : "transparent")
+                    ? Theme.withAlpha(Theme.primary, 0.2)
+                    : (hovered ? Theme.withAlpha(Theme.primary, 0.12) : Theme.withAlpha(Theme.surfaceContainerHigh, 0.28))
+                  border.width: actionButton.modelData.id === "autosave" && SettingsData.notesAutoSave ? 1 : 0
+                  border.color: Theme.withAlpha(Theme.primary, 0.55)
 
                   Row {
                     id: actionLayout
