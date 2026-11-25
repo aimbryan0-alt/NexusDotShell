@@ -154,11 +154,14 @@ function migrateToVersion(obj, targetVersion) {
     }
     if (currentVersion < 12) {
         var centerWidgetsV12 = Array.isArray(settings.barCenterWidgets)
-            ? settings.barCenterWidgets.slice() : [];
+            ? settings.barCenterWidgets.slice()
+            : Util.cloneDef(SpecModule.SPEC["barCenterWidgets"].def);
         var rightWidgetsV12 = Array.isArray(settings.barRightWidgets)
-            ? settings.barRightWidgets.slice() : [];
+            ? settings.barRightWidgets.slice()
+            : Util.cloneDef(SpecModule.SPEC["barRightWidgets"].def);
         var leftWidgetsV12 = Array.isArray(settings.barLeftWidgets)
-            ? settings.barLeftWidgets.slice() : [];
+            ? settings.barLeftWidgets.slice()
+            : Util.cloneDef(SpecModule.SPEC["barLeftWidgets"].def);
 
         // Keep Nexus Center alone in the true center; preserve other center
         // widgets by moving them into the right-side group.
