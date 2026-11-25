@@ -125,6 +125,33 @@ function migrateToVersion(obj, targetVersion) {
         });
         settings.barRightWidgets = rightWidgetsWithNetwork;
     }
+    if (currentVersion < 11 && Array.isArray(settings.barRightWidgets)) {
+        var restoredRightWidgets = settings.barRightWidgets.slice();
+        var sceneIndex = restoredRightWidgets.findIndex(function(widget) {
+            return widget && widget.id === "wallpaperCarousel";
+        });
+        if (sceneIndex < 0) {
+            var trayPosition = restoredRightWidgets.findIndex(function(widget) {
+                return widget && widget.id === "systemTray";
+            });
+            restoredRightWidgets.splice(trayPosition >= 0 ? trayPosition : restoredRightWidgets.length, 0, {
+                id: "wallpaperCarousel",
+                enabled: true
+            });
+        }
+        ["controlCenterButton", "notepadButton"].forEach(function(id) {
+            var index = restoredRightWidgets.findIndex(function(widget) {
+                return widget && widget.id === id;
+            });
+            if (index >= 0) {
+                var item = restoredRightWidgets.splice(index, 1)[0];
+                restoredRightWidgets.unshift(item);
+            } else {
+                restoredRightWidgets.unshift({ id: id, enabled: true });
+            }
+        });
+        settings.barRightWidgets = restoredRightWidgets;
+    }
     settings.configVersion = targetVersion;
     return settings;
 }
