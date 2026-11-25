@@ -1942,30 +1942,30 @@ BasePill {
                         value: root.brightnessSliderValue(modelData)
                         onMoved: root.setDeviceBrightness(modelData, value)
 
-                background: Rectangle {
-                  x: deviceBrightnessSlider.leftPadding
-                  y: deviceBrightnessSlider.topPadding + deviceBrightnessSlider.availableHeight / 2 - height / 2
-                  width: deviceBrightnessSlider.availableWidth
-                  height: 4
-                  radius: Theme.pillRadius
-                  color: Theme.withAlpha(Theme.outline, 0.32)
-                  Rectangle {
-                    width: deviceBrightnessSlider.visualPosition * parent.width
-                    height: parent.height
-                    radius: parent.radius
-                    color: Theme.primary
-                  }
-                }
-                handle: Rectangle {
-                  x: deviceBrightnessSlider.leftPadding + deviceBrightnessSlider.visualPosition * (deviceBrightnessSlider.availableWidth - width)
-                  y: deviceBrightnessSlider.topPadding + deviceBrightnessSlider.availableHeight / 2 - height / 2
-                  width: 13
-                  height: 13
-                  radius: Theme.pillRadius
-                  color: deviceBrightnessSlider.pressed ? Theme.primary : Theme.surfaceText
-                  border.width: 2
-                  border.color: Theme.primary
-                }
+                        background: Rectangle {
+                          x: deviceBrightnessSlider.leftPadding
+                          y: deviceBrightnessSlider.topPadding + deviceBrightnessSlider.availableHeight / 2 - height / 2
+                          width: deviceBrightnessSlider.availableWidth
+                          height: 4
+                          radius: Theme.pillRadius
+                          color: Theme.withAlpha(Theme.outline, 0.32)
+                          Rectangle {
+                            width: deviceBrightnessSlider.visualPosition * parent.width
+                            height: parent.height
+                            radius: parent.radius
+                            color: Theme.primary
+                          }
+                        }
+                        handle: Rectangle {
+                          x: deviceBrightnessSlider.leftPadding + deviceBrightnessSlider.visualPosition * (deviceBrightnessSlider.availableWidth - width)
+                          y: deviceBrightnessSlider.topPadding + deviceBrightnessSlider.availableHeight / 2 - height / 2
+                          width: 13
+                          height: 13
+                          radius: Theme.pillRadius
+                          color: deviceBrightnessSlider.pressed ? Theme.primary : Theme.surfaceText
+                          border.width: 2
+                          border.color: Theme.primary
+                        }
                       }
 
                       Item {
