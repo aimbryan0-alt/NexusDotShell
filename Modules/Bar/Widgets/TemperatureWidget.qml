@@ -28,6 +28,12 @@ BasePill {
           height: parent.height
           radius: parent.radius
           color: root.temperatureColor()
+          Behavior on width {
+            NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
+          }
+          Behavior on color {
+            ColorAnimation { duration: 180; easing.type: Easing.OutCubic }
+          }
         }
       }
 
@@ -81,8 +87,8 @@ BasePill {
 
   function temperatureText() {
     return SystemStatsService.cpuTemperature > 0
-      ? Math.round(SystemStatsService.cpuTemperature) + "°"
-      : "--°"
+      ? Math.round(SystemStatsService.cpuTemperature) + "°C"
+      : "--°C"
   }
 
   function temperatureColor() {

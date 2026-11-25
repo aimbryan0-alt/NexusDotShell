@@ -33,6 +33,12 @@ BasePill {
           height: parent.height
           radius: parent.radius
           color: root.usageColor()
+          Behavior on width {
+            NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
+          }
+          Behavior on color {
+            ColorAnimation { duration: 180; easing.type: Easing.OutCubic }
+          }
         }
       }
 
