@@ -134,8 +134,8 @@ Item {
     Rectangle {
       id: hudFrame
       anchors.fill: parent
-      anchors.leftMargin: 10
-      anchors.rightMargin: 10
+      anchors.leftMargin: 8
+      anchors.rightMargin: 8
       anchors.topMargin: 3
       anchors.bottomMargin: 3
       radius: 13
@@ -399,10 +399,10 @@ Item {
 
     BarBody {
       anchors.fill: parent
-      anchors.topMargin: Theme.spaceXS
-      anchors.bottomMargin: Theme.spaceXS
-      anchors.leftMargin: Theme.space2() + 6
-      anchors.rightMargin: Theme.space2() + 6
+      anchors.topMargin: Theme.spaceXXS
+      anchors.bottomMargin: Theme.spaceXXS
+      anchors.leftMargin: 8
+      anchors.rightMargin: 8
       screen: barWindow.screen
       barWindow: barWindow
     }
