@@ -57,7 +57,7 @@ Item {
     case "controlCenterButton": return settingsComp
     case "notepadButton": return notepadComp
     case "notificationButton": return notificationComp
-    case "wallpaperCarousel": return wallpaperCarouselComp
+    case "wallpaperCarousel": return null
     case "networkMonitor": return networkComp
     default: return null
     }
@@ -163,20 +163,16 @@ Item {
 
   // Keep the music pill and clock together in the center group. This avoids
   // hiding the player whenever the bar becomes too narrow for a second row.
-  readonly property real centerAvailableWidth:
-    Math.max(0, rightRow.x - (leftRow.x + leftRow.width))
-  readonly property bool centerFits:
-    centerAvailableWidth >= centerRow.width + root.spacing * 2
-
+  // Keep the center group inside the free lane between left and right.
+  // Clipping prevents long widget groups from painting over their neighbors.
   Row {
     id: centerRow
-    x: Math.max(
-      leftRow.x + leftRow.width + root.spacing,
-      Math.min((root.width - width) / 2, rightRow.x - root.spacing - width)
-    )
+    x: leftRow.x + leftRow.width + root.spacing
+    width: Math.max(0, rightRow.x - root.spacing - x)
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
-    visible: true
+    clip: true
+    visible: width > 0
   }
 
   Row {
