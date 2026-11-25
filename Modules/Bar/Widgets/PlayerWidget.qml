@@ -361,6 +361,35 @@ BasePill {
                 }
               }
             }
+
+            Rectangle {
+              width: 92
+              height: 28
+              radius: 14
+              color: SettingsData.lyricsHudEnabled
+                ? Theme.withAlpha(Theme.primary, 0.2)
+                : Theme.withAlpha(root.playerSurfaceColor, 0.82)
+              border.width: 1
+              border.color: SettingsData.lyricsHudEnabled
+                ? Theme.withAlpha(Theme.primary, 0.8)
+                : Theme.withAlpha(root.playerOutlineColor, 0.72)
+
+              Text {
+                anchors.centerIn: parent
+                text: SettingsData.lyricsHudEnabled ? "HUD  ON" : "HUD  OFF"
+                color: SettingsData.lyricsHudEnabled ? Theme.primary : Theme.surfaceText
+                font.family: Theme.monoFontFamily
+                font.pixelSize: 10
+                font.weight: Font.DemiBold
+                letterSpacing: 0.4
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: SettingsData.set("lyricsHudEnabled", !SettingsData.lyricsHudEnabled)
+              }
+            }
           }
         }
 
