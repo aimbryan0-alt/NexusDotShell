@@ -928,14 +928,60 @@ BasePill {
 
   content: Component {
     Item {
-      implicitWidth: root.hasMedia ? playerContent.width : 0
-      implicitHeight: root.hasMedia ? playerContent.implicitHeight : 0
+      implicitWidth: root.hasMedia ? playerContent.width : standbyContent.implicitWidth
+      implicitHeight: root.hasMedia ? playerContent.implicitHeight : standbyContent.implicitHeight
 
       TextMetrics {
         id: trackLabelMetrics
         font.family: Theme.monoFontFamily
         font.pixelSize: root.textSize() * 0.8
         text: root.trackText()
+      }
+
+      Row {
+        id: standbyContent
+        visible: !root.hasMedia
+        spacing: Theme.spaceXS
+        anchors.centerIn: parent
+
+        Rectangle {
+          width: 22
+          height: 22
+          radius: 7
+          anchors.verticalCenter: parent.verticalCenter
+          color: Theme.withAlpha(Theme.primary, 0.12)
+          border.width: 1
+          border.color: Theme.withAlpha(Theme.primary, 0.48)
+
+          DmsIcon {
+            anchors.centerIn: parent
+            name: "music_note"
+            size: 14
+            color: Theme.primary
+          }
+        }
+
+        Column {
+          anchors.verticalCenter: parent.verticalCenter
+          spacing: 0
+
+          Text {
+            text: "MEDIA"
+            color: Theme.primary
+            font.family: Theme.monoFontFamily
+            font.pixelSize: Math.max(8, root.textSize() * 0.66)
+            font.bold: true
+            font.letterSpacing: 0.7
+          }
+
+          Text {
+            text: "STANDBY"
+            color: Theme.widgetInactiveIconColor
+            font.family: Theme.monoFontFamily
+            font.pixelSize: Math.max(7, root.textSize() * 0.56)
+            font.letterSpacing: 0.35
+          }
+        }
       }
 
       Column {
