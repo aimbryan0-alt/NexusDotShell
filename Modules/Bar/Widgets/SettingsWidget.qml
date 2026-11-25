@@ -563,11 +563,24 @@ BasePill {
               delegate: Rectangle {
                 required property var modelData
                 width: (parent.width - parent.spacing * 3) / 4
-                height: 54
+                height: 58
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.62)
                 border.width: 1
                 border.color: Theme.withAlpha(modelData.tint, 0.24)
+
+                Rectangle {
+                  anchors.left: parent.left
+                  anchors.leftMargin: 1
+                  anchors.top: parent.top
+                  anchors.topMargin: 9
+                  anchors.bottom: parent.bottom
+                  anchors.bottomMargin: 9
+                  width: 2
+                  radius: 1
+                  color: modelData.tint
+                  opacity: 0.72
+                }
 
                 Column {
                   anchors.fill: parent
