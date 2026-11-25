@@ -39,7 +39,13 @@ PopupWindow {
       ].join(" ").toLowerCase()
       return searchable.indexOf(needle) !== -1
     })
-    matches.sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")))
+    const pinnedIds = Array.isArray(SettingsData.dockPinnedApps) ? SettingsData.dockPinnedApps : []
+    matches.sort((a, b) => {
+      const aPinned = pinnedIds.indexOf(String(a.id || "")) !== -1
+      const bPinned = pinnedIds.indexOf(String(b.id || "")) !== -1
+      if (aPinned !== bPinned) return aPinned ? -1 : 1
+      return String(a.name || "").localeCompare(String(b.name || ""))
+    })
     root.filteredApps = matches
     grid.currentIndex = 0
   }
@@ -135,7 +141,7 @@ PopupWindow {
           spacing: 3
 
           Text {
-            text: "NEXUS // APPLICATIONS"
+            text: "NEXUS // LAUNCHER"
             color: Theme.primary
             font.family: Theme.monoFontFamily
             font.pixelSize: 15
@@ -143,7 +149,7 @@ PopupWindow {
             font.bold: true
           }
           Text {
-            text: root.filteredApps.length + " APPS  ·  RIGHT-CLICK TO PIN"
+            text: root.filteredApps.length + " APPS  ·  PINNED FIRST  ·  RIGHT-CLICK TO PIN"
             color: Theme.surfaceVariantText
             font.family: Theme.monoFontFamily
             font.pixelSize: 9
@@ -166,7 +172,7 @@ PopupWindow {
         id: searchField
         width: parent.width
         height: 48
-        placeholderText: "Search applications..."
+        placeholderText: "Buscar aplicativos, ferramentas e utilitários..."
         selectByMouse: true
         color: Theme.surfaceText
         font.family: Theme.fontFamily
@@ -218,22 +224,36 @@ PopupWindow {
             border.width: grid.currentIndex === index || appMouse.containsMouse ? 1 : 0.6
             border.color: Theme.withAlpha(Theme.primary, grid.currentIndex === index ? 0.72 : 0.18)
 
-            Column {
-              anchors.centerIn: parent
-              spacing: 9
+            Rectangle {
+              anchors.top: parent.top
+              anchors.topMargin: 10
+              anchors.horizontalCenter: parent.horizontalCenter
+              width: 54
+              height: 54
+              radius: 15
+              color: Theme.withAlpha(Theme.primary, 0.075)
+              border.width: 1
+              border.color: Theme.withAlpha(Theme.primary, 0.12)
 
               IconImage {
-                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.centerIn: parent
                 width: 38
                 height: 38
                 source: modelData.icon ? Quickshell.iconPath(modelData.icon) : ""
                 asynchronous: true
               }
+            }
+
+            Column {
+              anchors.horizontalCenter: parent.horizontalCenter
+              anchors.bottom: parent.bottom
+              anchors.bottomMargin: 10
+              spacing: 4
 
               Text {
                 width: 108
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: modelData.name || "Application"
+                text: modelData.name || "Aplicativo"
                 color: Theme.surfaceText
                 font.family: Theme.fontFamily
                 font.pixelSize: 11
@@ -275,7 +295,7 @@ PopupWindow {
         Text {
           anchors.centerIn: parent
           visible: grid.count === 0
-          text: "No applications found"
+          text: "Nenhum aplicativo encontrado"
           color: Theme.surfaceVariantText
           font.family: Theme.fontFamily
           font.pixelSize: 13
