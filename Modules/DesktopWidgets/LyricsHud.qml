@@ -56,8 +56,8 @@ PanelWindow {
 
   Item {
     id: hud
-    width: 390
-    height: 174
+    width: 520
+    height: 190
 
     anchors {
       top: SettingsData.lyricsHudPosition === "top-left"
@@ -92,13 +92,13 @@ PanelWindow {
 
     Row {
       anchors.fill: parent
-      anchors.margins: 18
-      spacing: 14
+      anchors.margins: 20
+      spacing: 18
 
       ClippingRectangle {
-        width: 66
-        height: 66
-        radius: 12
+        width: 136
+        height: 136
+        radius: 16
         color: Theme.surfaceContainerHigh
 
         Image {
@@ -123,7 +123,7 @@ PanelWindow {
       }
 
       Column {
-        width: parent.width - 66 - parent.spacing
+        width: parent.width - 136 - parent.spacing
         spacing: 5
 
         Row {
@@ -211,7 +211,7 @@ PanelWindow {
           color: Theme.surfaceText
           font.family: "serif"
           font.italic: true
-          font.pixelSize: 15
+          font.pixelSize: 18
           font.weight: Font.DemiBold
           wrapMode: Text.WordWrap
           elide: Text.ElideRight
@@ -226,7 +226,7 @@ PanelWindow {
           color: Theme.withAlpha(Theme.surfaceVariantText, 0.76)
           font.family: "serif"
           font.italic: true
-          font.pixelSize: 12
+          font.pixelSize: 13
           wrapMode: Text.WordWrap
           elide: Text.ElideRight
           maximumLineCount: 1
