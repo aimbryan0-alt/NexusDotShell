@@ -23,7 +23,7 @@ Item {
   signal wheel(var wheelEvent)
 
   readonly property real dpr: root.screen ? Theme.screenScaleOf(root.screen) : 1
-  readonly property real horizontalPadding: Theme.snap(Math.max(5, widgetThickness * 0.18), dpr)
+  readonly property real horizontalPadding: Theme.snap(Math.max(4, widgetThickness * 0.14), dpr)
   readonly property bool isMouseHovered: mouseArea.containsMouse
 
   readonly property real visualWidth: vertical
