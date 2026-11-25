@@ -3,19 +3,19 @@ import QtQuick.Layouts
 import qs.Common
 import qs.Modules.Bar.Widgets
 
-// The bar's visual body: a transparent canvas laying out bar widgets into
-// left / center / right groups, driven by the SettingsData widget lists.
-// Widgets that have no component yet are skipped. Each widget id maps to an
-// inline Component over the registered widget type. The bar surface wraps this
-// and supplies the screen.
+// Balanced Nexus bar: launcher and window controls with media on the left,
+// adaptive Nexus Center in the middle, and system HUD widgets on the right.
 Item {
   id: root
 
   property QtObject screen: null
   property QtObject barWindow: null
 
-  readonly property int spacing: typeof SettingsData !== "undefined" ? SettingsData.barSpacing : 0
-  readonly property int innerPadding: typeof SettingsData !== "undefined" ? SettingsData.barInnerPadding : 0
+  readonly property int spacing: Math.max(2,
+    typeof SettingsData !== "undefined" ? SettingsData.barSpacing : 3)
+  readonly property int innerPadding: Math.max(6,
+    typeof SettingsData !== "undefined" ? SettingsData.barInnerPadding : 8)
+  readonly property int laneGap: Math.max(8, root.spacing + 4)
 
   Component { id: launcherButtonComp; LauncherButton {} }
   Component { id: submapComp; SubmapWidget {} }
@@ -33,6 +33,8 @@ Item {
   Component { id: settingsComp; SettingsWidget {} }
   Component { id: notepadComp; NotesWidget {} }
   Component { id: notificationComp; NotificationWidget {} }
+  Component { id: wallpaperCarouselComp; WallpaperCarouselWidget {} }
+  Component { id: networkComp; NetworkWidget {} }
 
   function registryFor(id) {
     switch (id) {
@@ -52,6 +54,8 @@ Item {
     case "controlCenterButton": return settingsComp
     case "notepadButton": return notepadComp
     case "notificationButton": return notificationComp
+    case "wallpaperCarousel": return wallpaperCarouselComp
+    case "networkMonitor": return networkComp
     default: return null
     }
   }
@@ -79,11 +83,14 @@ Item {
       if (!entry || entry.enabled !== true) continue
       if (groupCpuMemory && entry.id === "memUsage") continue
       var comp = root.registryFor(entry.id)
-      if (comp && comp.status === Component.Error) {
+      if (comp && comp.status === Component.Error)
         console.error("MQBAR component error for", entry.id, ":", comp.errorString())
+      if (comp === null) {
+        console.info("MQBAR skip (no comp):", entry.id)
+        continue
       }
-      if (comp === null) { console.info("MQBAR skip (no comp):", entry.id); continue }
-      var targetRow = entry.id === "player" ? playerRow : hostRow
+      // Keep widgets in the lane configured by SettingsData.
+      var targetRow = hostRow
       var initProps = {
         "screen": root.screen,
         "parentScreen": root.screen,
@@ -100,7 +107,6 @@ Item {
           })
         }
         root._created.push(obj)
-        console.info("MQBAR created:", entry.id, "parent=", hostRow.objectName, "w=", obj.width, "h=", obj.height, "vis=", obj.visible)
       } else {
         console.error("MQBAR failed to create obj for:", entry.id)
       }
@@ -108,76 +114,60 @@ Item {
   }
 
   function rebuild() {
-    for (var i = 0; i < root._created.length; i++) {
+    for (var i = 0; i < root._created.length; i++)
       root._created[i].destroy()
-    }
     root._created = []
     root.fillRow(SettingsData.barLeftWidgets, leftRow)
     root.fillRow(SettingsData.barCenterWidgets, centerRow)
     root.fillRow(SettingsData.barRightWidgets, rightRow)
-    console.info("MQBAR done. leftRow children=", leftRow.data.length, "centerRow children=", centerRow.data.length, "rightRow children=", rightRow.data.length)
-    console.info("MQBAR leftRow w=", leftRow.width, "centerRow w=", centerRow.width, "rightRow w=", rightRow.width)
   }
 
   function titleSpaceFor(titleWidget) {
     var usedWidth = 0
-    var precedingWidgets = 0
+    var count = 0
     for (var i = 0; i < leftRow.children.length; i++) {
       var child = leftRow.children[i]
-      if (child === titleWidget)
-        break
-      if (!child.visible)
-        continue
-      if (precedingWidgets > 0)
-        usedWidth += root.spacing
+      if (child === titleWidget) break
+      if (!child.visible) continue
+      if (count > 0) usedWidth += root.spacing
       usedWidth += child.width
-      precedingWidgets++
+      count++
     }
-    if (precedingWidgets > 0)
-      usedWidth += root.spacing
-    return Math.max(0, playerRow.x - root.spacing - leftRow.x - usedWidth)
+    if (count > 0) usedWidth += root.spacing
+    return Math.max(0, Math.min(190,
+      centerRow.x - root.laneGap - leftRow.x - usedWidth))
   }
 
-  Component.onCompleted: {
-    root.rebuild()
-  }
+  Component.onCompleted: root.rebuild()
 
   Connections {
     target: SettingsData
-    function onSettingsApplied() {
-      root.rebuild()
-    }
+    function onSettingsApplied() { root.rebuild() }
   }
 
   Row {
     id: leftRow
-    anchors.left: parent.left
-    anchors.leftMargin: Math.max(0, root.innerPadding)
+    x: root.innerPadding
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
   }
 
+  // The center remains visually centered when space permits, but yields a
+  // little to the side lanes instead of covering or clipping their widgets.
   Row {
     id: centerRow
-    x: Math.max(0, Math.min((root.width - width) / 2, rightRow.x - root.spacing - width))
+    x: Math.max(leftRow.x + leftRow.width + root.laneGap,
+      Math.min((root.width - width) / 2,
+        rightRow.x - root.laneGap - width))
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
-    visible: rightRow.x >= width + root.spacing
-  }
-
-  Row {
-    id: playerRow
-    anchors.right: centerRow.left
-    anchors.rightMargin: root.spacing
-    anchors.verticalCenter: parent.verticalCenter
-    spacing: root.spacing
-    visible: centerRow.visible
+    visible: x + width <= rightRow.x - root.laneGap
   }
 
   Row {
     id: rightRow
     anchors.right: parent.right
-    anchors.rightMargin: Math.max(0, root.innerPadding)
+    anchors.rightMargin: root.innerPadding
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
   }

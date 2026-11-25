@@ -22,8 +22,8 @@ PopupWindow {
   grabFocus: true
   color: "transparent"
   surfaceFormat.opaque: false
-  implicitWidth: 760
-  implicitHeight: 560
+  implicitWidth: 820
+  implicitHeight: 600
 
   function filterApps(query) {
     const needle = String(query || "").trim().toLowerCase()
@@ -39,7 +39,13 @@ PopupWindow {
       ].join(" ").toLowerCase()
       return searchable.indexOf(needle) !== -1
     })
-    matches.sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")))
+    const pinnedIds = Array.isArray(SettingsData.dockPinnedApps) ? SettingsData.dockPinnedApps : []
+    matches.sort((a, b) => {
+      const aPinned = pinnedIds.indexOf(String(a.id || "")) !== -1
+      const bPinned = pinnedIds.indexOf(String(b.id || "")) !== -1
+      if (aPinned !== bPinned) return aPinned ? -1 : 1
+      return String(a.name || "").localeCompare(String(b.name || ""))
+    })
     root.filteredApps = matches
     grid.currentIndex = 0
   }
@@ -91,8 +97,8 @@ PopupWindow {
 
     Column {
       anchors.fill: parent
-      anchors.margins: 22
-      spacing: 16
+      anchors.margins: 24
+      spacing: 18
 
       Item {
         width: parent.width
@@ -135,7 +141,7 @@ PopupWindow {
           spacing: 3
 
           Text {
-            text: "NEXUS // APPLICATIONS"
+            text: "NEXUS // LAUNCHER"
             color: Theme.primary
             font.family: Theme.monoFontFamily
             font.pixelSize: 15
@@ -143,7 +149,7 @@ PopupWindow {
             font.bold: true
           }
           Text {
-            text: root.filteredApps.length + " APPS  ·  RIGHT-CLICK TO PIN"
+            text: root.filteredApps.length + " APPS  ·  PINNED FIRST  ·  RIGHT-CLICK TO PIN"
             color: Theme.surfaceVariantText
             font.family: Theme.monoFontFamily
             font.pixelSize: 9
@@ -165,8 +171,8 @@ PopupWindow {
       TextField {
         id: searchField
         width: parent.width
-        height: 48
-        placeholderText: "Search applications..."
+        height: 52
+        placeholderText: "Buscar aplicativos, ferramentas e utilitários..."
         selectByMouse: true
         color: Theme.surfaceText
         font.family: Theme.fontFamily
@@ -174,7 +180,7 @@ PopupWindow {
         leftPadding: 16
         rightPadding: 16
         background: Rectangle {
-          radius: 10
+          radius: 14
           color: Theme.withAlpha(Theme.surfaceContainerHighest, 0.72)
           border.width: searchField.activeFocus ? 1 : 0.6
           border.color: Theme.withAlpha(Theme.primary, searchField.activeFocus ? 0.9 : 0.24)
@@ -191,9 +197,9 @@ PopupWindow {
       GridView {
         id: grid
         width: parent.width
-        height: parent.height - 42 - 48 - 32
-        cellWidth: 132
-        cellHeight: 112
+        height: parent.height - 46 - 52 - 36
+        cellWidth: 140
+        cellHeight: 120
         clip: true
         focus: true
         model: root.filteredApps
@@ -211,29 +217,43 @@ PopupWindow {
           Rectangle {
             anchors.fill: parent
             anchors.margins: 5
-            radius: 15
+            radius: 19
             color: appMouse.containsMouse || grid.currentIndex === index
               ? Theme.withAlpha(Theme.primary, 0.14)
               : Theme.withAlpha(Theme.surfaceContainerHigh, 0.38)
             border.width: grid.currentIndex === index || appMouse.containsMouse ? 1 : 0.6
             border.color: Theme.withAlpha(Theme.primary, grid.currentIndex === index ? 0.72 : 0.18)
 
-            Column {
-              anchors.centerIn: parent
-              spacing: 9
+            Rectangle {
+              anchors.top: parent.top
+              anchors.topMargin: 10
+              anchors.horizontalCenter: parent.horizontalCenter
+              width: 58
+              height: 58
+              radius: 18
+              color: Theme.withAlpha(Theme.primary, 0.075)
+              border.width: 1
+              border.color: Theme.withAlpha(Theme.primary, 0.12)
 
               IconImage {
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: 38
-                height: 38
+                anchors.centerIn: parent
+                width: 42
+                height: 42
                 source: modelData.icon ? Quickshell.iconPath(modelData.icon) : ""
                 asynchronous: true
               }
+            }
+
+            Column {
+              anchors.horizontalCenter: parent.horizontalCenter
+              anchors.bottom: parent.bottom
+              anchors.bottomMargin: 10
+              spacing: 4
 
               Text {
                 width: 108
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: modelData.name || "Application"
+                text: modelData.name || "Aplicativo"
                 color: Theme.surfaceText
                 font.family: Theme.fontFamily
                 font.pixelSize: 11
@@ -275,7 +295,7 @@ PopupWindow {
         Text {
           anchors.centerIn: parent
           visible: grid.count === 0
-          text: "No applications found"
+          text: "Nenhum aplicativo encontrado"
           color: Theme.surfaceVariantText
           font.family: Theme.fontFamily
           font.pixelSize: 13

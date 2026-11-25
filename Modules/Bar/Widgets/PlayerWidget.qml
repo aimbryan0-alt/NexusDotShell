@@ -20,7 +20,7 @@ BasePill {
   backgroundTint: root.artworkPaletteReady
     ? Theme.withAlpha(root.sampledArtworkColor, 0.1)
     : "transparent"
-  readonly property real controlSize: Math.round(root.textSize() * 1.5)
+  readonly property real controlSize: Math.round(root.textSize() * 1.65)
   readonly property color playerPillAccentColor: root.artworkPaletteReady
     ? Theme.blend(Theme.primary, root.sampledArtworkColor, 0.22)
     : Theme.primary
@@ -56,14 +56,12 @@ BasePill {
   readonly property var audioSinks: Pipewire.nodes ? Pipewire.nodes.values.filter(node => node.audio && node.isSink && !node.isStream) : []
   readonly property var player: root.activePlayer()
   readonly property string baseArtworkUrl: root.resolveArtworkUrl(root.player)
-  readonly property string artworkUrl: root.useArtworkFallback
-    ? root.lowerResolutionArtworkUrl(root.baseArtworkUrl)
-    : root.baseArtworkUrl
+  readonly property string artworkUrl: root.youtubeArtworkUrl(root.baseArtworkUrl)
   readonly property bool hasMedia: !!root.player && String(root.player.trackTitle || "").trim() !== ""
   readonly property bool lyricsAvailable: LyricsService.hasLyrics
   property bool overviewOpen: false
   property bool lyricsOpen: false
-  property bool useArtworkFallback: false
+  property int artworkFallbackLevel: 0
   property var selectedPlayer: null
   property int popupX: 0
   property int popupY: 0
@@ -76,7 +74,7 @@ BasePill {
     root.updateLyricsPlayer()
     root.displayedPosition = root.player ? root.player.position : 0
   }
-  onBaseArtworkUrlChanged: root.useArtworkFallback = false
+  onBaseArtworkUrlChanged: root.artworkFallbackLevel = 0
   onLyricsAvailableChanged: {
     if (!root.lyricsAvailable)
       root.lyricsOpen = false
@@ -130,8 +128,13 @@ BasePill {
     return ""
   }
 
-  function lowerResolutionArtworkUrl(url) {
-    return url.replace("/maxresdefault.jpg", "/hqdefault.jpg")
+  function youtubeArtworkUrl(url) {
+    if (!url || !url.includes("img.youtube.com/vi/"))
+      return url
+
+    const variants = ["maxresdefault.jpg", "sddefault.jpg", "hqdefault.jpg"]
+    const variant = variants[Math.min(2, root.artworkFallbackLevel)]
+    return url.replace(/(?:maxresdefault|sddefault|hqdefault)\.jpg$/, variant)
   }
 
   Canvas {
@@ -209,20 +212,8 @@ BasePill {
 
   function fallbackFromLowResolutionArtwork(width) {
     if (root.baseArtworkUrl.includes("img.youtube.com/vi/") &&
-        !root.useArtworkFallback && width < 640)
-      root.useArtworkFallback = true
-  }
-
-  Timer {
-    interval: 90
-    repeat: true
-    running: root.barWindow && root.barWindow.visible && root.hasMedia && root.player.isPlaying
-    onTriggered: {
-      const next = []
-      for (let i = 0; i < root.visualizerLevels.length; i++)
-        next.push(0.25 + Math.random() * 0.75)
-      root.visualizerLevels = next
-    }
+        root.artworkFallbackLevel < 2 && width < 640)
+      root.artworkFallbackLevel += 1
   }
 
   Timer {
@@ -286,17 +277,28 @@ BasePill {
           source: root.artworkUrl
           fillMode: Image.PreserveAspectCrop
           sourceSize: Qt.size(
-            Math.round(width * Theme.screenScaleOf(root.parentScreen)),
-            Math.round(height * Theme.screenScaleOf(root.parentScreen))
+            Math.round(root.overviewWidth * Theme.screenScaleOf(root.parentScreen)),
+            Math.round(460 * Theme.screenScaleOf(root.parentScreen))
           )
           asynchronous: true
           cache: true
+          mipmap: true
+          smooth: true
           visible: status === Image.Ready
           onStatusChanged: {
             if (status === Image.Error)
               root.fallbackFromLowResolutionArtwork(0)
             else if (status === Image.Ready)
               root.fallbackFromLowResolutionArtwork(implicitWidth)
+          }
+        }
+
+        Rectangle {
+          anchors.fill: parent
+          gradient: Gradient {
+            GradientStop { position: 0.0; color: Qt.rgba(5 / 255, 8 / 255, 15 / 255, 0.72) }
+            GradientStop { position: 0.52; color: Qt.rgba(5 / 255, 8 / 255, 15 / 255, 0.38) }
+            GradientStop { position: 1.0; color: Qt.rgba(5 / 255, 8 / 255, 15 / 255, 0.68) }
           }
         }
       }
@@ -357,6 +359,35 @@ BasePill {
                   cursorShape: Qt.PointingHandCursor
                   onClicked: root.lyricsOpen = parent.modelData.lyrics
                 }
+              }
+            }
+
+            Rectangle {
+              width: 92
+              height: 28
+              radius: 14
+              color: SettingsData.lyricsHudEnabled
+                ? Theme.withAlpha(Theme.primary, 0.2)
+                : Theme.withAlpha(root.playerSurfaceColor, 0.82)
+              border.width: 1
+              border.color: SettingsData.lyricsHudEnabled
+                ? Theme.withAlpha(Theme.primary, 0.8)
+                : Theme.withAlpha(root.playerOutlineColor, 0.72)
+
+              Text {
+                anchors.centerIn: parent
+                text: SettingsData.lyricsHudEnabled ? "HUD  ON" : "HUD  OFF"
+                color: SettingsData.lyricsHudEnabled ? Theme.primary : Theme.surfaceText
+                font.family: Theme.monoFontFamily
+                font.pixelSize: 10
+                font.weight: Font.DemiBold
+                font.letterSpacing: 0.4
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: SettingsData.set("lyricsHudEnabled", !SettingsData.lyricsHudEnabled)
               }
             }
           }
@@ -458,31 +489,97 @@ BasePill {
 
       ClippingRectangle {
         id: artwork
-        width: Math.min(mediaContent.width, mediaContent.height)
+        width: Math.min(mediaContent.width, mediaContent.height, 360)
         height: width
         anchors.horizontalCenter: mediaContent.horizontalCenter
         anchors.verticalCenter: mediaContent.verticalCenter
-        radius: Theme.cornerRadius
+        radius: width / 2
         color: Theme.withAlpha(root.playerAccentContainerColor, root.overviewElementAlpha)
         visible: !root.lyricsOpen
+        antialiasing: true
 
+        // The artwork becomes the label of a vinyl record and rotates only
+        // while the player is visible and actively playing.
         Image {
           id: artworkImage
           anchors.fill: parent
           source: root.artworkUrl
           fillMode: Image.PreserveAspectCrop
           sourceSize: Qt.size(
-            Math.round(width * Theme.screenScaleOf(root.parentScreen)),
-            Math.round(height * Theme.screenScaleOf(root.parentScreen))
+            Math.round(768 * Theme.screenScaleOf(root.parentScreen)),
+            Math.round(768 * Theme.screenScaleOf(root.parentScreen))
           )
           asynchronous: true
           cache: true
+          mipmap: true
+          smooth: true
           visible: status === Image.Ready
+          transform: Rotation {
+            origin.x: artworkImage.width / 2
+            origin.y: artworkImage.height / 2
+            angle: artworkImage.rotation
+          }
+          NumberAnimation on rotation {
+            from: 0
+            to: 360
+            duration: 9000
+            loops: Animation.Infinite
+            running: root.overviewOpen && root.hasMedia && root.player
+              && root.player.isPlaying && artworkImage.visible && !root.lyricsOpen
+          }
           onStatusChanged: {
             if (status === Image.Error)
               root.fallbackFromLowResolutionArtwork(0)
             else if (status === Image.Ready)
               root.fallbackFromLowResolutionArtwork(implicitWidth)
+          }
+        }
+
+        Rectangle {
+          anchors.fill: parent
+          radius: width / 2
+          color: "transparent"
+          border.width: 1
+          border.color: Theme.withAlpha(root.playerAccentColor, 0.72)
+        }
+
+        // Fine concentric grooves give the record depth without shader effects.
+        Repeater {
+          model: [0.76, 0.61, 0.46]
+          delegate: Rectangle {
+            required property real modelData
+            width: artwork.width * modelData
+            height: width
+            anchors.centerIn: parent
+            radius: width / 2
+            color: "transparent"
+            border.width: 1
+            border.color: Theme.withAlpha(Theme.surfaceText, 0.18)
+          }
+        }
+
+        Rectangle {
+          width: artwork.width * 0.23
+          height: width
+          anchors.centerIn: parent
+          radius: width / 2
+          color: Theme.withAlpha(root.playerSurfaceColor, 0.94)
+          border.width: 2
+          border.color: Theme.withAlpha(root.playerAccentColor, 0.9)
+
+          DmsIcon {
+            anchors.centerIn: parent
+            name: "music_note"
+            size: Math.max(18, parent.width * 0.34)
+            color: root.playerAccentColor
+          }
+
+          Rectangle {
+            width: 5
+            height: 5
+            anchors.centerIn: parent
+            radius: width / 2
+            color: Theme.surfaceText
           }
         }
 
@@ -494,7 +591,6 @@ BasePill {
           visible: !artworkImage.visible
         }
       }
-
         PlayerLyricsView {
           anchors.left: parent.left
           anchors.right: parent.right
@@ -503,6 +599,7 @@ BasePill {
           anchors.topMargin: 0
           visible: root.lyricsOpen
           textSize: 14
+          accentColor: root.playerAccentColor
         }
       }
 
@@ -928,8 +1025,8 @@ BasePill {
 
   content: Component {
     Item {
-      implicitWidth: root.hasMedia ? playerContent.width : 0
-      implicitHeight: root.hasMedia ? playerContent.implicitHeight : 0
+      implicitWidth: root.hasMedia ? playerContent.width : standbyContent.implicitWidth
+      implicitHeight: root.hasMedia ? playerContent.implicitHeight : standbyContent.implicitHeight
 
       TextMetrics {
         id: trackLabelMetrics
@@ -938,12 +1035,58 @@ BasePill {
         text: root.trackText()
       }
 
+      Row {
+        id: standbyContent
+        visible: !root.hasMedia
+        spacing: Theme.spaceXS
+        anchors.centerIn: parent
+
+        Rectangle {
+          width: 22
+          height: 22
+          radius: 7
+          anchors.verticalCenter: parent.verticalCenter
+          color: Theme.withAlpha(Theme.primary, 0.12)
+          border.width: 1
+          border.color: Theme.withAlpha(Theme.primary, 0.48)
+
+          DmsIcon {
+            anchors.centerIn: parent
+            name: "music_note"
+            size: 14
+            color: Theme.primary
+          }
+        }
+
+        Column {
+          anchors.verticalCenter: parent.verticalCenter
+          spacing: 0
+
+          Text {
+            text: "MEDIA"
+            color: Theme.primary
+            font.family: Theme.monoFontFamily
+            font.pixelSize: Math.max(8, root.textSize() * 0.66)
+            font.bold: true
+            font.letterSpacing: 0.7
+          }
+
+          Text {
+            text: "STANDBY"
+            color: Theme.widgetInactiveIconColor
+            font.family: Theme.monoFontFamily
+            font.pixelSize: Math.max(7, root.textSize() * 0.56)
+            font.letterSpacing: 0.35
+          }
+        }
+      }
+
       Column {
         id: playerContent
         visible: root.hasMedia
         width: Math.max(
-          Math.min(180, Math.max(trackLabelMetrics.advanceWidth, 3 * root.controlSize + 4)),
-          3 * root.controlSize + 4 + 2 * (30 + Theme.spaceXS)
+          Math.min(220, Math.max(trackLabelMetrics.advanceWidth, 3 * root.controlSize + 6)),
+          3 * root.controlSize + 6 + 2 * (34 + Theme.spaceXS)
         )
         spacing: 0
         anchors.horizontalCenter: parent.horizontalCenter
@@ -968,7 +1111,7 @@ BasePill {
           Item {
             id: visualizer
             visible: root.player && root.player.isPlaying
-            width: 30
+            width: 34
             height: root.controlSize
             clip: true
             anchors.right: controls.left

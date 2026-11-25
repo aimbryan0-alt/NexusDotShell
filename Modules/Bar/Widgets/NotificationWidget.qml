@@ -312,6 +312,15 @@ BasePill {
               border.width: 1
               border.color: Theme.withAlpha(Theme.outlineVariant, 0.28)
 
+              Rectangle {
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                width: 2
+                radius: 1
+                color: Theme.withAlpha(Theme.primary, 0.72)
+              }
+
               Column {
                 id: notificationCard
                 anchors.left: parent.left
@@ -391,6 +400,15 @@ BasePill {
       color: Theme.withAlpha(Theme.surfaceContainerLowest, 0.97)
       border.width: 1
       border.color: Theme.withAlpha(Theme.primary, 0.58)
+
+      Rectangle {
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        width: 3
+        radius: 2
+        color: Theme.primary
+      }
 
       Column {
         id: toastContent

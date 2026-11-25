@@ -13,6 +13,7 @@ PanelWindow {
 
   property var targetScreen: null
   property bool chooserOpen: false
+  property bool advancedOptionsOpen: false
   property bool appPickerOpen: false
   property bool chooserAddLayer: false
   property string chooserScope: "global"
@@ -150,10 +151,10 @@ PanelWindow {
     Rectangle {
       id: panel
       visible: root.overlayVisible && root.overviewMode
-      width: Math.min(parent.width - Theme.spaceXL * 2, 1120)
-      height: Math.min(parent.height - Theme.spaceXL * 2, 760)
+      width: Math.min(parent.width - Theme.spaceXL * 2, 980)
+      height: Math.min(parent.height - Theme.spaceXL * 2, 680)
       anchors.centerIn: parent
-      radius: Theme.cornerRadius
+      radius: 22
       color: Theme.withAlpha(
         Theme.widgetBaseBackgroundColor,
         SettingsData.barWidgetTransparency
@@ -177,7 +178,7 @@ PanelWindow {
             spacing: 2
 
             Text {
-              text: root.overviewMode ? qsTr("Wallpaper library") : qsTr("Change wallpaper")
+              text: root.overviewMode ? qsTr("NEXUS // WALLPAPER") : qsTr("NEXUS // QUICK SWITCH")
               color: Theme.surfaceText
               font.family: Theme.fontFamily
               font.pixelSize: Theme.fontSizeMedium
@@ -260,7 +261,7 @@ PanelWindow {
 
           Flickable {
             id: options
-            width: root.overviewMode ? 270 : 0
+            width: root.overviewMode ? 190 : 0
             height: parent.height
             contentWidth: width
             contentHeight: optionsContent.implicitHeight
@@ -341,6 +342,7 @@ PanelWindow {
               }
 
               Row {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 height: 36
                 spacing: Theme.spaceXS
@@ -364,6 +366,7 @@ PanelWindow {
               }
 
               Text {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 text: qsTr("Shortcut: %1").arg(WallpaperService.pendingShortcut)
                 color: Theme.surfaceText
@@ -385,6 +388,7 @@ PanelWindow {
               }
 
               Text {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 text: qsTr("Checks Lua config binds too; if a bind expression cannot be resolved, the shortcut won't be applied.")
                 color: Theme.surfaceVariantText
@@ -394,6 +398,7 @@ PanelWindow {
               }
 
               ActionButton {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: qsTr("Choose media file…")
                 onClicked: WallpaperService.chooseMediaFile(
@@ -402,6 +407,7 @@ PanelWindow {
               }
 
               ActionButton {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: qsTr("Add media file as a layer…")
                 onClicked: WallpaperService.chooseMediaFile(
@@ -410,6 +416,7 @@ PanelWindow {
               }
 
               ActionButton {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: root.selectedType === "app"
                   ? qsTr("Change app preview…")
@@ -443,7 +450,15 @@ PanelWindow {
                 onClicked: WallpaperService.chooseDirectory(root.targetScreen)
               }
 
+              ActionButton {
+                width: parent.width
+                label: root.advancedOptionsOpen ? qsTr("Less options") : qsTr("More options")
+                emphasized: root.advancedOptionsOpen
+                onClicked: root.advancedOptionsOpen = !root.advancedOptionsOpen
+              }
+
               Row {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 height: 36
                 spacing: Theme.spaceXS
@@ -520,12 +535,14 @@ PanelWindow {
               }
 
               Rectangle {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 height: 1
                 color: Theme.withAlpha(Theme.outlineVariant, 0.5)
               }
 
               Text {
+                visible: root.advancedOptionsOpen
                 text: qsTr("MEDIA URL")
                 color: Theme.surfaceVariantText
                 font.family: Theme.fontFamily
@@ -534,6 +551,7 @@ PanelWindow {
               }
 
               Rectangle {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 height: 36
                 radius: Theme.hoverRadius
@@ -558,12 +576,14 @@ PanelWindow {
               }
 
               ActionButton {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: qsTr("Use URL as video/stream")
                 onClicked: applyUrl()
               }
 
               ActionButton {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: qsTr("Add URL as a layer")
                 onClicked: applyUrl(true)
@@ -690,12 +710,14 @@ PanelWindow {
               }
 
               Rectangle {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 height: 1
                 color: Theme.withAlpha(Theme.outlineVariant, 0.5)
               }
 
               ActionButton {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: SettingsData.wallpaperCycleEnabled
                   ? qsTr("Slideshow: on")
@@ -704,6 +726,7 @@ PanelWindow {
               }
 
               Row {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 height: 34
                 spacing: Theme.spaceXS
@@ -743,6 +766,7 @@ PanelWindow {
               }
 
               ActionButton {
+                visible: root.advancedOptionsOpen
                 width: parent.width
                 label: qsTr("Fit: ") + SettingsData.wallpaperFit
                 onClicked: SettingsData.set(
@@ -812,7 +836,7 @@ PanelWindow {
             Rectangle {
               id: layerGraph
               width: parent.width
-              height: 178
+              height: 150
               visible: root.overviewMode
               radius: Theme.cornerRadius
               color: Theme.withAlpha(Theme.surfaceContainer, 0.72)
@@ -867,7 +891,7 @@ PanelWindow {
 
                     Rectangle {
                       anchors.fill: parent
-                      radius: Theme.cornerRadius
+                      radius: 18
                       color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.92)
                       border.width: 1
                       border.color: Theme.withAlpha(Theme.outlineVariant, 0.65)
@@ -880,7 +904,7 @@ PanelWindow {
                         anchors.top: parent.top
                         anchors.margins: Theme.spaceXS
                         height: 62
-                        radius: Theme.hoverRadius
+                        radius: 14
                         color: modelData.type === "color"
                           ? Qt.color(modelData.source)
                           : Theme.surfaceContainer
@@ -1080,7 +1104,7 @@ PanelWindow {
                     readonly property int groupContentHeight: collapsed
                       ? 0
                       : directoryGroup.modelData.items.length > 0
-                        ? Math.ceil(directoryGroup.modelData.items.length / 3) * 152
+                        ? Math.ceil(directoryGroup.modelData.items.length / 4) * 116
                         : 36
                     width: wallpaperGroups.width
                     height: 44 + (groupContentHeight > 0 ? Theme.spaceXS + groupContentHeight : 0)
@@ -1089,7 +1113,7 @@ PanelWindow {
                     Rectangle {
                       width: parent.width
                       height: 44
-                      radius: Theme.cornerRadius
+                      radius: 16
                       color: Theme.withAlpha(
                         Theme.widgetBaseBackgroundColor,
                         SettingsData.barWidgetTransparency
@@ -1197,10 +1221,10 @@ PanelWindow {
                         height: directoryItemsViewport.viewportHeight
                         y: directoryItemsViewport.scrollOffset
                         contentY: directoryItemsViewport.scrollOffset
-                        property int columnCount: 3
+                        property int columnCount: 4
                         cellWidth: width / columnCount
-                        cellHeight: 152
-                        cacheBuffer: cellHeight
+                        cellHeight: 116
+                        cacheBuffer: 0
                         model: directoryGroup.collapsed
                           ? []
                           : directoryGroup.modelData.items
@@ -1226,16 +1250,46 @@ PanelWindow {
                   }
                 }
 
-                Text {
+                Rectangle {
                   visible: root.overviewMode && WallpaperService.directoryGroups.length === 0
                   width: parent.width
-                  height: 120
-                  horizontalAlignment: Text.AlignHCenter
-                  verticalAlignment: Text.AlignVCenter
-                  text: qsTr("No wallpaper folders added.\nAdd one or more folders to build your library.")
-                  color: Theme.surfaceVariantText
-                  font.family: Theme.fontFamily
-                  font.pixelSize: Theme.fontSizeMedium
+                  height: 112
+                  radius: Theme.cornerRadius
+                  color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.48)
+                  border.width: 1
+                  border.color: Theme.withAlpha(Theme.primary, 0.28)
+
+                  Row {
+                    anchors.centerIn: parent
+                    spacing: Theme.spaceM
+
+                    DmsIcon {
+                      anchors.verticalCenter: parent.verticalCenter
+                      name: "wallpaper"
+                      size: 28
+                      color: Theme.primary
+                    }
+
+                    Column {
+                      anchors.verticalCenter: parent.verticalCenter
+                      spacing: Theme.spaceXS
+
+                      Text {
+                        text: qsTr("NEXUS WALLPAPER // EMPTY")
+                        color: Theme.surfaceText
+                        font.family: Theme.monoFontFamily
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.DemiBold
+                      }
+
+                      Text {
+                        text: qsTr("Add a folder to build your wallpaper library.")
+                        color: Theme.surfaceVariantText
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeSmall
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -2031,39 +2085,59 @@ PanelWindow {
         Rectangle {
           anchors.fill: parent
           anchors.margins: Theme.spaceXS
-          radius: Theme.cornerRadius
+          radius: 16
           color: parent.parent.selectedInStack
-            ? Theme.withAlpha(Theme.primary, 0.22)
+            ? Theme.withAlpha(Theme.primary, 0.14)
             : Theme.withAlpha(
               Theme.widgetBaseBackgroundColor,
-              SettingsData.barWidgetTransparency
+              SettingsData.barWidgetTransparency * 0.72
             )
-          border.width: parent.parent.selectedInStack ? 2 : 1
-          border.color: parent.parent.selectedInStack
-            ? Theme.primary
-            : Theme.withAlpha(Theme.outlineVariant, 0.65)
-          clip: true
+          border.width: parent.parent.selectedInStack ? 1 : 0
+          border.color: Theme.primary
 
-          AnimatedImage {
-            anchors.fill: parent
-            source: parent.parent.previewActivated
-              && WallpaperService.typeForSource(parent.parent.modelData) === "image"
-              && (!root.isGifSource(parent.parent.modelData) || root.gifAnimationDelayElapsed)
-              ? parent.parent.modelData
-              : ""
-            fillMode: Image.PreserveAspectCrop
-            sourceSize: Qt.size(240, 120)
-            asynchronous: true
-            cache: true
-            playing: !root.isGifSource(parent.parent.modelData)
-              || (parent.parent.previewActivated && root.gifAnimationDelayElapsed)
-            opacity: status === Image.Ready ? 1 : 0
+          Rectangle {
+            id: wallpaperThumbCircle
+            width: 76
+            height: 76
+            radius: 38
+            anchors.top: parent.top
+            anchors.topMargin: 5
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: Theme.surfaceContainerHigh
+            border.width: parent.parent.selectedInStack ? 2 : 1
+            border.color: parent.parent.selectedInStack
+              ? Theme.primary
+              : Theme.withAlpha(Theme.outlineVariant, 0.75)
+            clip: true
 
-            Behavior on opacity {
-              NumberAnimation {
-                duration: 100
-                easing.type: Theme.standardEasing
+            Image {
+              anchors.fill: parent
+              source: parent.parent.parent.previewActivated
+                && WallpaperService.typeForSource(parent.parent.parent.modelData) === "image"
+                ? parent.parent.parent.modelData
+                : ""
+              fillMode: Image.PreserveAspectCrop
+              sourceSize: Qt.size(128, 128)
+              asynchronous: true
+              cache: false
+              opacity: status === Image.Ready ? 1 : 0
+
+              Behavior on opacity {
+                NumberAnimation {
+                  duration: 110
+                  easing.type: Theme.standardEasing
+                }
               }
+            }
+
+            DmsIcon {
+              anchors.centerIn: parent
+              visible: WallpaperService.typeForSource(
+                parent.parent.parent.modelData
+              ) !== "image"
+              name: "wallpaper"
+              size: 27
+              color: Theme.primary
             }
           }
 
@@ -2071,8 +2145,9 @@ PanelWindow {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            anchors.margins: Theme.spaceXS
-            height: 28
+            anchors.bottomMargin: 4
+            height: 25
+            horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             text: String(parent.parent.modelData).split("/").pop()
             color: Theme.surfaceText
@@ -2095,11 +2170,11 @@ PanelWindow {
 
           ActionButton {
             visible: root.overviewMode
-            width: 32
-            height: 32
+            width: 26
+            height: 26
             anchors.top: parent.top
             anchors.right: parent.right
-            anchors.margins: Theme.spaceS
+            anchors.margins: Theme.spaceXS
             label: "+"
             emphasized: true
             onClicked: WallpaperService.addLayer(
@@ -2119,7 +2194,7 @@ PanelWindow {
     signal clicked
 
     height: 36
-    radius: Theme.cornerRadius
+    radius: 16
     opacity: enabled ? 1 : 0.55
     color: actionMouse.containsMouse
       ? Theme.withAlpha(Theme.primary, 0.2)

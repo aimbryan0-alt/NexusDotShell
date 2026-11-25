@@ -259,11 +259,11 @@ BasePill {
 
   content: Component {
     Row {
-      spacing: 5
+      spacing: 3
 
       DmsIcon {
         name: root.wifiDevice && root.wifiDevice.connected ? "wifi" : "wifi_off"
-        size: root.iconSize(-4)
+        size: root.iconSize(-6)
         color: root.wifiDevice && root.wifiDevice.connected ? Theme.primary : Theme.widgetInactiveIconColor
         filled: !!root.wifiDevice && root.wifiDevice.connected
         anchors.verticalCenter: parent.verticalCenter
@@ -273,7 +273,7 @@ BasePill {
         name: root.adapter && !root.adapter.enabled
           ? "bluetooth_disabled"
           : (root.bluetoothDevices.some(device => device.connected) ? "bluetooth_connected" : "bluetooth")
-        size: root.iconSize(-4)
+        size: root.iconSize(-6)
         color: root.bluetoothDevices.some(device => device.connected)
           ? Theme.primary
           : (root.adapter && root.adapter.enabled ? Theme.widgetIconColor : Theme.widgetInactiveIconColor)
@@ -283,7 +283,7 @@ BasePill {
 
       DmsIcon {
         name: root.volumeIcon()
-        size: root.iconSize(-4)
+        size: root.iconSize(-6)
         color: root.audioReady && !root.activeSink.audio.muted
           && root.activeSink.audio.volume > 0 ? Theme.primary : Theme.widgetInactiveIconColor
         filled: root.audioReady && !root.activeSink.audio.muted
@@ -301,7 +301,7 @@ BasePill {
       return
     }
     const point = root.mapToItem(root.barWindow.contentItem, 0, root.height)
-    const width = Math.min(380, root.parentScreen ? root.parentScreen.width - 24 : 380)
+    const width = Math.min(440, root.parentScreen ? root.parentScreen.width - 24 : 440)
     root.popupX = Math.round(Math.max(8, Math.min(
       (root.parentScreen ? root.parentScreen.width : root.barWindow.width) - width - 8,
       point.x + root.width / 2 - width / 2
@@ -330,7 +330,7 @@ BasePill {
     grabFocus: true
     color: "transparent"
     surfaceFormat.opaque: false
-    implicitWidth: Math.min(380, root.parentScreen ? root.parentScreen.width - 24 : 380)
+    implicitWidth: Math.min(440, root.parentScreen ? root.parentScreen.width - 24 : 440)
     implicitHeight: Math.min(
       settingsColumn.implicitHeight + 28,
       Math.max(240, root.parentScreen ? root.parentScreen.height - root.popupY - 16 : 700)
@@ -365,6 +365,35 @@ BasePill {
       )
       border.width: 1
       border.color: Theme.withAlpha(Theme.primary, 0.34)
+
+      Rectangle {
+        anchors.fill: parent
+        anchors.margins: 1
+        radius: Theme.cornerRadius
+        gradient: Gradient {
+          GradientStop {
+            position: 0
+            color: Theme.withAlpha(Theme.surfaceText, 0.055)
+          }
+          GradientStop {
+            position: 0.48
+            color: Theme.withAlpha(Theme.surfaceText, 0.016)
+          }
+          GradientStop {
+            position: 1
+            color: Theme.withAlpha(Theme.surfaceText, 0)
+          }
+        }
+      }
+
+      Rectangle {
+        anchors.fill: parent
+        anchors.margins: 1
+        radius: Theme.cornerRadius
+        color: "transparent"
+        border.width: 1
+        border.color: Theme.withAlpha(Theme.outlineVariant, 0.16)
+      }
 
       Rectangle {
         anchors.left: parent.left
@@ -403,33 +432,98 @@ BasePill {
 
         Item {
           width: parent.width
-          height: 32
+          height: 48
 
           Rectangle {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
-            width: 3
-            height: 18
-            radius: 1
-            color: Theme.primary
+            width: 34
+            height: 34
+            radius: 10
+            color: Theme.withAlpha(Theme.primary, 0.13)
+            border.width: 1
+            border.color: Theme.withAlpha(Theme.primary, 0.42)
+
+            DmsIcon {
+              anchors.centerIn: parent
+              name: "tune"
+              size: 19
+              color: Theme.primary
+            }
           }
 
-          Text {
+          Rectangle {
             anchors.left: parent.left
-            anchors.leftMargin: 11
+            anchors.top: parent.top
+            width: 2
+            height: 8
+            radius: 1
+            color: Theme.tertiary
+            opacity: 0.8
+          }
+
+          Column {
+            anchors.left: parent.left
+            anchors.leftMargin: 43
             anchors.verticalCenter: parent.verticalCenter
-            text: "NEXUS // QUICK SETTINGS"
-            color: Theme.primary
-            font.family: Theme.monoFontFamily
-            font.pixelSize: Theme.fontSizeMedium - 1
-            font.weight: Font.DemiBold
-            font.letterSpacing: 0.8
+            width: Math.max(0, parent.width - 108)
+            spacing: 2
+
+            Text {
+              width: parent.width
+              text: "NEXUS // COMMAND CENTER"
+              elide: Text.ElideRight
+              color: Theme.primary
+              font.family: Theme.monoFontFamily
+              font.pixelSize: Theme.fontSizeMedium
+              font.weight: Font.DemiBold
+              font.letterSpacing: 1.0
+            }
+
+            Text {
+              text: "SYSTEM CONTROL  /  LIVE TELEMETRY"
+              color: Theme.widgetInactiveIconColor
+              font.family: Theme.monoFontFamily
+              font.pixelSize: Theme.fontSizeSmall - 2
+              font.letterSpacing: 0.7
+            }
+          }
+
+          Rectangle {
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            width: 48
+            height: 19
+            radius: Theme.pillRadius
+            color: Theme.withAlpha(Theme.secondary, 0.12)
+            border.width: 1
+            border.color: Theme.withAlpha(Theme.secondary, 0.34)
+
+            Row {
+              anchors.centerIn: parent
+              spacing: 4
+              Rectangle {
+                width: 5
+                height: 5
+                radius: 3
+                color: Theme.secondary
+                anchors.verticalCenter: parent.verticalCenter
+              }
+              Text {
+                text: "LIVE"
+                color: Theme.secondary
+                font.family: Theme.monoFontFamily
+                font.pixelSize: 8
+                font.bold: true
+                anchors.verticalCenter: parent.verticalCenter
+              }
+            }
           }
 
           Text {
             anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            text: "CLOSE"
+            anchors.top: parent.top
+            text: "CLOSE  ×"
             color: Theme.primary
             font.family: Theme.monoFontFamily
             font.pixelSize: Theme.fontSizeSmall - 1
@@ -443,9 +537,197 @@ BasePill {
           }
         }
 
+        Column {
+          width: parent.width
+          spacing: 6
+
+          Row {
+            width: parent.width
+            height: 14
+
+            Text {
+              anchors.left: parent.left
+              anchors.verticalCenter: parent.verticalCenter
+              text: "SYSTEM TELEMETRY"
+              color: Theme.widgetInactiveIconColor
+              font.family: Theme.monoFontFamily
+              font.pixelSize: Theme.fontSizeSmall - 2
+              font.weight: Font.DemiBold
+              font.letterSpacing: 0.8
+            }
+
+            Text {
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              text: "RESOURCE STATUS"
+              color: Theme.tertiary
+              font.family: Theme.monoFontFamily
+              font.pixelSize: Theme.fontSizeSmall - 3
+              font.letterSpacing: 0.5
+            }
+          }
+
+          Row {
+            width: parent.width
+            spacing: 6
+
+            Repeater {
+              model: [
+                {
+                  label: "CPU",
+                  icon: "memory",
+                  description: "PROCESSOR LOAD",
+                  value: Math.round(SystemStatsService.cpuUsage) + "%",
+                  level: SystemStatsService.cpuUsage,
+                  tint: SystemStatsService.cpuUsage >= 85 ? Theme.error
+                    : SystemStatsService.cpuUsage >= 65 ? Theme.warning : Theme.primary
+                },
+                {
+                  label: "RAM",
+                  icon: "developer_board",
+                  description: "MEMORY IN USE",
+                  value: Math.round(SystemStatsService.memoryUsage) + "%",
+                  level: SystemStatsService.memoryUsage,
+                  tint: SystemStatsService.memoryUsage >= 90 ? Theme.error
+                    : SystemStatsService.memoryUsage >= 75 ? Theme.warning : Theme.secondary
+                },
+                {
+                  label: "TEMP",
+                  icon: "device_thermostat",
+                  description: "CPU TEMPERATURE",
+                  value: SystemStatsService.cpuTemperature > 0
+                    ? Math.round(SystemStatsService.cpuTemperature) + "°C"
+                    : "--",
+                  level: SystemStatsService.cpuTemperature > 0
+                    ? Math.min(100, SystemStatsService.cpuTemperature) : 0,
+                  tint: SystemStatsService.cpuTemperature >= 85 ? Theme.error
+                    : SystemStatsService.cpuTemperature >= 70 ? Theme.warning : Theme.tertiary
+                },
+                {
+                  label: "DISK",
+                  icon: "database",
+                  description: "STORAGE USED",
+                  value: Math.round(SystemStatsService.diskUsage) + "%",
+                  level: SystemStatsService.diskUsage,
+                  tint: SystemStatsService.diskUsage >= 90 ? Theme.error
+                    : SystemStatsService.diskUsage >= 75 ? Theme.warning : Theme.primary
+                }
+              ]
+
+              delegate: Rectangle {
+                required property var modelData
+                width: (parent.width - parent.spacing * 3) / 4
+                height: 62
+                radius: Theme.cornerRadius
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.72)
+                border.width: 1
+                border.color: Theme.withAlpha(modelData.tint, 0.24)
+
+                Rectangle {
+                  anchors.left: parent.left
+                  anchors.leftMargin: 1
+                  anchors.top: parent.top
+                  anchors.topMargin: 9
+                  anchors.bottom: parent.bottom
+                  anchors.bottomMargin: 9
+                  width: 2
+                  radius: 1
+                  color: modelData.tint
+                  opacity: 0.72
+                }
+
+                Column {
+                  anchors.fill: parent
+                  anchors.margins: 7
+                  spacing: 3
+
+                  Row {
+                    width: parent.width
+
+                    DmsIcon {
+                      anchors.verticalCenter: parent.verticalCenter
+                      name: modelData.icon
+                      size: 11
+                      color: modelData.tint
+                    }
+
+                    Text {
+                      text: modelData.label
+                      color: Theme.widgetInactiveIconColor
+                      font.family: Theme.monoFontFamily
+                      font.pixelSize: Math.max(8, Theme.fontSizeSmall - 3)
+                      font.weight: Font.DemiBold
+                    }
+
+                    Item { width: 1; height: 1 }
+
+                    Text {
+                      anchors.right: parent.right
+                      text: modelData.value
+                      color: modelData.tint
+                      font.family: Theme.monoFontFamily
+                      font.pixelSize: Math.max(9, Theme.fontSizeSmall - 1)
+                      font.weight: Font.Bold
+                    }
+                  }
+
+                  Rectangle {
+                    width: parent.width
+                    height: 3
+                    radius: 2
+                    color: Theme.withAlpha(Theme.outline, 0.28)
+
+                    Rectangle {
+                      width: parent.width * Math.max(0, Math.min(100, Number(modelData.level) || 0)) / 100
+                      height: parent.height
+                      radius: parent.radius
+                      color: modelData.tint
+                    }
+                  }
+
+                  Text {
+                    width: parent.width
+                    text: modelData.description
+                    color: Theme.widgetInactiveIconColor
+                    font.family: Theme.monoFontFamily
+                    font.pixelSize: Math.max(7, Theme.fontSizeSmall - 4)
+                    elide: Text.ElideRight
+                  }
+                }
+              }
+            }
+          }
+        }
+
         Row {
           width: parent.width
-          height: 68
+          height: 18
+
+          Text {
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            text: "DEVICE LINKS"
+            color: Theme.widgetInactiveIconColor
+            font.family: Theme.monoFontFamily
+            font.pixelSize: Theme.fontSizeSmall - 2
+            font.weight: Font.DemiBold
+            font.letterSpacing: 1.0
+          }
+
+          Text {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            text: "01  /  CONNECTION MATRIX"
+            color: Theme.tertiary
+            font.family: Theme.monoFontFamily
+            font.pixelSize: Theme.fontSizeSmall - 2
+            font.letterSpacing: 0.5
+          }
+        }
+
+        Row {
+          width: parent.width
+          height: 76
           spacing: 8
 
           QuickSettingsTile {
@@ -658,6 +940,18 @@ BasePill {
                 required property var modelData
                 width: wifiNetworkList.width
                 height: networkRow.height + (passwordRow.visible ? passwordRow.height + 6 : 0)
+
+                Rectangle {
+                  anchors.fill: parent
+                  radius: Theme.hoverRadius
+                  color: modelData.connected
+                    ? Theme.withAlpha(Theme.primary, 0.10)
+                    : Theme.withAlpha(Theme.surfaceContainerHighest, 0.28)
+                  border.width: 1
+                  border.color: modelData.connected
+                    ? Theme.withAlpha(Theme.primary, 0.32)
+                    : Theme.withAlpha(Theme.outlineVariant, 0.22)
+                }
 
                 Row {
                   id: networkRow
@@ -874,7 +1168,6 @@ BasePill {
                 font.pixelSize: Theme.fontSizeSmall - 1
                 MouseArea {
                   anchors.fill: parent
-                  anchors.margins: -6
                   cursorShape: Qt.PointingHandCursor
                   onClicked: root.refreshBluetoothDevices()
                 }
@@ -1145,6 +1438,19 @@ BasePill {
                 required property var modelData
                 width: btDeviceList.width
                 height: 34
+
+                Rectangle {
+                  anchors.fill: parent
+                  radius: Theme.hoverRadius
+                  color: modelData.connected
+                    ? Theme.withAlpha(Theme.primary, 0.10)
+                    : Theme.withAlpha(Theme.surfaceContainerHighest, 0.28)
+                  border.width: 1
+                  border.color: modelData.connected
+                    ? Theme.withAlpha(Theme.primary, 0.32)
+                    : Theme.withAlpha(Theme.outlineVariant, 0.22)
+                }
+
                 Row {
                   anchors.fill: parent
                   spacing: 7
@@ -1302,6 +1608,31 @@ BasePill {
                 value: root.audioReady ? root.activeSink.audio.volume : 0
                 onMoved: if (root.audioReady)
                   root.activeSink.audio.volume = value
+
+                background: Rectangle {
+                  x: volumeSlider.leftPadding
+                  y: volumeSlider.topPadding + volumeSlider.availableHeight / 2 - height / 2
+                  width: volumeSlider.availableWidth
+                  height: 4
+                  radius: Theme.pillRadius
+                  color: Theme.withAlpha(Theme.outline, 0.32)
+                  Rectangle {
+                    width: volumeSlider.visualPosition * parent.width
+                    height: parent.height
+                    radius: parent.radius
+                    color: Theme.primary
+                  }
+                }
+                handle: Rectangle {
+                  x: volumeSlider.leftPadding + volumeSlider.visualPosition * (volumeSlider.availableWidth - width)
+                  y: volumeSlider.topPadding + volumeSlider.availableHeight / 2 - height / 2
+                  width: 13
+                  height: 13
+                  radius: Theme.pillRadius
+                  color: volumeSlider.pressed ? Theme.primary : Theme.surfaceText
+                  border.width: 2
+                  border.color: Theme.primary
+                }
               }
             }
 
@@ -1403,6 +1734,7 @@ BasePill {
                 }
               }
               Slider {
+                id: microphoneSlider
                 width: parent.width - 25
                 height: 26
                 from: 0
@@ -1411,9 +1743,60 @@ BasePill {
                   ? root.activeSource.audio.volume : 0
                 onMoved: if (root.activeSource && root.activeSource.ready && root.activeSource.audio)
                   root.activeSource.audio.volume = value
+
+                background: Rectangle {
+                  x: microphoneSlider.leftPadding
+                  y: microphoneSlider.topPadding + microphoneSlider.availableHeight / 2 - height / 2
+                  width: microphoneSlider.availableWidth
+                  height: 4
+                  radius: Theme.pillRadius
+                  color: Theme.withAlpha(Theme.outline, 0.32)
+                  Rectangle {
+                    width: microphoneSlider.visualPosition * parent.width
+                    height: parent.height
+                    radius: parent.radius
+                    color: Theme.primary
+                  }
+                }
+                handle: Rectangle {
+                  x: microphoneSlider.leftPadding + microphoneSlider.visualPosition * (microphoneSlider.availableWidth - width)
+                  y: microphoneSlider.topPadding + microphoneSlider.availableHeight / 2 - height / 2
+                  width: 13
+                  height: 13
+                  radius: Theme.pillRadius
+                  color: microphoneSlider.pressed ? Theme.primary : Theme.surfaceText
+                  border.width: 2
+                  border.color: Theme.primary
+                }
               }
             }
           }
+          }
+
+          Row {
+            width: parent.width
+            height: 18
+
+            Text {
+              anchors.left: parent.left
+              anchors.verticalCenter: parent.verticalCenter
+              text: "POWER & DISPLAY"
+              color: Theme.widgetInactiveIconColor
+              font.family: Theme.monoFontFamily
+              font.pixelSize: Theme.fontSizeSmall - 2
+              font.weight: Font.DemiBold
+              font.letterSpacing: 1.0
+            }
+
+            Text {
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              text: "02  /  DISPLAY & ENERGY"
+              color: Theme.tertiary
+              font.family: Theme.monoFontFamily
+              font.pixelSize: Theme.fontSizeSmall - 2
+              font.letterSpacing: 0.5
+            }
           }
 
           Rectangle {
@@ -1476,12 +1859,38 @@ BasePill {
                 elide: Text.ElideRight
               }
               Slider {
+                id: brightnessSlider
                 width: parent.width
                 height: 26
                 from: 0
                 to: 100
                 value: root.brightnessControlPercent
                 onMoved: root.setBrightnessTargets(value)
+
+                background: Rectangle {
+                  x: brightnessSlider.leftPadding
+                  y: brightnessSlider.topPadding + brightnessSlider.availableHeight / 2 - height / 2
+                  width: brightnessSlider.availableWidth
+                  height: 4
+                  radius: Theme.pillRadius
+                  color: Theme.withAlpha(Theme.outline, 0.32)
+                  Rectangle {
+                    width: brightnessSlider.visualPosition * parent.width
+                    height: parent.height
+                    radius: parent.radius
+                    color: Theme.primary
+                  }
+                }
+                handle: Rectangle {
+                  x: brightnessSlider.leftPadding + brightnessSlider.visualPosition * (brightnessSlider.availableWidth - width)
+                  y: brightnessSlider.topPadding + brightnessSlider.availableHeight / 2 - height / 2
+                  width: 13
+                  height: 13
+                  radius: Theme.pillRadius
+                  color: brightnessSlider.pressed ? Theme.primary : Theme.surfaceText
+                  border.width: 2
+                  border.color: Theme.primary
+                }
               }
 
               Column {
@@ -1586,12 +1995,38 @@ BasePill {
                       }
 
                       Slider {
+                        id: deviceBrightnessSlider
                         width: parent.width
                         height: 26
                         from: 0
                         to: 100
                         value: root.brightnessSliderValue(modelData)
                         onMoved: root.setDeviceBrightness(modelData, value)
+
+                        background: Rectangle {
+                          x: deviceBrightnessSlider.leftPadding
+                          y: deviceBrightnessSlider.topPadding + deviceBrightnessSlider.availableHeight / 2 - height / 2
+                          width: deviceBrightnessSlider.availableWidth
+                          height: 4
+                          radius: Theme.pillRadius
+                          color: Theme.withAlpha(Theme.outline, 0.32)
+                          Rectangle {
+                            width: deviceBrightnessSlider.visualPosition * parent.width
+                            height: parent.height
+                            radius: parent.radius
+                            color: Theme.primary
+                          }
+                        }
+                        handle: Rectangle {
+                          x: deviceBrightnessSlider.leftPadding + deviceBrightnessSlider.visualPosition * (deviceBrightnessSlider.availableWidth - width)
+                          y: deviceBrightnessSlider.topPadding + deviceBrightnessSlider.availableHeight / 2 - height / 2
+                          width: 13
+                          height: 13
+                          radius: Theme.pillRadius
+                          color: deviceBrightnessSlider.pressed ? Theme.primary : Theme.surfaceText
+                          border.width: 2
+                          border.color: Theme.primary
+                        }
                       }
 
                       Item {
@@ -1813,6 +2248,52 @@ BasePill {
             wrapMode: Text.Wrap
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSmall - 1
+          }
+
+          Rectangle {
+            width: parent.width
+            height: 1
+            color: Theme.withAlpha(Theme.primary, 0.2)
+          }
+
+          Row {
+            width: parent.width
+            height: 18
+
+            Text {
+              anchors.verticalCenter: parent.verticalCenter
+              text: "NEXUS // LOCAL SESSION"
+              color: Theme.widgetInactiveIconColor
+              font.family: Theme.monoFontFamily
+              font.pixelSize: Theme.fontSizeSmall - 2
+              font.letterSpacing: 0.5
+            }
+
+            Row {
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              spacing: 5
+
+              Rectangle {
+                width: 6
+                height: 6
+                radius: 3
+                anchors.verticalCenter: parent.verticalCenter
+                color: SettingsPanelService.errorMessage === "" && root.connectionError === ""
+                  ? Theme.primary : Theme.error
+              }
+
+              Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: SettingsPanelService.errorMessage === "" && root.connectionError === ""
+                  ? "SYSTEM READY" : "ATTENTION"
+                color: SettingsPanelService.errorMessage === "" && root.connectionError === ""
+                  ? Theme.primary : Theme.error
+                font.family: Theme.monoFontFamily
+                font.pixelSize: Theme.fontSizeSmall - 2
+                font.letterSpacing: 0.5
+              }
+            }
           }
         }
       }

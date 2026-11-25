@@ -27,6 +27,9 @@ Singleton {
   property bool locationSearchPending: false
   property int _locationSearchSerial: 0
   property string _locationSearchQuery: ""
+  property int _geocodeSerial: 0
+  property string _pendingGeocodeCity: ""
+  property bool _geocodePending: false
   readonly property int _minFetchInterval: 30000
 
   readonly property var _dayIcons: ({
@@ -48,15 +51,16 @@ Singleton {
     "95":"thunderstorm","96":"thunderstorm","99":"thunderstorm"
   })
   readonly property var _conditions: ({
-    "0":"Clear Sky","1":"Clear Sky","2":"Partly Cloudy","3":"Overcast",
-    "45":"Fog","48":"Fog","51":"Drizzle","53":"Drizzle","55":"Heavy Drizzle",
-    "56":"Freezing Drizzle","57":"Freezing Drizzle",
-    "61":"Light Rain","63":"Rain","65":"Heavy Rain",
-    "66":"Light Freezing Rain","67":"Heavy Freezing Rain",
-    "71":"Light Snow","73":"Snow","75":"Heavy Snow","77":"Snow Grains",
-    "80":"Light Showers","81":"Showers","82":"Heavy Showers",
-    "85":"Light Snow Showers","86":"Heavy Snow Showers",
-    "95":"Thunderstorm","96":"Thunderstorm w/ Hail","99":"Thunderstorm w/ Hail"
+    "0":"Céu limpo","1":"Predomínio de sol","2":"Parcialmente nublado","3":"Nublado",
+    "45":"Nevoeiro","48":"Nevoeiro com geada",
+    "51":"Garoa fraca","53":"Garoa moderada","55":"Garoa intensa",
+    "56":"Garoa congelante fraca","57":"Garoa congelante intensa",
+    "61":"Chuva fraca","63":"Chuva moderada","65":"Chuva forte",
+    "66":"Chuva congelante fraca","67":"Chuva congelante forte",
+    "71":"Neve fraca","73":"Neve moderada","75":"Neve intensa","77":"Grãos de neve",
+    "80":"Pancadas fracas","81":"Pancadas moderadas","82":"Pancadas fortes",
+    "85":"Pancadas de neve fracas","86":"Pancadas de neve fortes",
+    "95":"Trovoada","96":"Trovoada com granizo","99":"Trovoada com granizo intenso"
   })
 
 
@@ -117,18 +121,18 @@ Singleton {
     const dateObj = new Date(date)
 
     const periods = [
-      { name: "Dawn", start: new Date(times.nightEnd), end: new Date(times.nauticalDawn) },
-      { name: "Dawn", start: new Date(times.nauticalDawn), end: new Date(times.dawn) },
-      { name: "Dawn", start: new Date(times.dawn), end: new Date(times.sunrise) },
-      { name: "Sunrise", start: new Date(times.sunrise), end: new Date(times.sunriseEnd) },
-      { name: "Golden Hour", start: new Date(times.sunriseEnd), end: new Date(times.goldenHourEnd) },
-      { name: "Morning", start: new Date(times.goldenHourEnd), end: new Date(times.solarNoon) },
-      { name: "Afternoon", start: new Date(times.solarNoon), end: new Date(times.goldenHour) },
-      { name: "Golden Hour", start: new Date(times.goldenHour), end: new Date(times.sunsetStart) },
-      { name: "Sunset", start: new Date(times.sunsetStart), end: new Date(times.sunset) },
-      { name: "Dusk", start: new Date(times.sunset), end: new Date(times.dusk) },
-      { name: "Dusk", start: new Date(times.dusk), end: new Date(times.nauticalDusk) },
-      { name: "Dusk", start: new Date(times.nauticalDusk), end: new Date(times.night) }
+      { name: "Amanhecer", start: new Date(times.nightEnd), end: new Date(times.nauticalDawn) },
+      { name: "Amanhecer", start: new Date(times.nauticalDawn), end: new Date(times.dawn) },
+      { name: "Amanhecer", start: new Date(times.dawn), end: new Date(times.sunrise) },
+      { name: "Nascer do sol", start: new Date(times.sunrise), end: new Date(times.sunriseEnd) },
+      { name: "Hora dourada", start: new Date(times.sunriseEnd), end: new Date(times.goldenHourEnd) },
+      { name: "Manhã", start: new Date(times.goldenHourEnd), end: new Date(times.solarNoon) },
+      { name: "Tarde", start: new Date(times.solarNoon), end: new Date(times.goldenHour) },
+      { name: "Hora dourada", start: new Date(times.goldenHour), end: new Date(times.sunsetStart) },
+      { name: "Pôr do sol", start: new Date(times.sunsetStart), end: new Date(times.sunset) },
+      { name: "Anoitecer", start: new Date(times.sunset), end: new Date(times.dusk) },
+      { name: "Anoitecer", start: new Date(times.dusk), end: new Date(times.nauticalDusk) },
+      { name: "Anoitecer", start: new Date(times.nauticalDusk), end: new Date(times.night) }
     ]
 
     const sunrise = new Date(times.nightEnd)
@@ -147,7 +151,7 @@ Singleton {
         }
       }
     }
-    return { period: "Night", periodIndex: 0, periodPercent: 0, dayPercent: dayPercent }
+    return { period: "Noite", periodIndex: 0, periodPercent: 0, dayPercent: dayPercent }
   }
 
   function getSkyArcPosition(date, isSun) {
@@ -168,6 +172,27 @@ Singleton {
     return ((isDay !== false) ? _dayIcons : _nightIcons)[String(code)] || "cloud"
   }
   function weatherCondition(code) { return _conditions[String(code)] || "Unknown" }
+  function _parseJsonResponse(raw, source) {
+    const rawText = String(raw === undefined || raw === null ? "" : raw)
+    const body = (rawText.charCodeAt(0) === 0xFEFF ? rawText.slice(1) : rawText).trim()
+    if (!body)
+      throw new Error(source + ": resposta vazia; verifique a conexão e a disponibilidade da API")
+
+    let parsed
+    try {
+      parsed = JSON.parse(body)
+    } catch (error) {
+      throw new Error(source + ": JSON inválido (" + String(error)
+        + "). Início da resposta: " + body.slice(0, 180))
+    }
+
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
+      throw new Error(source + ": formato JSON inesperado")
+    if (parsed.error)
+      throw new Error(source + ": " + (parsed.reason || parsed.message || "a API retornou um erro"))
+    return parsed
+  }
+
   function _useF() { return (typeof SettingsData !== "undefined") ? (SettingsData.useFahrenheit ?? false) : false }
   function currentTempText() {
     if (!weather.available) return "--"
@@ -180,6 +205,7 @@ Singleton {
   function formatPercent(v) { return v != null ? v + "%" : "--" }
   function formatSpeed(kmh) { return kmh != null ? kmh + " km/h" : "--" }
   function formatPressure(hpa) { return hpa != null ? hpa + " hPa" : "--" }
+  function formatRain(mm) { return mm != null ? Number(mm).toLocaleString(Qt.locale(), "f", 1) + " mm" : "--" }
   function calendarDayDifference(a, b) {
     return Math.floor((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate()) -
       Date.UTC(a.getFullYear(),a.getMonth(),a.getDate())) / 86400000)
@@ -200,7 +226,13 @@ Singleton {
       if (p.length===2) {
         const lat = parseFloat(p[0]), lon = parseFloat(p[1])
         if (!isNaN(lat) && !isNaN(lon)) {
-          root.location = {city: city||"Local Weather", country:"", latitude:lat, longitude:lon}
+          const locationParts = city.split(",").map(part => part.trim()).filter(Boolean)
+          root.location = {
+            city: locationParts[0] || "Local Weather",
+            country: locationParts.slice(1).join(", "),
+            latitude: lat,
+            longitude: lon
+          }
           fetchWeather(lat, lon); return
         }
       }
@@ -210,9 +242,20 @@ Singleton {
   }
 
   function geocodeCity(city) {
+    const serial = ++root._geocodeSerial
+    root._pendingGeocodeCity = city
+    if (geocodeFetcher.running) {
+      root._geocodePending = true
+      return
+    }
+    startGeocode(city, serial)
+  }
+
+  function startGeocode(city, serial) {
     geocodeFetcher.requestedLocation = city
+    geocodeFetcher.requestedSerial = serial
     geocodeFetcher.command = ["curl","-sf","--max-time","10",
-      "https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(city)+"&count=1&language=en&format=json"]
+      "https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(city)+"&count=5&language=pt&format=json"]
     geocodeFetcher.running = true
   }
 
@@ -233,11 +276,14 @@ Singleton {
       return
     root.locationSearchPending = false
     try {
-      const response = JSON.parse(text.trim())
+      const response = root._parseJsonResponse(text, "Busca de cidades")
       root.locationSuggestions = (response.results || []).slice(0, 5).map(result => ({
         name: result.name || "",
         admin1: result.admin1 || "",
         country: result.country || "",
+        countryCode: result.country_code || "",
+        admin2: result.admin2 || "",
+        population: result.population || 0,
         latitude: result.latitude,
         longitude: result.longitude
       }))
@@ -258,8 +304,8 @@ Singleton {
     const params = [
       "latitude="+lat,"longitude="+lon,
       "current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,surface_pressure,wind_speed_10m",
-      "daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max",
-      "hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,apparent_temperature,relative_humidity_2m,surface_pressure,visibility",
+      "daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,precipitation_sum",
+      "hourly=temperature_2m,weather_code,precipitation_probability,precipitation,wind_speed_10m,apparent_temperature,relative_humidity_2m,surface_pressure,visibility",
       "timezone=auto","forecast_days=7"
     ]
     lastFetchTime = now
@@ -301,20 +347,29 @@ Singleton {
   Process {
     id: geocodeFetcher
     property string requestedLocation: ""
+    property int requestedSerial: 0
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
+        if (geocodeFetcher.requestedSerial !== root._geocodeSerial
+            || SettingsData.weatherCoordinates !== ""
+            || SettingsData.weatherLocation !== geocodeFetcher.requestedLocation)
+          return
         try {
-          const d = JSON.parse(text.trim())
+          const d = root._parseJsonResponse(text, "Geocodificação")
           const r = (d.results||[])[0]
           if (!r) throw new Error("No geocoding results")
-          if (SettingsData.weatherCoordinates !== ""
-              || SettingsData.weatherLocation !== geocodeFetcher.requestedLocation)
-            return
           root.location = {city:r.name, country:r.country||"", latitude:r.latitude, longitude:r.longitude}
+          SettingsData.set("weatherLocation", [r.name, r.admin1, r.country].filter(Boolean).join(", "))
           SettingsData.set("weatherCoordinates", r.latitude + "," + r.longitude)
           root.fetchWeather()
         } catch(e) { root.lastFetchError = "Geocoding failed: "+String(e) }
+      }
+    }
+    onExited: {
+      if (root._geocodePending) {
+        root._geocodePending = false
+        root.startGeocode(root._pendingGeocodeCity, root._geocodeSerial)
       }
     }
   }
@@ -335,7 +390,7 @@ Singleton {
         "curl", "-fsS", "--max-time", "8", "--get",
         "--data-urlencode", "name=" + root._locationSearchQuery,
         "--data-urlencode", "count=5",
-        "--data-urlencode", "language=en",
+        "--data-urlencode", "language=pt",
         "--data-urlencode", "format=json",
         "https://geocoding-api.open-meteo.com/v1/search"
       ]
@@ -368,19 +423,21 @@ Singleton {
     stdout: StdioCollector {
       onStreamFinished: {
         try {
-          const data = JSON.parse(text.trim())
-          if (!data.current || !data.daily) throw new Error("Missing weather fields")
+          const data = root._parseJsonResponse(text, "Previsão do tempo")
+          if (!data.current || !data.daily || !Array.isArray(data.daily.time))
+            throw new Error("Previsão do tempo: resposta sem os campos current/daily.time esperados")
           const cur = data.current, daily = data.daily, hourly = data.hourly || {}
           const tC = cur.temperature_2m||0, fC = cur.apparent_temperature||tC
 
           const forecast = (daily.time||[]).map(function(t,i) {
             return {
-              day: root._fmtDay(t,i), wCode: daily.weather_code?.[i]||0,
+              date: t, day: root._fmtDay(t,i), wCode: daily.weather_code?.[i]||0,
               tempMin: daily.temperature_2m_min?.[i]||0,
               tempMax: daily.temperature_2m_max?.[i]||0,
               tempMinF: (daily.temperature_2m_min?.[i]||0)*9/5+32,
               tempMaxF: (daily.temperature_2m_max?.[i]||0)*9/5+32,
               precipitationProbability: daily.precipitation_probability_max?.[i]||0,
+              precipitationMm: daily.precipitation_sum?.[i]??0,
               sunrise: daily.sunrise?.[i] ? root._fmtTime(daily.sunrise[i]) : "",
               sunset:  daily.sunset?.[i]  ? root._fmtTime(daily.sunset[i])  : "",
               rawSunrise: daily.sunrise?.[i]||"", rawSunset: daily.sunset?.[i]||""
@@ -403,6 +460,7 @@ Singleton {
               wind: hourly.wind_speed_10m?.[i]||0,
               pressure: hourly.surface_pressure?.[i]||0,
               precipitationProbability: hourly.precipitation_probability?.[i]||0,
+              precipitationMm: hourly.precipitation?.[i]??0,
               isDay: sr<t && t<ss
             }
           })
@@ -421,17 +479,26 @@ Singleton {
             rawSunrise: daily.sunrise?.[0]||"", rawSunset: daily.sunset?.[0]||"",
             pressure:cur.surface_pressure||0,
             precipitationProbability:daily.precipitation_probability_max?.[0]||0,
+            precipitationMm:daily.precipitation_sum?.[0]??0,
             isDay:Boolean(cur.is_day),
             forecast:forecast, hourlyForecast:hourlyForecast
           }
         } catch(e) {
           root.weather = Object.assign({}, root.weather, {loading:false})
           root.lastFetchError = String(e)
+          console.warn("WeatherService:", root.lastFetchError)
           root.retryAttempts++
           if (root.retryAttempts < 3) retryTimer.restart()
         }
       }
     }
+  }
+
+  Timer {
+    id: locationUpdateDelay
+    interval: 160
+    repeat: false
+    onTriggered: root.updateLocation()
   }
 
   Timer { id:pollTimer; interval:900000; running:root.refCount>0; repeat:true; triggeredOnStart:true; onTriggered:root.fetchWeather() }
@@ -441,11 +508,11 @@ Singleton {
     if (typeof SettingsData !== "undefined") {
       SettingsData.weatherLocationChanged.connect(function() {
         root.location=null; root.lastFetchTime=0
-        if (root.refCount>0) root.updateLocation()
+        if (root.refCount>0) locationUpdateDelay.restart()
       })
       SettingsData.weatherCoordinatesChanged.connect(function() {
         root.location=null; root.lastFetchTime=0
-        if (root.refCount>0) root.updateLocation()
+        if (root.refCount>0) locationUpdateDelay.restart()
       })
     }
   }

@@ -267,9 +267,9 @@ Singleton {
   readonly property real hoverVerticalInset: spaceXS - spaceXXS / 2
   readonly property int pillRadius: 999
 
-  readonly property int barThickness: 28
-  readonly property int barHeight: 16
-  readonly property int widgetThickness: 26
+  readonly property int barThickness: 44
+  readonly property int barHeight: 44
+  readonly property int widgetThickness: 36
   readonly property int barPosition: typeof SettingsData !== "undefined" ? SettingsData.barPosition : 1
 
   // ---- spacing aliases matching DMS ----

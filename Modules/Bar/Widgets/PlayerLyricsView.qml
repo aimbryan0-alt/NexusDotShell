@@ -7,6 +7,7 @@ Item {
   id: root
 
   property real textSize: 16
+  property color accentColor: Theme.primary
 
   Rectangle {
     anchors.fill: parent
@@ -41,11 +42,17 @@ Item {
       width: lyricsList.width - 8
       text: root.lineText(modelData, index)
       textFormat: LyricsService.synced ? Text.RichText : Text.PlainText
-      color: "#f3eee8"
-      opacity: LyricsService.synced && index !== LyricsService.activeIndex ? 0.72 : 1
-      font.family: Theme.fontFamily
-      font.pixelSize: root.textSize
+      color: LyricsService.synced && index === LyricsService.activeIndex ? root.accentColor : Theme.surfaceText
+      opacity: LyricsService.synced && index !== LyricsService.activeIndex ? 0.48 : 1
+      font.family: "serif"
+      font.italic: true
+      font.pixelSize: LyricsService.synced && index === LyricsService.activeIndex
+        ? root.textSize + 5
+        : root.textSize
       font.weight: LyricsService.synced && index === LyricsService.activeIndex ? Font.DemiBold : Font.Normal
+      font.letterSpacing: 0.25
+      lineHeight: 1.18
+      lineHeightMode: Text.ProportionalHeight
       wrapMode: Text.Wrap
       horizontalAlignment: Text.AlignHCenter
       onYChanged: {
@@ -65,17 +72,18 @@ Item {
       width: parent.width
       text: {
         switch (LyricsService.state) {
-        case "loading": return "Searching for lyrics…"
+        case "loading": return "Procurando letras…"
         case "instrumental": return "Instrumental"
-        case "unavailable": return "Lyrics are unavailable"
-        case "error": return "Lyrics could not be loaded"
-        case "none": return "No lyrics found"
-        default: return "Lyrics are not available"
+        case "unavailable": return "Letras indisponíveis"
+        case "error": return "Não foi possível carregar as letras"
+        case "none": return "Nenhuma letra encontrada"
+        default: return "Letras não disponíveis"
         }
       }
-      color: "#eee5dc"
-      font.family: Theme.fontFamily
-      font.pixelSize: 14
+      color: Theme.surfaceText
+      font.family: "serif"
+      font.italic: true
+      font.pixelSize: 15
       horizontalAlignment: Text.AlignHCenter
       wrapMode: Text.Wrap
     }
@@ -83,10 +91,11 @@ Item {
     Text {
       anchors.horizontalCenter: parent.horizontalCenter
       visible: LyricsService.state === "none" || LyricsService.state === "error"
-      text: "Retry"
-      color: "#ffd2bd"
-      font.family: Theme.fontFamily
-      font.pixelSize: 13
+      text: "Tentar novamente"
+      color: Theme.primary
+      font.family: "serif"
+      font.italic: true
+      font.pixelSize: 14
       MouseArea {
         anchors.fill: parent
         anchors.margins: -8
@@ -102,8 +111,9 @@ Item {
     anchors.bottomMargin: Theme.spaceXS
     visible: LyricsService.state === "ready" && LyricsService.attributionName !== ""
     text: LyricsService.attributionName
-    color: "#c9bdb2"
-    font.family: Theme.fontFamily
+    color: Theme.surfaceVariantText
+    font.family: "serif"
+    font.italic: true
     font.pixelSize: 10
     opacity: 0.9
     MouseArea {

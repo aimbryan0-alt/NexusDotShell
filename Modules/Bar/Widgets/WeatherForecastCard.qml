@@ -49,19 +49,36 @@ Rectangle {
   readonly property string precipitationText: (root.forecastData?.precipitationProbability ?? 0) + "%"
 
   readonly property var values: daily ? [] : [
-    { label: "Humidity", text: root.humidityText, icon: "humidity_low" },
-    { label: "Wind", text: root.windText, icon: "air" },
-    { label: "Pressure", text: root.pressureText, icon: "speed" },
-    { label: "Precipitation", text: root.precipitationText, icon: "rainy" }
+    { label: qsTr("Umidade"), text: root.humidityText, icon: "humidity_low" },
+    { label: qsTr("Vento"), text: root.windText, icon: "air" },
+    { label: qsTr("Pressão"), text: root.pressureText, icon: "speed" },
+    { label: qsTr("Chuva"), text: qsTr("%1 · %2").arg(root.precipitationText).arg(WeatherService.formatRain(root.forecastData?.precipitationMm)), icon: "rainy" }
   ]
 
-  color: isCurrent ? Theme.withAlpha(Theme.primary, 0.1) : Theme.nestedSurface
-  border.color: isCurrent ? Theme.withAlpha(Theme.primary, 0.3) : "transparent"
+  readonly property color forecastAccent: daily ? Theme.primary : Theme.secondary
+  color: isCurrent ? Theme.withAlpha(forecastAccent, 0.14) : Theme.nestedSurface
+  border.color: isCurrent ? Theme.withAlpha(forecastAccent, 0.48) : Theme.withAlpha(Theme.outline, 0.12)
   border.width: 1
+
+  Behavior on color {
+    ColorAnimation { duration: 180; easing.type: Easing.OutCubic }
+  }
+  Behavior on border.color {
+    ColorAnimation { duration: 180; easing.type: Easing.OutCubic }
+  }
+
+  Rectangle {
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    height: 2
+    radius: 1
+    color: isCurrent ? root.forecastAccent : Theme.withAlpha(root.forecastAccent, 0.24)
+  }
 
   Column {
     anchors.centerIn: parent
-    spacing: Theme.spacingXS
+    spacing: Theme.spaceS
 
     Text {
       text: root.forecastData != null ? root.dateText : "--"
@@ -74,8 +91,8 @@ Rectangle {
 
     DmsIcon {
       name: root.forecastData ? WeatherService.weatherIcon(root.forecastData.wCode || 0, root.forecastData.isDay ?? true) : "cloud"
-      size: 24
-      color: root.isCurrent ? Theme.primary : Theme.withAlpha(Theme.primary, 0.8)
+      size: 22
+      color: root.isCurrent ? root.forecastAccent : Theme.withAlpha(root.forecastAccent, 0.78)
       anchors.horizontalCenter: parent.horizontalCenter
       visible: root.forecastData != null
     }
@@ -83,15 +100,34 @@ Rectangle {
     Text {
       text: root.daily ? root.minMaxTempText : root.tempText
       font.family: Theme.monoFontFamily
-      font.pixelSize: Theme.fontSizeSmall
+      font.pixelSize: Theme.fontSizeSmall + 1
       color: root.isCurrent ? Theme.primary : Theme.surfaceText
-      font.weight: Font.Medium
+      font.weight: Font.DemiBold
       anchors.horizontalCenter: parent.horizontalCenter
       visible: root.forecastData != null
     }
 
+    Row {
+      spacing: Theme.spacingXXS
+      anchors.horizontalCenter: parent.horizontalCenter
+      visible: root.forecastData != null && (root.daily || root.dense)
+      DmsIcon {
+        name: "rainy"
+        size: 11
+        color: Theme.withAlpha(Theme.primary, 0.82)
+        anchors.verticalCenter: parent.verticalCenter
+      }
+      Text {
+        text: qsTr("%1 · %2").arg(root.precipitationText).arg(WeatherService.formatRain(root.forecastData.precipitationMm))
+        font.family: Theme.monoFontFamily
+        font.pixelSize: Theme.fontSizeSmall - 3
+        color: Theme.withAlpha(Theme.surfaceText, 0.68)
+        anchors.verticalCenter: parent.verticalCenter
+      }
+    }
+
     Text {
-      text: root.feelsLikeText
+      text: qsTr("Sensação %1").arg(root.feelsLikeText)
       font.family: Theme.monoFontFamily
       font.pixelSize: Theme.fontSizeSmall - 2
       color: root.isCurrent ? Theme.primary : Theme.withAlpha(Theme.surfaceText, 0.7)

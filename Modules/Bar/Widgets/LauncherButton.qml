@@ -1,7 +1,5 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell.Io
-import Quickshell.Widgets
 import qs.Common
 import qs.Modules.Bar.Widgets
 import qs.Services
@@ -31,20 +29,33 @@ BasePill {
       implicitWidth: 28
       implicitHeight: 22
 
-      IconImage {
-        id: archLogo
+      Rectangle {
+        id: nexusMark
         anchors.centerIn: parent
         width: 22
         height: 22
-        source: "file:///usr/share/pixmaps/archlinux-logo.svg"
-        asynchronous: true
-        layer.enabled: true
-        layer.effect: MultiEffect {
-          saturation: 0
-          colorization: 1
-          colorizationColor: Theme.primary
-          brightness: 0.5
-          contrast: 1
+        radius: 7
+        color: Theme.withAlpha(Theme.primary, 0.13)
+        border.width: 1
+        border.color: Theme.withAlpha(Theme.primary, 0.72)
+
+        Text {
+          anchors.centerIn: parent
+          text: "N"
+          color: Theme.primary
+          font.family: Theme.monoFontFamily
+          font.pixelSize: 15
+          font.weight: Font.Black
+          font.letterSpacing: -1
+        }
+
+        Rectangle {
+          anchors.right: parent.right
+          anchors.top: parent.top
+          width: 4
+          height: 4
+          radius: 1
+          color: Theme.primary
         }
       }
     }

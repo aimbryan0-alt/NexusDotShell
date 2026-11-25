@@ -11,6 +11,9 @@ import qs.Services
 BasePill {
   id: root
 
+  // Hide the tray capsule when there are no status icons to show.
+  visible: root.visibleItems.length > 0 || root.hiddenItems.length > 0
+
   property var barWindow: null
   property var parentScreen: null
   property var openMenuItem: null
@@ -28,6 +31,8 @@ BasePill {
   property string overflowTooltipText: "hidden tray icons"
   property int overflowTooltipX: 0
   property int overflowTooltipY: 0
+  readonly property real trayButtonSize: Math.max(24, Math.min(30, root.widgetThickness - 6))
+  readonly property real trayIconSize: Math.round(trayButtonSize * 0.68)
   readonly property real availableMenuHeight: root.parentScreen
     ? Math.max(120, root.parentScreen.height - (root.barWindow ? root.barWindow.height : Theme.barHeight) - Theme.space2() * 2)
     : 420
@@ -110,7 +115,7 @@ BasePill {
 
   content: Component {
     Row {
-      spacing: 2
+      spacing: 3
 
       Repeater {
         // Use the actual SNI objects rather than the collection wrapper so
@@ -121,11 +126,13 @@ BasePill {
           required property var modelData
           readonly property var item: modelData
 
-          width: 26
-          height: 26
+          width: root.trayButtonSize
+          height: root.trayButtonSize
           anchors.verticalCenter: parent.verticalCenter
           radius: Theme.pillRadius
           color: hovered ? Theme.surfaceText_12 : "transparent"
+          border.width: hovered ? 1 : 0
+          border.color: Theme.withAlpha(Theme.primary, 0.38)
 
           property bool hovered: false
 
@@ -133,12 +140,23 @@ BasePill {
             id: trayIcon
             anchors.centerIn: parent
             source: root._iconOf(item)
-            width: 18
-            height: 18
+            width: root.trayIconSize
+            height: root.trayIconSize
             asynchronous: true
             smooth: true
             mipmap: true
             visible: status === Image.Ready
+          }
+
+          Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottomMargin: 2
+            width: 9
+            height: 2
+            radius: 1
+            color: Theme.primary
+            opacity: hovered ? 0.9 : 0
           }
 
           Text {
@@ -177,10 +195,12 @@ BasePill {
 
       Rectangle {
         visible: root.hiddenItems.length > 0
-        width: 24
-        height: 26
+        width: root.trayButtonSize
+        height: root.trayButtonSize
         radius: Theme.pillRadius
         color: overflowMouse.containsMouse ? Theme.surfaceText_12 : "transparent"
+        border.width: overflowMouse.containsMouse ? 1 : 0
+        border.color: Theme.withAlpha(Theme.primary, 0.38)
 
         Canvas {
           id: overflowChevron
@@ -382,7 +402,7 @@ BasePill {
     grabFocus: true
     color: "transparent"
     implicitWidth: Math.max(48, hiddenRow.implicitWidth + 16)
-    implicitHeight: 42
+    implicitHeight: root.trayButtonSize + 14
 
     onVisibleChanged: {
       if (!visible)
@@ -409,21 +429,34 @@ BasePill {
           model: root.hiddenItems
           delegate: Rectangle {
             required property var modelData
-            width: 26
-            height: 26
+            width: root.trayButtonSize
+            height: root.trayButtonSize
             radius: Theme.pillRadius
             color: hiddenMouse.containsMouse ? Theme.surfaceText_12 : "transparent"
+            border.width: hiddenMouse.containsMouse ? 1 : 0
+            border.color: Theme.withAlpha(Theme.primary, 0.38)
 
             IconImage {
               id: hiddenTrayIcon
               anchors.centerIn: parent
               source: root._iconOf(modelData)
-              width: 18
-              height: 18
+              width: root.trayIconSize
+              height: root.trayIconSize
               asynchronous: true
               smooth: true
               mipmap: true
               visible: status === Image.Ready
+            }
+
+            Rectangle {
+              anchors.bottom: parent.bottom
+              anchors.horizontalCenter: parent.horizontalCenter
+              anchors.bottomMargin: 2
+              width: 9
+              height: 2
+              radius: 1
+              color: Theme.primary
+              opacity: hiddenMouse.containsMouse ? 0.9 : 0
             }
 
             Text {

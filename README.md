@@ -274,6 +274,47 @@ Copyright (C) 2026 mmj2023
 - `Modules/Bar/Widgets/` - reusable bar widgets, quick settings, launcher, and system monitor
 - `Modules/Dock/` - floating application dock
 
+## Install and Hyprland Lua integration
+
+On a Hyprland setup using the native Lua configuration API, run the guided
+installer from the repository directory:
+
+```sh
+bash install.sh
+```
+
+The installer verifies the required commands, builds the native telemetry
+helpers, installs the desktop entry, and installs a short `nexus` launcher in
+`~/.local/bin`. It then asks before modifying the detected
+`~/.config/hypr/hyprland.lua` configuration. It creates a timestamped backup
+before adding the autostart and screenshot binding. It does not install system
+packages or run privileged commands.
+
+After installation, launch the shell manually with:
+
+```sh
+nexus
+```
+
+The Hyprland Lua integration starts NexusDotShell on the `hyprland.start`
+event and binds `SUPER + SHIFT + S` to a terminal-free full-output screenshot.
+Captures are saved under `~/Pictures/Nexus-Showcase/`. The screenshot shortcut
+requires `hyprshot`; on Arch Linux it may be installed with an AUR helper,
+for example `yay -S hyprshot`.
+
+To enable or remove only the Lua integration:
+
+```sh
+bash scripts/enable-hyprland-lua.sh
+bash scripts/disable-hyprland-lua.sh
+```
+
+The removal helper deletes only the marked NexusDotShell block and creates a
+backup first. The startup wrapper checks whether this project is already
+running before launching another instance. The older
+`enable-hyprland-autostart.sh` and `disable-hyprland-autostart.sh` helpers
+remain available for traditional `hyprland.conf` configurations.
+
 ## Running
 
 ```sh

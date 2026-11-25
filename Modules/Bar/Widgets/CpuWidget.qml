@@ -70,7 +70,7 @@ BasePill {
             anchors.centerIn: parent
 
             DmsIcon {
-              name: "memory"
+              name: "speed"
               size: root.iconSize()
               color: root.usageColor()
               anchors.verticalCenter: parent.verticalCenter
@@ -127,6 +127,28 @@ BasePill {
             radius: Theme.hoverRadius
             color: root.cpuHovered ? Theme.withAlpha(Theme.primary, 0.12) : "transparent"
             z: -1
+          }
+
+          Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: Math.max(18, parent.width - 8)
+            height: 2
+            radius: 1
+            color: Theme.withAlpha(Theme.outline, 0.28)
+
+            Rectangle {
+              width: parent.width * Math.max(0, Math.min(100, SystemStatsService.cpuUsage)) / 100
+              height: parent.height
+              radius: parent.radius
+              color: root.usageColor()
+              Behavior on width {
+                NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
+              }
+              Behavior on color {
+                ColorAnimation { duration: 180; easing.type: Easing.OutCubic }
+              }
+            }
           }
         }
 
@@ -213,6 +235,28 @@ BasePill {
             radius: Theme.hoverRadius
             color: root.memoryHovered ? Theme.withAlpha(Theme.primary, 0.12) : "transparent"
             z: -1
+          }
+
+          Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: Math.max(18, parent.width - 8)
+            height: 2
+            radius: 1
+            color: Theme.withAlpha(Theme.outline, 0.28)
+
+            Rectangle {
+              width: parent.width * Math.max(0, Math.min(100, SystemStatsService.memoryUsage)) / 100
+              height: parent.height
+              radius: parent.radius
+              color: root.memoryColor()
+              Behavior on width {
+                NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
+              }
+              Behavior on color {
+                ColorAnimation { duration: 180; easing.type: Easing.OutCubic }
+              }
+            }
           }
         }
 
@@ -723,13 +767,55 @@ BasePill {
         height: parent.height - 34
         visible: SystemStatsService.gpus.length === 0
 
-        Text {
+        Rectangle {
           anchors.centerIn: parent
-          text: SystemStatsService.gpuStatsError.length > 0
-            ? SystemStatsService.gpuStatsError
-            : qsTr("No graphics devices detected")
-          color: Theme.widgetInactiveIconColor
-          font.pixelSize: 12
+          width: Math.min(parent.width - 24, 340)
+          height: 112
+          radius: Theme.cornerRadius
+          color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.48)
+          border.width: 1
+          border.color: Theme.withAlpha(Theme.outline, 0.28)
+
+          Rectangle {
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            width: 2
+            radius: 1
+            color: Theme.primary
+            opacity: 0.72
+          }
+
+          Column {
+            anchors.centerIn: parent
+            spacing: 5
+
+            DmsIcon {
+              anchors.horizontalCenter: parent.horizontalCenter
+              name: "developer_board"
+              size: 23
+              color: Theme.primary
+            }
+
+            Text {
+              anchors.horizontalCenter: parent.horizontalCenter
+              text: qsTr("GPU // NO DEVICE")
+              color: Theme.widgetTextColor
+              font.family: Theme.monoFontFamily
+              font.pixelSize: 11
+              font.weight: Font.DemiBold
+            }
+
+            Text {
+              anchors.horizontalCenter: parent.horizontalCenter
+              text: SystemStatsService.gpuStatsError.length > 0
+                ? SystemStatsService.gpuStatsError
+                : qsTr("No graphics devices detected")
+              color: Theme.widgetInactiveIconColor
+              font.pixelSize: 10
+              elide: Text.ElideRight
+            }
+          }
         }
       }
     }
@@ -1536,16 +1622,71 @@ BasePill {
           }
         }
 
-        Text {
-          anchors.centerIn: parent
+        Item {
+          anchors.fill: parent
           visible: processListView.count === 0
-          text: SystemStatsService.processListError.length > 0
-            ? SystemStatsService.processListError
-            : SystemStatsService.processes.length === 0
-            ? qsTr("Waiting for process data…")
-            : qsTr("No matching processes")
-          color: Theme.widgetInactiveIconColor
-          font.pixelSize: 12
+
+          Rectangle {
+            anchors.centerIn: parent
+            width: Math.min(parent.width - 24, 360)
+            height: 104
+            radius: Theme.cornerRadius
+            color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.42)
+            border.width: 1
+            border.color: Theme.withAlpha(Theme.outline, 0.26)
+
+            Rectangle {
+              anchors.left: parent.left
+              anchors.top: parent.top
+              anchors.bottom: parent.bottom
+              width: 2
+              radius: 1
+              color: Theme.primary
+              opacity: 0.72
+            }
+
+            Row {
+              anchors.centerIn: parent
+              spacing: 12
+
+              DmsIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                name: SystemStatsService.processListError.length > 0
+                  ? "warning" : (SystemStatsService.processes.length === 0 ? "terminal" : "search")
+                size: 25
+                color: SystemStatsService.processListError.length > 0 ? Theme.warning : Theme.primary
+              }
+
+              Column {
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 4
+
+                Text {
+                  text: SystemStatsService.processListError.length > 0
+                    ? qsTr("PROCESS FEED // ERROR")
+                    : SystemStatsService.processes.length === 0
+                      ? qsTr("PROCESS FEED // SYNC")
+                      : qsTr("PROCESS QUERY // EMPTY")
+                  color: Theme.widgetTextColor
+                  font.family: Theme.monoFontFamily
+                  font.pixelSize: 10
+                  font.weight: Font.DemiBold
+                }
+
+                Text {
+                  width: Math.min(250, processPage.width - 100)
+                  text: SystemStatsService.processListError.length > 0
+                    ? SystemStatsService.processListError
+                    : SystemStatsService.processes.length === 0
+                      ? qsTr("Waiting for process data…")
+                      : qsTr("No processes match the current filters.")
+                  color: Theme.widgetInactiveIconColor
+                  font.pixelSize: 10
+                  wrapMode: Text.WordWrap
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -1856,7 +1997,7 @@ BasePill {
       color: Theme.withAlpha(Theme.widgetBaseBackgroundColor,
         typeof SettingsData !== "undefined" ? SettingsData.popupTransparency : 0.65)
       border.width: 1
-      border.color: Theme.withAlpha(Theme.outline, 0.35)
+      border.color: Theme.withAlpha(Theme.primary, 0.34)
 
       Column {
         anchors.fill: parent
@@ -1870,9 +2011,9 @@ BasePill {
 
           DmsIcon {
             anchors.verticalCenter: parent.verticalCenter
-            name: "monitoring"
-            size: 24
-            color: Theme.primary
+            name: "memory"
+            size: 23
+            color: Theme.secondary
           }
 
           Column {
@@ -1882,18 +2023,22 @@ BasePill {
 
             Text {
               width: parent.width
-              text: qsTr("System Monitor")
+              text: "NEXUS CORE"
               color: Theme.widgetTextColor
-              font.pixelSize: 16
-              font.weight: Font.DemiBold
+              font.pixelSize: 15
+              font.weight: Font.Bold
+              font.family: Theme.monoFontFamily
+              font.letterSpacing: 1.1
               elide: Text.ElideRight
             }
 
             Text {
               width: parent.width
-              text: SystemStatsService.cpuModel || qsTr("Processor and memory")
+              text: qsTr("SYSTEM MONITOR · %1 NÚCLEOS").arg(SystemStatsService.cpuCoreCount)
               color: Theme.widgetInactiveIconColor
-              font.pixelSize: 11
+              font.family: Theme.monoFontFamily
+              font.pixelSize: 10
+              font.letterSpacing: 0.35
               elide: Text.ElideRight
             }
           }
@@ -1924,16 +2069,16 @@ BasePill {
 
         Row {
           width: parent.width
-          height: 38
-          spacing: 8
+          height: 34
+          spacing: 6
 
           Repeater {
             model: [
-              { "id": "overview", "text": qsTr("Overview"), "icon": "dashboard" },
-              { "id": "processor", "text": qsTr("Processor"), "icon": "memory" },
-              { "id": "memory", "text": qsTr("Memory"), "icon": "developer_board" },
+              { "id": "overview", "text": qsTr("Geral"), "icon": "dashboard" },
+              { "id": "processor", "text": qsTr("CPU"), "icon": "memory" },
+              { "id": "memory", "text": qsTr("RAM"), "icon": "developer_board" },
               { "id": "gpu", "text": qsTr("GPU"), "icon": "videogame_asset" },
-              { "id": "processes", "text": qsTr("Processes"), "icon": "view_list" }
+              { "id": "processes", "text": qsTr("Processos"), "icon": "view_list" }
             ]
 
             delegate: Rectangle {
@@ -1942,14 +2087,14 @@ BasePill {
 
               width: (parent.width - parent.spacing * 4) / 5
               height: parent.height
-              radius: Theme.cornerRadius
+              radius: Theme.hoverRadius
               color: root.overviewTab === modelData.id
                 ? Theme.withAlpha(Theme.primary, 0.16)
                 : overviewTabMouse.containsMouse
-                  ? Theme.withAlpha(Theme.primary, 0.1)
-                  : Theme.withAlpha(Theme.surfaceContainerHigh, 0.65)
-              border.width: root.overviewTab === modelData.id || overviewTabMouse.containsMouse ? 1 : 0
-              border.color: Theme.withAlpha(Theme.primary, 0.4)
+                  ? Theme.withAlpha(Theme.primary, 0.08)
+                  : Theme.withAlpha(Theme.surfaceContainerHigh, 0.38)
+              border.width: root.overviewTab === modelData.id ? 1 : 0
+              border.color: Theme.withAlpha(Theme.primary, 0.38)
 
               Row {
                 anchors.centerIn: parent
@@ -1968,7 +2113,7 @@ BasePill {
                   text: modelData.text
                   color: root.overviewTab === modelData.id || overviewTabMouse.containsMouse
                     ? Theme.primary : Theme.widgetTextColor
-                  font.pixelSize: 11
+                  font.pixelSize: 10
                   font.weight: root.overviewTab === modelData.id ? Font.DemiBold : Font.Normal
                 }
               }
@@ -1990,17 +2135,19 @@ BasePill {
           visible: root.overviewTab === "overview"
 
           Grid {
-            anchors.fill: parent
+            anchors.top: parent.top
+            width: parent.width
+            height: Math.max(210, parent.height * 0.66)
             columns: 2
             columnSpacing: 10
             rowSpacing: 10
 
             Repeater {
               model: [
-                { "id": "cpu", "title": qsTr("PROCESSOR"), "icon": "memory" },
-                { "id": "memory", "title": qsTr("MEMORY"), "icon": "developer_board" },
-                { "id": "gpu", "title": qsTr("GRAPHICS"), "icon": "videogame_asset" },
-                { "id": "temperature", "title": qsTr("CPU TEMP"), "icon": "device_thermostat" }
+                { "id": "cpu", "title": qsTr("PROCESSADOR"), "icon": "memory" },
+                { "id": "memory", "title": qsTr("MEMÓRIA"), "icon": "developer_board" },
+                { "id": "gpu", "title": qsTr("GRÁFICOS"), "icon": "videogame_asset" },
+                { "id": "temperature", "title": qsTr("TEMPERATURA"), "icon": "device_thermostat" }
               ]
 
               delegate: Rectangle {
@@ -2008,9 +2155,13 @@ BasePill {
                 width: (parent.width - parent.columnSpacing * (parent.columns - 1)) / parent.columns
                 height: parent.height >= 300 ? (parent.height - parent.rowSpacing) / 2 : parent.height / 2
                 radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.72)
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.76)
                 border.width: 1
-                border.color: Theme.withAlpha(Theme.primary, 0.12)
+                border.color: Theme.withAlpha(
+                  modelData.id === "memory" ? Theme.secondary
+                    : modelData.id === "gpu" ? Theme.tertiary
+                    : modelData.id === "temperature" ? Theme.warning : Theme.primary,
+                  0.24)
 
                 Column {
                   anchors.fill: parent
@@ -2075,19 +2226,58 @@ BasePill {
 
                   UsageHistoryGraph {
                     width: parent.width
-                    height: 34
+                    height: 30
                     visible: modelData.id !== "temperature"
                     values: modelData.id === "cpu" ? SystemStatsService.cpuHistory
                       : modelData.id === "memory" ? SystemStatsService.memoryHistory
                       : (SystemStatsService.gpus.length > 0 ? SystemStatsService.gpus[0].history || [] : [])
-                    graphColor: modelData.id === "memory" ? Theme.secondary : Theme.primary
+                    graphColor: modelData.id === "memory" ? Theme.secondary
+                      : modelData.id === "gpu" ? Theme.tertiary : Theme.primary
+                  }
+
+                  // Compact live-load rail complements the history graph.
+                  Rectangle {
+                    width: parent.width
+                    height: 5
+                    radius: 3
+                    color: Theme.withAlpha(Theme.outline, 0.24)
+
+                    Rectangle {
+                      width: parent.width * Math.max(0, Math.min(100,
+                        modelData.id === "cpu" ? SystemStatsService.cpuUsage
+                          : modelData.id === "memory" ? SystemStatsService.memoryUsage
+                          : modelData.id === "gpu"
+                            ? (SystemStatsService.gpus.length > 0
+                              ? SystemStatsService.gpus[0].utilization : 0)
+                            : SystemStatsService.cpuTemperature)) / 100
+                      height: parent.height
+                      radius: parent.radius
+                      color: modelData.id === "temperature"
+                        ? (SystemStatsService.cpuTemperature >= 85 ? Theme.error
+                          : SystemStatsService.cpuTemperature >= 70 ? Theme.warning : Theme.secondary)
+                        : modelData.id === "memory" ? Theme.secondary
+                        : modelData.id === "gpu" ? Theme.tertiary : Theme.primary
+                      Behavior on width {
+                        NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
+                      }
+                      Behavior on color {
+                        ColorAnimation { duration: 180; easing.type: Easing.OutCubic }
+                      }
+                    }
                   }
 
                   Text {
                     width: parent.width
                     visible: modelData.id === "gpu"
                     text: SystemStatsService.gpus.length > 0
-                      ? SystemStatsService.gpus[0].name : qsTr("No graphics device data")
+                      ? SystemStatsService.gpus[0].name + "  ·  " +
+                        (SystemStatsService.gpus[0].memoryUsage >= 0
+                          ? (SystemStatsService.gpus[0].memoryTotal > 0
+                            ? qsTr("VRAM %1 / %2 MiB").arg(Math.round(SystemStatsService.gpus[0].memoryUsage))
+                              .arg(Math.round(SystemStatsService.gpus[0].memoryTotal))
+                            : qsTr("%1 MiB GPU memory").arg(Math.round(SystemStatsService.gpus[0].memoryUsage)))
+                          : qsTr("VRAM unavailable"))
+                      : qsTr("No graphics device data")
                     color: Theme.widgetInactiveIconColor
                     font.pixelSize: 9
                     elide: Text.ElideRight
@@ -2110,6 +2300,109 @@ BasePill {
                     : modelData.id === "memory" ? "memory"
                     : modelData.id === "gpu" ? "gpu" : "processor"
                 }
+              }
+            }
+          }
+
+          Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            height: Math.max(112, parent.height - parent.height * 0.66 - 8)
+            radius: Theme.cornerRadius
+            color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.62)
+            border.width: 1
+            border.color: Theme.withAlpha(Theme.primary, 0.2)
+
+            Column {
+              anchors.fill: parent
+              anchors.margins: 10
+              spacing: 6
+
+              Row {
+                width: parent.width
+                height: 18
+                spacing: 6
+
+                DmsIcon {
+                  name: "activity"
+                  size: 14
+                  color: Theme.primary
+                  anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Text {
+                  text: qsTr("MAIOR USO DE CPU")
+                  color: Theme.primary
+                  font.family: Theme.monoFontFamily
+                  font.pixelSize: 10
+                  font.bold: true
+                  font.letterSpacing: 0.8
+                  anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Item { width: 1; height: 1 }
+
+                Text {
+                  text: qsTr("%1 ativos").arg(SystemStatsService.processCount)
+                  color: Theme.widgetInactiveIconColor
+                  font.pixelSize: 9
+                  anchors.verticalCenter: parent.verticalCenter
+                }
+              }
+
+              Repeater {
+                model: SystemStatsService.processes.slice()
+                  .sort((a, b) => b.cpu - a.cpu).slice(0, 3)
+
+                delegate: Row {
+                  required property var modelData
+                  width: parent.width
+                  height: 22
+                  spacing: 8
+
+                  Rectangle {
+                    width: 4
+                    height: 4
+                    radius: 2
+                    color: index === 0 ? Theme.primary : Theme.withAlpha(Theme.primary, 0.45)
+                    anchors.verticalCenter: parent.verticalCenter
+                  }
+
+                  Text {
+                    width: Math.max(80, parent.width - 120)
+                    text: modelData.name
+                    color: Theme.widgetTextColor
+                    font.pixelSize: 10
+                    elide: Text.ElideRight
+                    anchors.verticalCenter: parent.verticalCenter
+                  }
+
+                  Item { width: 1; height: 1 }
+
+                  Text {
+                    text: modelData.cpu.toFixed(1) + "%"
+                    color: Theme.primary
+                    font.family: Theme.monoFontFamily
+                    font.pixelSize: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                  }
+
+                  Text {
+                    text: modelData.memoryPercent.toFixed(1) + "%"
+                    color: Theme.widgetInactiveIconColor
+                    font.family: Theme.monoFontFamily
+                    font.pixelSize: 9
+                    anchors.verticalCenter: parent.verticalCenter
+                  }
+                }
+              }
+
+              Text {
+                visible: SystemStatsService.processCount === 0
+                text: qsTr("Collecting process activity…")
+                color: Theme.widgetInactiveIconColor
+                font.pixelSize: 10
               }
             }
           }
@@ -2343,6 +2636,13 @@ BasePill {
                           radius: parent.radius
                           color: modelData.usage >= 80 ? Theme.error
                             : (modelData.usage >= 60 ? Theme.warning : Theme.primary)
+
+                          Behavior on width {
+                            NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
+                          }
+                          Behavior on color {
+                            ColorAnimation { duration: 180; easing.type: Easing.OutCubic }
+                          }
                         }
                       }
                     }
@@ -2426,6 +2726,18 @@ BasePill {
               height: 150
               radius: Theme.cornerRadius
               color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.72)
+              border.width: 1
+              border.color: Theme.withAlpha(Theme.secondary, 0.22)
+
+              Rectangle {
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: 2
+                radius: 1
+                color: Theme.secondary
+                opacity: 0.62
+              }
 
               Column {
                 anchors.fill: parent
@@ -2520,6 +2832,8 @@ BasePill {
               height: 62
               radius: Theme.cornerRadius
               color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.64)
+              border.width: 1
+              border.color: Theme.withAlpha(Theme.primary, 0.2)
 
               Item {
                 anchors.fill: parent

@@ -192,13 +192,35 @@ BasePill {
           height: 26
           anchors.verticalCenter: parent.verticalCenter
           radius: Theme.pillRadius
-          color: win.activated ? Theme.surfaceText_12 : "transparent"
+          color: win.activated
+            ? Theme.withAlpha(Theme.primary, appIconMouse.containsMouse ? 0.2 : 0.12)
+            : (appIconMouse.containsMouse ? Theme.withAlpha(Theme.primary, 0.1) : "transparent")
+          border.width: appIconMouse.containsMouse ? 1 : 0
+          border.color: Theme.withAlpha(Theme.primary, 0.38)
+
+          Behavior on color {
+            ColorAnimation { duration: 130; easing.type: Easing.OutCubic }
+          }
 
           IconImage {
             anchors.centerIn: parent
             source: Theme.getAppIcon(win.appId)
             implicitSize: 18
             asynchronous: true
+          }
+
+          Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottomMargin: 2
+            width: win.activated ? 9 : 4
+            height: 2
+            radius: 1
+            color: Theme.primary
+            opacity: win.activated ? 0.9 : (appIconMouse.containsMouse ? 0.55 : 0)
+            Behavior on opacity {
+              NumberAnimation { duration: 130 }
+            }
           }
 
           MouseArea {

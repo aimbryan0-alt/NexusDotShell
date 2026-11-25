@@ -55,7 +55,10 @@ PopupWindow {
                 "number": day.getDate(),
                 "inMonth": day.getMonth() === shownMonth,
                 "isToday": sameDay(day, today),
-                "isSelected": sameDay(day, selectedDate)
+                "isSelected": sameDay(day, selectedDate),
+                "hasEvent": SettingsData.calendarEvents.some(function(event) {
+                    return event.date === dateKey(day);
+                })
             });
         }
         return days;
@@ -75,6 +78,46 @@ PopupWindow {
         return SettingsData.calendarEvents.filter(function(event) {
             return event.date === dateKey(selectedDate);
         });
+    }
+
+    function selectedDateLabel() {
+        const day = selectedDate.getDay() === 0 ? 7 : selectedDate.getDay();
+        return Qt.locale().dayName(day, Locale.LongFormat) + ", "
+            + selectedDate.getDate() + " "
+            + Qt.locale().monthName(selectedDate.getMonth(), Locale.LongFormat);
+    }
+
+    function upcomingEvents(limit) {
+        return SettingsData.calendarEvents
+            .filter(function(event) {
+                return event.date >= dateKey(selectedDate);
+            })
+            .slice()
+            .sort(function(a, b) {
+                return a.date.localeCompare(b.date);
+            })
+            .slice(0, limit);
+    }
+
+    function formatEventDate(dateString) {
+        const parts = dateString.split("-");
+        return parts.length === 3 ? parts[2] + "/" + parts[1] : dateString;
+    }
+
+    function selectedDayForecast() {
+        if (!WeatherService.weather.available)
+            return null;
+        const forecast = WeatherService.weather.forecast || [];
+        const key = dateKey(selectedDate);
+        for (let i = 0; i < forecast.length; i++) {
+            if (forecast[i].date === key)
+                return forecast[i];
+        }
+        return null;
+    }
+
+    function selectedDateIsToday() {
+        return sameDay(selectedDate, today);
     }
 
     function addEvent() {
@@ -235,7 +278,8 @@ PopupWindow {
     surfaceFormat.opaque: false
 
     Timer {
-        interval: 10
+        // Keep the HUD milliseconds responsive without waking the UI every 10 ms.
+        interval: 100
         running: root.visible
         repeat: true
         onTriggered: root.updateMillisecondsTime()
@@ -347,7 +391,11 @@ PopupWindow {
 
                             DmsIcon {
                                 anchors.verticalCenter: parent.verticalCenter
-                                name: WeatherService.weatherIcon(WeatherService.weather.wCode, WeatherService.weather.isDay)
+                                name: root.selectedDayForecast()
+                                    ? WeatherService.weatherIcon(root.selectedDayForecast().wCode, true)
+                                    : root.selectedDateIsToday()
+                                        ? WeatherService.weatherIcon(WeatherService.weather.wCode, WeatherService.weather.isDay)
+                                        : "cloud"
                                 size: 34
                                 color: Theme.primary
                             }
@@ -358,16 +406,22 @@ PopupWindow {
                                 spacing: 3
 
                                 Text {
-                                    text: WeatherService.currentTempText()
+                                    text: root.selectedDayForecast()
+                                        ? WeatherService.formatTemp(Math.round(root.selectedDayForecast().tempMin)) + " / " + WeatherService.formatTemp(Math.round(root.selectedDayForecast().tempMax))
+                                        : root.selectedDateIsToday() ? WeatherService.currentTempText() : "--"
                                     color: Theme.widgetTextColor
                                     font.family: Theme.monoFontFamily
-                                    font.pixelSize: 23
+                                    font.pixelSize: root.selectedDayForecast() ? 17 : 23
                                     font.weight: Font.Medium
                                 }
 
                                 Text {
                                     width: parent.width
-                                    text: WeatherService.weather.available ? WeatherService.weatherCondition(WeatherService.weather.wCode) : qsTr("Weather unavailable")
+                                    text: root.selectedDayForecast()
+                                        ? WeatherService.weatherCondition(root.selectedDayForecast().wCode)
+                                        : root.selectedDateIsToday() && WeatherService.weather.available
+                                            ? WeatherService.weatherCondition(WeatherService.weather.wCode)
+                                            : qsTr("Sem previsão para esta data")
                                     color: Theme.widgetTextColor
                                     font.pixelSize: 11
                                     elide: Text.ElideRight
@@ -379,6 +433,18 @@ PopupWindow {
                                     color: Theme.widgetInactiveIconColor
                                     font.pixelSize: 10
                                     visible: text.length > 0
+                                    elide: Text.ElideRight
+                                }
+
+                                Text {
+                                    width: parent.width
+                                    text: root.selectedDayForecast()
+                                        ? qsTr("Chuva %1 · %2").arg(WeatherService.formatPercent(root.selectedDayForecast().precipitationProbability)).arg(WeatherService.formatRain(root.selectedDayForecast().precipitationMm))
+                                        : root.selectedDateIsToday() && WeatherService.weather.available
+                                            ? qsTr("Chuva %1 · %2").arg(WeatherService.formatPercent(WeatherService.weather.precipitationProbability)).arg(WeatherService.formatRain(WeatherService.weather.precipitationMm))
+                                            : qsTr("Previsão indisponível para esta data")
+                                    color: Theme.widgetInactiveIconColor
+                                    font.pixelSize: 10
                                     elide: Text.ElideRight
                                 }
 
@@ -553,10 +619,22 @@ PopupWindow {
 
                             Text {
                                 anchors.centerIn: parent
+                                anchors.verticalCenterOffset: modelData.hasEvent ? -2 : 0
                                 text: modelData.number
                                 color: modelData.isSelected ? Theme.onPrimary : modelData.inMonth ? Theme.widgetTextColor : Theme.widgetInactiveIconColor
                                 font.pixelSize: 13
                                 font.weight: modelData.isToday || modelData.isSelected ? Font.DemiBold : Font.Normal
+                            }
+
+                            Rectangle {
+                                width: 4
+                                height: 4
+                                radius: 2
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.bottom: parent.bottom
+                                anchors.bottomMargin: 3
+                                color: modelData.isSelected ? Theme.onPrimary : Theme.primary
+                                visible: modelData.hasEvent
                             }
 
                             MouseArea {
@@ -837,10 +915,10 @@ PopupWindow {
                         Text {
                             width: parent.width - 70
                             height: parent.height
-                            text: qsTr("Events")
+                            text: qsTr("NEXUS · AGENDA")
                             color: Theme.widgetTextColor
-                            font.pixelSize: 17
-                            font.weight: Font.Medium
+                            font.pixelSize: 15
+                            font.weight: Font.DemiBold
                             verticalAlignment: Text.AlignVCenter
                             elide: Text.ElideRight
                         }
@@ -873,9 +951,22 @@ PopupWindow {
 
                     }
 
+                    Text {
+                        width: parent.width
+                        height: 18
+                        text: root.selectedDateLabel()
+                            + (root.eventsForSelectedDate().length > 0
+                                ? "  ·  " + root.eventsForSelectedDate().length + " " + qsTr("event(s)")
+                                : "  ·  " + qsTr("Agenda livre"))
+                        color: Theme.widgetInactiveIconColor
+                        font.pixelSize: 11
+                        font.weight: Font.Medium
+                        elide: Text.ElideRight
+                    }
+
                     Item {
                         width: parent.width
-                        height: parent.height - 150
+                        height: parent.height - 180
 
                         Flickable {
                             id: eventFlickable
@@ -900,7 +991,7 @@ PopupWindow {
                                     TextField {
                                         width: parent.width - 84
                                         height: 38
-                                        placeholderText: qsTr("Event for ") + root.dateKey(root.selectedDate)
+                                        placeholderText: qsTr("Novo evento para ") + root.dateKey(root.selectedDate)
                                         text: root.eventTitle
                                         color: Theme.widgetTextColor
                                         placeholderTextColor: Theme.widgetInactiveIconColor
@@ -926,7 +1017,7 @@ PopupWindow {
 
                                         Text {
                                             anchors.centerIn: parent
-                                            text: qsTr("Add")
+                                            text: qsTr("Adicionar")
                                             color: Theme.onPrimary
                                             font.pixelSize: 13
                                         }
@@ -947,18 +1038,37 @@ PopupWindow {
                                         required property var modelData
 
                                         width: eventColumn.width
-                                        height: 44
+                                        height: 48
                                         radius: Theme.cornerRadius
-                                        color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.68)
+                                        color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.72)
+                                        border.width: 1
+                                        border.color: Theme.withAlpha(Theme.outline, 0.12)
+
+                                        Rectangle {
+                                            width: 3
+                                            height: parent.height - 14
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: 1
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            radius: 2
+                                            color: Theme.primary
+                                        }
 
                                         Row {
                                             anchors.fill: parent
-                                            anchors.leftMargin: 12
+                                            anchors.leftMargin: 14
                                             anchors.rightMargin: 8
                                             spacing: 8
 
+                                            DmsIcon {
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                name: "radio_button_checked"
+                                                size: 12
+                                                color: Theme.primary
+                                            }
+
                                             Text {
-                                                width: parent.width - 42
+                                                width: parent.width - 58
                                                 height: parent.height
                                                 text: modelData.title
                                                 color: Theme.widgetTextColor
@@ -1005,31 +1115,98 @@ PopupWindow {
                                         anchors.fill: parent
 
                                         Column {
+                                            width: parent.width - 20
                                             anchors.centerIn: parent
-                                            spacing: 12
+                                            spacing: 7
 
                                             DmsIcon {
                                                 anchors.horizontalCenter: parent.horizontalCenter
                                                 name: "emoji_events"
-                                                size: 48
+                                                size: root.upcomingEvents(2).length > 0 ? 30 : 48
                                                 color: Theme.withAlpha(Theme.primary, 0.85)
                                             }
 
                                             Text {
                                                 anchors.horizontalCenter: parent.horizontalCenter
-                                                text: qsTr("You're all caught up")
+                                                text: qsTr("Tudo em dia")
                                                 color: Theme.widgetTextColor
-                                                font.pixelSize: 18
+                                                font.pixelSize: 16
                                             }
 
                                             Text {
-                                                width: eventColumn.width - 24
-                                                text: qsTr("No events for this day")
+                                                width: parent.width
+                                                text: qsTr("Nenhum evento para este dia")
                                                 color: Theme.widgetInactiveIconColor
-                                                font.pixelSize: 14
+                                                font.pixelSize: 12
                                                 horizontalAlignment: Text.AlignHCenter
                                             }
 
+                                            Text {
+                                                width: parent.width
+                                                visible: root.upcomingEvents(2).length > 0
+                                                text: qsTr("PRÓXIMOS EVENTOS")
+                                                color: Theme.primary
+                                                font.pixelSize: 10
+                                                font.weight: Font.DemiBold
+                                                topPadding: 3
+                                            }
+
+                                            Repeater {
+                                                model: root.upcomingEvents(2)
+
+                                                delegate: Rectangle {
+                                                    required property var modelData
+                                                    width: parent.width
+                                                    height: 30
+                                                    radius: Theme.cornerRadius
+                                                    color: upcomingEventMouse.containsMouse
+                                                        ? Theme.withAlpha(Theme.primary, 0.14)
+                                                        : Theme.withAlpha(Theme.surfaceContainerHigh, 0.72)
+
+                                                    Row {
+                                                        anchors.fill: parent
+                                                        anchors.leftMargin: 9
+                                                        anchors.rightMargin: 8
+                                                        spacing: 8
+
+                                                        Text {
+                                                            width: 38
+                                                            height: parent.height
+                                                            text: root.formatEventDate(modelData.date)
+                                                            color: Theme.primary
+                                                            font.pixelSize: 10
+                                                            font.weight: Font.DemiBold
+                                                            verticalAlignment: Text.AlignVCenter
+                                                        }
+
+                                                        Text {
+                                                            width: parent.width - 46
+                                                            height: parent.height
+                                                            text: modelData.title
+                                                            color: Theme.widgetTextColor
+                                                            font.pixelSize: 11
+                                                            elide: Text.ElideRight
+                                                            verticalAlignment: Text.AlignVCenter
+                                                        }
+                                                    }
+
+                                                    MouseArea {
+                                                        id: upcomingEventMouse
+                                                        anchors.fill: parent
+                                                        hoverEnabled: true
+                                                        cursorShape: Qt.PointingHandCursor
+                                                        onClicked: {
+                                                            const parts = modelData.date.split("-");
+                                                            if (parts.length === 3) {
+                                                                root.selectedDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+                                                                root.shownYear = root.selectedDate.getFullYear();
+                                                                root.shownMonth = root.selectedDate.getMonth();
+                                                                root.editingEvent = false;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
 
                                     }

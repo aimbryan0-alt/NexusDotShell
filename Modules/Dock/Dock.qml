@@ -28,6 +28,15 @@ Item {
     const tail = full.split(".").pop()
     return full ? [full, tail] : []
   }
+  function desktopEntryForAppId(appId) {
+    const aliases = root.appAliases(appId)
+    if (aliases.length === 0 || !DesktopEntries.applications)
+      return null
+    const entries = DesktopEntries.applications.values || []
+    return entries.find(entry =>
+      root.appAliases(entry.id).some(alias => aliases.indexOf(alias) !== -1)
+    ) || null
+  }
   function matchesPinnedWindow(entry, window) {
     if (!entry || !window)
       return false
@@ -43,7 +52,8 @@ Item {
   }
   readonly property var dockWindows: {
     const windows = root.monitorWindows.filter(window =>
-      !root.pinnedEntries.some(entry => root.matchesPinnedWindow(entry, window))
+      window && window.wayland
+        && !root.pinnedEntries.some(entry => root.matchesPinnedWindow(entry, window))
     )
     if (!SettingsData.dockGroupByApp)
       return windows.map(window => window.wayland)
@@ -72,12 +82,12 @@ Item {
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.bottom: parent.bottom
     anchors.bottomMargin: root.shouldShow ? 10 : -dockSurface.height - 8
-    width: dockRow.implicitWidth + 28
-    height: root.baseIconSize + 24
+    width: dockRow.implicitWidth + 32
+    height: root.baseIconSize + 26
     radius: height / 2
-    color: Theme.withAlpha(Theme.surfaceContainerLowest, 0.94)
+    color: Theme.withAlpha(Theme.surfaceContainerLowest, 0.88)
     border.width: 1
-    border.color: Theme.withAlpha(Theme.primary, root.shouldShow ? 0.72 : 0.3)
+    border.color: Theme.withAlpha(Theme.primary, root.shouldShow ? 0.42 : 0.18)
     opacity: root.shouldShow ? 1 : 0
     visible: opacity > 0
 
@@ -98,11 +108,11 @@ Item {
     Rectangle {
       anchors.horizontalCenter: parent.horizontalCenter
       anchors.top: parent.top
-      width: Math.min(parent.width - 48, Math.max(36, dockRow.implicitWidth * 0.42))
-      height: 2
+      width: Math.min(parent.width - 64, Math.max(28, dockRow.implicitWidth * 0.24))
+      height: 1
       radius: 1
       color: Theme.primary
-      opacity: 0.82
+      opacity: 0.48
     }
 
     // Small HUD corner marks keep the dock visually aligned with the top bar.
@@ -130,7 +140,7 @@ Item {
     Row {
       id: dockRow
       anchors.centerIn: parent
-      spacing: 5
+      spacing: 6
 
       Repeater {
         model: root.pinnedEntries
@@ -138,42 +148,43 @@ Item {
           required property var modelData
           readonly property var entry: modelData
           readonly property real iconSize: root.baseIconSize
-          width: iconSize + 7
-          height: iconSize + 7
+          width: iconSize + 10
+          height: iconSize + 10
+          scale: favoriteMouse.containsMouse ? 1.055 : 1.0
+          Behavior on scale {
+            NumberAnimation { duration: 135; easing.type: Easing.OutCubic }
+          }
           Rectangle {
             anchors.fill: parent
-            radius: 15
+            radius: 18
             color: favoriteMouse.containsMouse
-              ? Theme.withAlpha(Theme.primary, 0.2)
+              ? Theme.withAlpha(Theme.primary, 0.16)
               : root.runningWindowFor(entry)
-                ? Theme.withAlpha(Theme.primary, 0.08)
-                : "transparent"
-            border.width: favoriteMouse.containsMouse || root.runningWindowFor(entry) ? 1.5 : 1
+                ? Theme.withAlpha(Theme.primary, 0.09)
+                : Theme.withAlpha(Theme.surfaceContainerHigh, 0.24)
+            border.width: favoriteMouse.containsMouse ? 1 : root.runningWindowFor(entry) ? 1 : 0
             border.color: Theme.withAlpha(Theme.primary,
-              favoriteMouse.containsMouse ? 1 : root.runningWindowFor(entry) ? 0.92 : 0.38)
+              favoriteMouse.containsMouse ? 0.82 : 0.48)
+            Behavior on color { ColorAnimation { duration: 145 } }
+            Behavior on border.color { ColorAnimation { duration: 145 } }
           }
           IconImage {
             anchors.centerIn: parent
-            width: iconSize - 8
-            height: iconSize - 8
+            width: iconSize - 10
+            height: iconSize - 10
             source: entry.icon ? Quickshell.iconPath(entry.icon) : ""
             asynchronous: true
-          }
-          Text {
-            anchors.right: parent.right
-            anchors.top: parent.top
-            text: "★"
-            color: Theme.primary
-            font.pixelSize: 9
           }
           Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
-            width: root.runningWindowFor(entry) ? 13 : 4
+            width: root.runningWindowFor(entry) ? 10 : 3
             height: 3
             radius: 2
             color: Theme.primary
             opacity: root.runningWindowFor(entry) ? 1 : 0.42
+            Behavior on width { NumberAnimation { duration: 145 } }
+            Behavior on opacity { NumberAnimation { duration: 145 } }
           }
           MouseArea {
             id: favoriteMouse
@@ -214,11 +225,16 @@ Item {
 
         delegate: Item {
           required property var modelData
-          readonly property var appWindow: modelData
+          readonly property var appWindow: modelData || null
           readonly property real iconSize: root.baseIconSize
+          visible: !!appWindow
 
-          width: iconMouse.containsMouse ? iconSize + 7 : iconSize
-          height: iconSize + 7
+          width: iconSize + 10
+          height: iconSize + 10
+          scale: iconMouse.containsMouse ? 1.055 : 1.0
+          Behavior on scale {
+            NumberAnimation { duration: 135; easing.type: Easing.OutCubic }
+          }
 
           Behavior on width {
             NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
@@ -226,22 +242,24 @@ Item {
 
           Rectangle {
             anchors.fill: parent
-            radius: 15
+            radius: 14
             color: iconMouse.containsMouse
-              ? Theme.withAlpha(Theme.primary, 0.2)
-              : appWindow.activated
-                ? Theme.withAlpha(Theme.primary, 0.08)
-                : "transparent"
-            border.width: iconMouse.containsMouse || appWindow.activated ? 1 : 0
+              ? Theme.withAlpha(Theme.primary, 0.16)
+              : appWindow && appWindow.activated
+                ? Theme.withAlpha(Theme.primary, 0.09)
+                : Theme.withAlpha(Theme.surfaceContainerHigh, 0.24)
+            border.width: iconMouse.containsMouse || (appWindow && appWindow.activated) ? 1 : 0
             border.color: Theme.withAlpha(Theme.primary,
-              iconMouse.containsMouse ? 0.9 : 0.68)
+              iconMouse.containsMouse ? 0.82 : 0.48)
+            Behavior on color { ColorAnimation { duration: 145 } }
+            Behavior on border.color { ColorAnimation { duration: 145 } }
           }
 
           IconImage {
             anchors.centerIn: parent
-            width: iconSize - 8
-            height: iconSize - 8
-            source: Theme.getAppIcon(appWindow.appId)
+            width: iconSize - 10
+            height: iconSize - 10
+            source: appWindow ? Theme.getAppIcon(appWindow.appId || "") : ""
             asynchronous: true
           }
 
@@ -249,23 +267,44 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 1
-            width: appWindow.activated ? 13 : 4
+            width: appWindow && appWindow.activated ? 10 : 3
             height: 3
             radius: 2
             color: Theme.primary
-            opacity: appWindow.activated ? 1 : 0.42
+            opacity: appWindow && appWindow.activated ? 1 : 0.42
+            Behavior on width { NumberAnimation { duration: 145 } }
+            Behavior on opacity { NumberAnimation { duration: 145 } }
           }
 
           MouseArea {
             id: iconMouse
             anchors.fill: parent
             hoverEnabled: true
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
             cursorShape: Qt.PointingHandCursor
-            onClicked: appWindow.activate()
+            enabled: !!appWindow
+            onClicked: function(mouse) {
+              if (!appWindow)
+                return
+              if (mouse.button === Qt.RightButton) {
+                const entry = root.desktopEntryForAppId(appWindow.appId)
+                if (!entry)
+                  return
+                const pinned = Array.isArray(SettingsData.dockPinnedApps)
+                  ? SettingsData.dockPinnedApps : []
+                const entryId = String(entry.id)
+                if (pinned.indexOf(entryId) === -1)
+                  SettingsData.set("dockPinnedApps", pinned.concat([entryId]))
+                return
+              }
+              appWindow.activate()
+            }
           }
 
-          ToolTip.visible: iconMouse.containsMouse && !!appWindow.title
-          ToolTip.text: appWindow.title || appWindow.appId || "Application"
+          ToolTip.visible: !!appWindow && iconMouse.containsMouse && !!(appWindow.title || appWindow.appId)
+          ToolTip.text: appWindow
+            ? (appWindow.title || appWindow.appId || "Application") + " · right-click to pin"
+            : "Application"
           ToolTip.delay: 450
         }
       }
@@ -285,7 +324,7 @@ Item {
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.bottom: parent.bottom
-    height: 5
+    height: 8
     color: "transparent"
     visible: SettingsData.dockAutoHide
 

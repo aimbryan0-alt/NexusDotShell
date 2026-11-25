@@ -134,10 +134,10 @@ Item {
     Rectangle {
       id: hudFrame
       anchors.fill: parent
-      anchors.leftMargin: 10
-      anchors.rightMargin: 10
-      anchors.topMargin: 3
-      anchors.bottomMargin: 3
+      anchors.leftMargin: 8
+      anchors.rightMargin: 8
+      anchors.topMargin: 2
+      anchors.bottomMargin: 2
       radius: 13
       color: Theme.withAlpha(
         Theme.surfaceContainerLowest,
@@ -399,10 +399,10 @@ Item {
 
     BarBody {
       anchors.fill: parent
-      anchors.topMargin: Theme.space2()
-      anchors.bottomMargin: Theme.space2()
-      anchors.leftMargin: Theme.space2() + 6
-      anchors.rightMargin: Theme.space2() + 6
+      anchors.topMargin: Theme.spaceXXS
+      anchors.bottomMargin: Theme.spaceXXS
+      anchors.leftMargin: 8
+      anchors.rightMargin: 8
       screen: barWindow.screen
       barWindow: barWindow
     }

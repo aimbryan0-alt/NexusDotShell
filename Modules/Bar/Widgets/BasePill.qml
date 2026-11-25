@@ -11,8 +11,8 @@ Item {
   id: root
 
   property QtObject screen: null
-  property real widgetThickness: Theme.widgetThickness
-  property real barThickness: Theme.barThickness
+  property real widgetThickness: Theme.widgetThickness * 0.95
+  property real barThickness: Theme.barThickness * 0.95
   property real barSpacing: 0
   property bool vertical: false
   property color backgroundTint: "transparent"
@@ -23,7 +23,7 @@ Item {
   signal wheel(var wheelEvent)
 
   readonly property real dpr: root.screen ? Theme.screenScaleOf(root.screen) : 1
-  readonly property real horizontalPadding: Theme.snap(Math.max(0, widgetThickness / 30) * 10, dpr)
+  readonly property real horizontalPadding: Theme.snap(Math.max(5, widgetThickness * 0.15), dpr)
   readonly property bool isMouseHovered: mouseArea.containsMouse
 
   readonly property real visualWidth: vertical
@@ -68,19 +68,51 @@ Item {
       border.width: 1
       border.color: Theme.withAlpha(
         root.isMouseHovered ? Theme.primary : Theme.outlineVariant,
-        root.isMouseHovered ? 0.58 : 0.28
+        root.isMouseHovered ? 0.48 : 0.16
       )
+
+      Behavior on color {
+        ColorAnimation { duration: 140; easing.type: Easing.OutCubic }
+      }
+      Behavior on border.color {
+        ColorAnimation { duration: 140; easing.type: Easing.OutCubic }
+      }
     }
 
-    // A restrained HUD edge highlight; it is static to avoid extra animation work.
+    // Quiet macOS-like glass pill; the Nexus accent appears on interaction.
     Rectangle {
       anchors.top: background.top
       anchors.horizontalCenter: background.horizontalCenter
-      width: Math.max(0, background.width - 16)
+      width: Math.max(0, background.width - 20)
       height: 1
       radius: 1
       color: Theme.primary
-      opacity: root.isMouseHovered ? 0.72 : 0.16
+      opacity: root.isMouseHovered ? 0.68 : 0.05
+    }
+
+    Rectangle {
+      anchors.top: background.top
+      anchors.right: background.right
+      anchors.rightMargin: 12
+      width: 7
+      height: 2
+      radius: 1
+      color: Theme.tertiary
+      opacity: root.isMouseHovered ? 0.82 : 0
+    }
+
+    // A second, restrained accent anchors the pill without adding polling.
+    Rectangle {
+      anchors.bottom: background.bottom
+      anchors.horizontalCenter: background.horizontalCenter
+      width: Math.min(background.width - 24, Math.max(18, background.width * 0.24))
+      height: 1
+      radius: 1
+      color: Theme.primary
+      opacity: root.isMouseHovered ? 0.58 : 0.06
+      Behavior on opacity {
+        NumberAnimation { duration: 140 }
+      }
     }
 
     Loader {

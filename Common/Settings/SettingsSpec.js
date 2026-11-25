@@ -29,6 +29,8 @@ var SPEC = {
     weatherCoordinates: { def: "" },
     calendarBirthYear: { def: -1 },
     calendarLifeExpectancy: { def: 90 },
+    lyricsHudEnabled: { def: false },
+    lyricsHudPosition: { def: "right-center" },
     notesAutoSave: { def: false },
     notesShowLineNumbers: { def: false },
     notesExpanded: { def: false },
@@ -60,27 +62,29 @@ var SPEC = {
             { id: "submap", enabled: true },
             { id: "workspaceSwitcher", enabled: true },
             { id: "runningApps", enabled: true },
-            { id: "focusedWindow", enabled: true }
+            { id: "focusedWindow", enabled: true },
+            { id: "player", enabled: true }
         ]
     },
     barCenterWidgets: {
-        def: [
-            { id: "player", enabled: true },
-            { id: "clock", enabled: true },
-            
-        ]
+        // Nexus Center is placed last in the right-side lane.
+        def: []
     },
     barRightWidgets: {
+        // Right side: complete system core, notes, notifications, wallpaper and clock.
+        // Media follows the focused-window widget on the left side.
         def: [
-            { id: "clipboard", enabled: true },
-            { id: "notificationButton", enabled: true },
             { id: "systemTray", enabled: true },
+            { id: "networkMonitor", enabled: true },
             { id: "cpuUsage", enabled: true },
             { id: "cpuTemperature", enabled: true },
             { id: "memUsage", enabled: true },
             { id: "diskUsage", enabled: true },
             { id: "battery", enabled: true },
             { id: "notepadButton", enabled: true },
+            { id: "notificationButton", enabled: true },
+            { id: "wallpaperCarousel", enabled: true },
+            { id: "clock", enabled: true },
             { id: "controlCenterButton", enabled: true }
         ]
     },

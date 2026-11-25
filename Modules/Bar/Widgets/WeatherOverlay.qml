@@ -25,19 +25,19 @@ PopupWindow {
   grabFocus: true
   color: "transparent"
   surfaceFormat.opaque: false
-  implicitWidth: Math.min(860, Math.max(380, Screen.width - Theme.spaceXL * 2))
+  implicitWidth: Math.min(780, Math.max(380, Screen.width - Theme.spaceXL * 2))
   implicitHeight: column.implicitHeight + Theme.spaceL * 2 +
     (locationSuggestions.length > 0 ? Math.min(160, locationSuggestionList.contentHeight) + Theme.spaceL : 0)
 
   readonly property var locationSuggestions: WeatherService.locationSuggestions
   readonly property bool locationSearchPending: WeatherService.locationSearchPending
   readonly property var heroMetrics: [
-    { icon: "humidity_low", label: qsTr("Humidity"), value: WeatherService.formatPercent(WeatherService.weather.humidity) },
-    { icon: "air", label: qsTr("Wind"), value: WeatherService.formatSpeed(WeatherService.weather.wind) },
-    { icon: "speed", label: qsTr("Pressure"), value: WeatherService.formatPressure(WeatherService.weather.pressure) },
-    { icon: "rainy", label: qsTr("Precipitation"), value: WeatherService.formatPercent(WeatherService.weather.precipitationProbability) },
-    { icon: "wb_twilight", label: qsTr("Sunrise"), value: WeatherService.weather.sunrise || "--" },
-    { icon: "bedtime", label: qsTr("Sunset"), value: WeatherService.weather.sunset || "--" }
+    { icon: "humidity_low", label: qsTr("Umidade"), value: WeatherService.formatPercent(WeatherService.weather.humidity) },
+    { icon: "air", label: qsTr("Vento"), value: WeatherService.formatSpeed(WeatherService.weather.wind) },
+    { icon: "speed", label: qsTr("Pressão"), value: WeatherService.formatPressure(WeatherService.weather.pressure) },
+    { icon: "rainy", label: qsTr("Chuva"), value: qsTr("%1 · %2").arg(WeatherService.formatPercent(WeatherService.weather.precipitationProbability)).arg(WeatherService.formatRain(WeatherService.weather.precipitationMm)) },
+    { icon: "wb_twilight", label: qsTr("Nascer do sol"), value: WeatherService.weather.sunrise || "--" },
+    { icon: "bedtime", label: qsTr("Pôr do sol"), value: WeatherService.weather.sunset || "--" }
   ]
 
   onVisibleChanged: {
@@ -70,7 +70,7 @@ PopupWindow {
     WeatherService.searchLocations("")
     locInput.text = ""
     SettingsData.set("weatherCoordinates", location.latitude + "," + location.longitude)
-    SettingsData.set("weatherLocation", location.name)
+    SettingsData.set("weatherLocation", [location.name, location.admin1, location.country].filter(Boolean).join(", "))
     WeatherService.updateLocation()
   }
 
@@ -90,15 +90,71 @@ PopupWindow {
       anchors.margins: Theme.spaceL
       spacing: Theme.spaceS
 
+      Row {
+        width: parent.width
+        height: 30
+        spacing: Theme.spaceS
+
+        Rectangle {
+          width: 3
+          height: 22
+          radius: 1
+          color: Theme.secondary
+          anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Column {
+          anchors.verticalCenter: parent.verticalCenter
+          spacing: 0
+
+          Text {
+            text: "NEXUS // ATMOS"
+            color: Theme.secondary
+            font.family: Theme.monoFontFamily
+            font.pixelSize: Theme.fontSizeSmall
+            font.bold: true
+            font.letterSpacing: 1.1
+          }
+
+          Text {
+            text: WeatherService.weather.city || qsTr("Monitoramento climático")
+            color: Theme.withAlpha(Theme.surfaceText, 0.55)
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeSmall - 2
+            elide: Text.ElideRight
+          }
+        }
+
+        Item { width: Math.max(0, parent.width - 210); height: 1 }
+
+        Text {
+          anchors.verticalCenter: parent.verticalCenter
+          text: WeatherService.weather.loading ? "SYNC…" : "LIVE / WX"
+          color: Theme.withAlpha(Theme.secondary, 0.9)
+          font.family: Theme.monoFontFamily
+          font.pixelSize: Theme.fontSizeSmall - 2
+        }
+      }
+
       // Current conditions and the six key weather readings.
       Rectangle {
         id: heroCard
         width: parent.width
-        height: 148
+        height: 136
         radius: Theme.cornerRadius
         color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.6)
         border.width: 1
-        border.color: Theme.withAlpha(Theme.outline, 0.18)
+        border.color: Theme.withAlpha(Theme.secondary, 0.28)
+
+        Rectangle {
+          anchors.left: parent.left
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          width: 2
+          radius: 1
+          color: Theme.secondary
+          opacity: 0.86
+        }
 
         Item {
           anchors.fill: parent
@@ -112,7 +168,7 @@ PopupWindow {
             DmsIcon {
               anchors.verticalCenter: parent.verticalCenter
               name: WeatherService.weatherIcon(WeatherService.weather.wCode, WeatherService.weather.isDay)
-              size: 48
+              size: 42
               color: Theme.primary
             }
 
@@ -136,7 +192,7 @@ PopupWindow {
               }
 
               Text {
-                text: qsTr("Feels Like %1").arg(WeatherService.formatTemp(WeatherService.weather.feelsLike))
+                text: qsTr("Sensação %1").arg(WeatherService.formatTemp(WeatherService.weather.feelsLike))
                 color: Theme.withAlpha(Theme.surfaceText, 0.5)
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSmall
@@ -234,7 +290,7 @@ PopupWindow {
             fillColor: "transparent"
             PathPolyline {
               path: {
-                const points = WeatherService.getEcliptic(new Date()) || []
+                const points = WeatherService.getEcliptic(new Date(), 24) || []
                 return points.map(point => Qt.point(
                   point.h * (skyCard.width - Theme.spaceS * 2),
                   (1 - point.v) * (skyCard.height - Theme.spaceS * 2) / 2
@@ -309,7 +365,7 @@ PopupWindow {
         height: 36
         spacing: Theme.spaceS
         Repeater {
-          model: [qsTr("Daily"), qsTr("Hourly")]
+          model: [qsTr("Diária"), qsTr("Por hora")]
           Rectangle {
             width: 64
             height: 36
@@ -458,7 +514,7 @@ PopupWindow {
               color: Theme.surfaceText
               font.family: Theme.fontFamily
               font.pixelSize: Theme.fontSizeSmall
-              property string placeholderText: "City name or lat,lon"
+              property string placeholderText: qsTr("Buscar cidade, estado ou país")
               Text {
                 anchors.fill: parent
                 verticalAlignment: Text.AlignVCenter
@@ -479,7 +535,7 @@ PopupWindow {
             border.width: 1
             Text {
               anchors.centerIn: parent
-              text: "Set"
+              text: qsTr("Aplicar")
               color: Theme.primary
               font.family: Theme.fontFamily
               font.pixelSize: Theme.fontSizeSmall
@@ -500,7 +556,7 @@ PopupWindow {
             border.width: 1
             Text {
               anchors.centerIn: parent
-              text: "Auto IP"
+              text: qsTr("IP aprox.")
               color: Theme.secondary
               font.family: Theme.fontFamily
               font.pixelSize: Theme.fontSizeSmall - 1
@@ -552,20 +608,36 @@ PopupWindow {
             delegate: Rectangle {
               required property var modelData
               width: locationSuggestionList.width
-              height: 32
+              height: 42
               radius: Theme.hoverRadius
               color: suggestionMouse.containsMouse ? Theme.withAlpha(Theme.primary, 0.16) : "transparent"
 
-              Text {
+              Column {
                 anchors.fill: parent
                 anchors.leftMargin: 8
                 anchors.rightMargin: 8
-                verticalAlignment: Text.AlignVCenter
-                elide: Text.ElideRight
-                text: [modelData.name, modelData.admin1, modelData.country].filter(Boolean).join(", ")
-                color: Theme.surfaceText
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSizeSmall
+                anchors.topMargin: 5
+                anchors.bottomMargin: 4
+                spacing: 1
+
+                Text {
+                  width: parent.width
+                  text: modelData.name
+                  color: Theme.surfaceText
+                  font.family: Theme.fontFamily
+                  font.pixelSize: Theme.fontSizeSmall
+                  font.weight: Font.Medium
+                  elide: Text.ElideRight
+                }
+
+                Text {
+                  width: parent.width
+                  text: [modelData.admin1, modelData.admin2, modelData.country].filter(Boolean).join(" · ")
+                  color: Theme.withAlpha(Theme.surfaceText, 0.58)
+                  font.family: Theme.fontFamily
+                  font.pixelSize: Theme.fontSizeSmall - 2
+                  elide: Text.ElideRight
+                }
               }
 
               MouseArea {
@@ -607,14 +679,15 @@ PopupWindow {
       SettingsData.set("weatherCoordinates", "")
     }
     locInput.text = ""
-    WeatherService.forceRefresh()
+    // WeatherService debounces the location/coordinate setting signals and
+    // resolves the final selection once both values have been stored.
   }
 
   Component.onCompleted: {
     if (typeof SettingsData !== "undefined") {
       const c = SettingsData.weatherCoordinates || ""
       const l = SettingsData.weatherLocation || ""
-      locInput.placeholderText = (c || l) ? (c || l) : "City name or lat,lon"
+      locInput.placeholderText = (l || c) ? (l || c) : qsTr("Buscar cidade, estado ou país")
     }
   }
 }

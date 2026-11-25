@@ -37,6 +37,11 @@ BasePill {
     barWindow: root.barWindow
   }
 
+  WorldClockOverlay {
+    id: worldClockOverlay
+    barWindow: root.barWindow
+  }
+
   content: Component {
     Row {
       readonly property bool privacyActive: PrivacyService.activeIndicators.length > 0
@@ -45,27 +50,32 @@ BasePill {
 
       // Time + Date Column
       Column {
-        spacing: 0
+        spacing: 1
         anchors.verticalCenter: parent.verticalCenter
 
         Item {
           id: timeRow
-          implicitWidth: dateRow.implicitWidth
+          implicitWidth: timeLabel.implicitWidth + Theme.spaceXS + wallpaperButton.width
           implicitHeight: Math.max(timeLabel.implicitHeight, Theme.iconSizeSmall)
 
           Text {
             id: timeLabel
-            anchors.centerIn: parent
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
             text: ClockService.timeString
             color: Theme.primary
             font.family: Theme.monoFontFamily
             font.pixelSize: root.textSize()
             font.bold: true
+            Behavior on color {
+              ColorAnimation { duration: 160; easing.type: Easing.OutCubic }
+            }
           }
 
           Item {
             id: wallpaperButton
-            x: timeLabel.x + timeLabel.width + Theme.spaceXXS
+            anchors.left: timeLabel.right
+            anchors.leftMargin: Theme.spaceXS
             anchors.verticalCenter: parent.verticalCenter
             width: Theme.iconSizeSmall
             height: Theme.iconSizeSmall
@@ -78,6 +88,9 @@ BasePill {
               color: wallpaperButtonMouse.containsMouse
                 ? Theme.withAlpha(Theme.primary, 0.12)
                 : "transparent"
+              Behavior on color {
+                ColorAnimation { duration: 140; easing.type: Easing.OutCubic }
+              }
             }
 
             DmsIcon {
@@ -95,8 +108,9 @@ BasePill {
               onClicked: WallpaperService.openOverview(root.parentScreen)
             }
           }
-        }
 
+
+        }
         Row {
           id: dateRow
           anchors.horizontalCenter: parent.horizontalCenter
@@ -106,14 +120,14 @@ BasePill {
             text: ClockService.dateString
             color: Theme.widgetInactiveIconColor
             font.family: Theme.monoFontFamily
-            font.pixelSize: Math.round(root.textSize() * 0.7)
+            font.pixelSize: Math.round(root.textSize() * 0.76)
           }
 
           Text {
             text: ClockService.weekdayString
             color: Theme.widgetInactiveIconColor
             font.family: Theme.monoFontFamily
-            font.pixelSize: Math.round(root.textSize() * 0.7)
+            font.pixelSize: Math.round(root.textSize() * 0.76)
           }
         }
       }
@@ -177,18 +191,24 @@ BasePill {
           anchors.fill: parent
           radius: Theme.hoverRadius
           color: weatherMa.containsMouse ? Theme.withAlpha(Theme.primary, 0.12) : "transparent"
+          Behavior on color {
+            ColorAnimation { duration: 140; easing.type: Easing.OutCubic }
+          }
         }
 
         Row {
           id: weatherRow
           anchors.centerIn: parent
-          spacing: 4
+          spacing: 3
 
           DmsIcon {
             anchors.verticalCenter: parent.verticalCenter
             name: WeatherService.weatherIcon(WeatherService.weather.wCode, WeatherService.weather.isDay)
             size: Math.round(root.textSize() * 0.9)
             color: Theme.widgetIconColor
+            Behavior on color {
+              ColorAnimation { duration: 160; easing.type: Easing.OutCubic }
+            }
           }
 
           Text {

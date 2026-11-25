@@ -849,7 +849,7 @@ BasePill {
       radius: Theme.cornerRadius
       color: Theme.withAlpha(Theme.widgetBaseBackgroundColor, SettingsData.barWidgetTransparency)
       border.width: 1
-      border.color: Theme.withAlpha(Theme.outline, 0.35)
+      border.color: Theme.withAlpha(Theme.primary, 0.42)
 
       Column {
         anchors.fill: parent
@@ -865,10 +865,12 @@ BasePill {
             width: parent.width - 84
             height: parent.height
             leftPadding: 16
-            text: qsTr("Notepad")
+            text: "🌳  NEXUS NOTES"
             color: Theme.widgetTextColor
             font.family: Theme.fontFamily
-            font.pixelSize: Math.round(Theme.fontSizeMedium * 1.3)
+            font.pixelSize: Math.round(Theme.fontSizeMedium * 1.05)
+            font.bold: true
+            font.letterSpacing: 1.2
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
           }
@@ -924,7 +926,7 @@ BasePill {
           id: headerDivider
           width: parent.width
           height: 1
-          color: Theme.withAlpha(Theme.outline, 0.3)
+          color: Theme.withAlpha(Theme.primary, 0.42)
         }
 
         Row {
@@ -963,8 +965,10 @@ BasePill {
                   color: NotesService.currentIndex === index
                     ? Theme.withAlpha(Theme.primary, 0.16)
                     : "transparent"
-                  border.width: NotesService.currentIndex === index ? 0 : 1
-                  border.color: Theme.withAlpha(Theme.outline, 0.2)
+                  border.width: NotesService.currentIndex === index ? 1 : 1
+                  border.color: NotesService.currentIndex === index
+                    ? Theme.withAlpha(Theme.primary, 0.75)
+                    : Theme.withAlpha(Theme.outline, 0.22)
 
                   Text {
                     id: tabTitle
@@ -1202,9 +1206,11 @@ BasePill {
             - tabsBar.height - searchBar.height - optionsBar.height - actionBar.height - statusBar.height)
           x: 16
           radius: Theme.cornerRadius
-          color: Theme.withAlpha(Theme.surfaceContainerHigh, 0.72)
-          border.width: noteEditor.activeFocus ? 1 : 0
-          border.color: Theme.primary
+          color: Theme.withAlpha(Theme.surfaceContainer, 0.94)
+          border.width: 1
+          border.color: noteEditor.activeFocus
+            ? Theme.withAlpha(Theme.primary, 0.9)
+            : Theme.withAlpha(Theme.outline, 0.28)
           clip: true
 
           Flickable {
@@ -1523,7 +1529,7 @@ BasePill {
         Item {
           id: actionBar
           width: parent.width
-          height: 64
+          height: 56
 
           Item {
             anchors.fill: parent
@@ -1533,52 +1539,58 @@ BasePill {
             Row {
               anchors.left: parent.left
               anchors.right: parent.right
-              anchors.rightMargin: 44
+              anchors.rightMargin: 42
               anchors.verticalCenter: parent.verticalCenter
-              spacing: 2
+              spacing: 6
 
               Repeater {
                 model: [
-                  { id: "save", label: qsTr("Save"), icon: "save" },
-                  { id: "open", label: qsTr("Open"), icon: "folder_open" },
-                  { id: "new", label: qsTr("New"), icon: "note_add" },
-                  { id: "autosave", label: qsTr("Auto-save"), icon: "sync" },
-                  { id: "preview", label: root.markdownPreview ? qsTr("Edit") : qsTr("Preview"), icon: root.markdownPreview ? "edit" : "visibility" }
+                  { id: "save", label: qsTr("Salvar"), icon: "save" },
+                  { id: "open", label: qsTr("Abrir"), icon: "folder_open" },
+                  { id: "new", label: qsTr("Nova"), icon: "note_add" },
+                  { id: "autosave", label: qsTr("Auto"), icon: "sync" },
+                  { id: "preview", label: root.markdownPreview ? qsTr("Editar") : qsTr("Prévia"), icon: root.markdownPreview ? "edit" : "visibility" }
                 ]
 
                 delegate: Rectangle {
                   id: actionButton
                   required property var modelData
                   readonly property bool hovered: actionMouse.containsMouse
-                  width: actionLayout.implicitWidth + 12
-                  height: 42
+                  readonly property bool active: (modelData.id === "autosave" && SettingsData.notesAutoSave)
+                    || (modelData.id === "preview" && root.markdownPreview)
+                  width: actionLayout.implicitWidth + 20
+                  height: 36
                   anchors.verticalCenter: parent.verticalCenter
-                  radius: Theme.hoverRadius
-                  color: actionButton.modelData.id === "autosave" && SettingsData.notesAutoSave
-                    ? Theme.withAlpha(Theme.primary, 0.16)
-                    : (hovered ? Theme.withAlpha(Theme.primary, 0.13) : "transparent")
+                  radius: 18
+                  color: modelData.id === "save"
+                    ? (hovered ? Theme.withAlpha(Theme.primary, 0.24) : Theme.withAlpha(Theme.primary, 0.15))
+                    : active ? Theme.withAlpha(Theme.primary, 0.14)
+                    : hovered ? Theme.withAlpha(Theme.primary, 0.09)
+                    : Theme.withAlpha(Theme.surfaceContainerHigh, 0.22)
+                  border.width: modelData.id === "save" || active ? 1 : 0
+                  border.color: Theme.withAlpha(Theme.primary, modelData.id === "save" ? 0.48 : 0.34)
 
                   Row {
                     id: actionLayout
                     anchors.centerIn: parent
-                    spacing: 4
+                    spacing: 5
 
                     DmsIcon {
                       anchors.verticalCenter: parent.verticalCenter
                       name: actionButton.modelData.icon
-                      size: 20
-                      color: actionButton.hovered ? Theme.primary : Theme.widgetInactiveIconColor
+                      size: 16
+                      color: actionButton.active || actionButton.hovered
+                        ? Theme.primary : Theme.widgetInactiveIconColor
                     }
 
                     Text {
                       anchors.verticalCenter: parent.verticalCenter
                       text: actionButton.modelData.id === "autosave" && SettingsData.notesAutoSave
-                        ? actionButton.modelData.label + " ✓"
-                        : actionButton.modelData.label
-                      color: actionButton.modelData.id === "autosave" && SettingsData.notesAutoSave
-                        ? Theme.primary : Theme.widgetTextColor
+                        ? qsTr("Auto ON") : actionButton.modelData.label
+                      color: actionButton.active ? Theme.primary : Theme.widgetTextColor
                       font.family: Theme.fontFamily
                       font.pixelSize: Theme.fontSizeSmall
+                      font.weight: actionButton.modelData.id === "save" || actionButton.active ? Font.DemiBold : Font.Medium
                     }
                   }
 
@@ -1605,18 +1617,19 @@ BasePill {
             }
 
             Rectangle {
-              width: 40
-              height: 40
+              width: 36
+              height: 36
               anchors.right: parent.right
               anchors.verticalCenter: parent.verticalCenter
-              radius: Theme.hoverRadius
-              color: moreMouse.containsMouse ? Theme.withAlpha(Theme.primary, 0.13) : "transparent"
+              radius: 12
+              color: moreMouse.containsMouse ? Theme.withAlpha(Theme.primary, 0.13)
+                : Theme.withAlpha(Theme.surfaceContainerHigh, 0.34)
 
               DmsIcon {
                 anchors.centerIn: parent
                 name: "more_horiz"
-                size: 20
-                color: Theme.widgetInactiveIconColor
+                size: 19
+                color: moreMouse.containsMouse ? Theme.primary : Theme.widgetInactiveIconColor
               }
 
               MouseArea {
@@ -1642,7 +1655,7 @@ BasePill {
             width: parent.width * 0.32
             height: parent.height
             text: NotesService.currentText.length === 0
-              ? qsTr("Empty")
+              ? qsTr("🌱 Cultivando ideias")
               : qsTr("%1 characters · %2 lines")
                 .arg(NotesService.currentText.length)
                 .arg(NotesService.currentText.split("\n").length)

@@ -14,7 +14,7 @@ import "Settings/SpecUtil.js" as Util
 Singleton {
   id: root
 
-  readonly property int settingsConfigVersion: 9
+  readonly property int settingsConfigVersion: 16
   readonly property string _configDir: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/myquickshell"
   readonly property string settingsPath: _configDir + "/settings.json"
 
@@ -47,6 +47,8 @@ Singleton {
   property string weatherCoordinates: ""
   property real calendarBirthYear: -1
   property real calendarLifeExpectancy: 90
+  property bool lyricsHudEnabled: false
+  property string lyricsHudPosition: "right-center"
   property bool notesAutoSave: false
   property bool notesShowLineNumbers: false
   property bool notesExpanded: false

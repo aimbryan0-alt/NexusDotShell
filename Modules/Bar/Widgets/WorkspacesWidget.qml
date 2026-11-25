@@ -512,59 +512,58 @@ BasePill {
           required property int modelData
           readonly property bool isActive: modelData === root.activeId
           readonly property bool isOccupied: WorkspacesService.occupiedIds.indexOf(modelData) !== -1
+          readonly property bool isHovered: workspaceMouseArea.containsMouse
 
-          width: isActive ? 34 : 25
-          height: 23
+          width: isActive ? 34 : 27
+          height: 26
           anchors.verticalCenter: parent.verticalCenter
-          radius: 7
+          radius: height / 2
           color: isActive
-            ? Theme.withAlpha(Theme.primary, 0.2)
-            : (isOccupied
-              ? Theme.withAlpha(Theme.surfaceContainerHighest, 0.88)
-              : Theme.withAlpha(Theme.surfaceVariant, 0.42))
-          border.width: isActive ? 1.4 : (isOccupied ? 1 : 0)
+            ? Theme.withAlpha(Theme.primary, 0.22)
+            : (isHovered
+              ? Theme.withAlpha(Theme.primary, 0.13)
+              : (isOccupied
+                ? Theme.withAlpha(Theme.surfaceContainerHighest, 0.76)
+                : Theme.withAlpha(Theme.surfaceVariant, 0.22)))
+          border.width: isActive ? 1.2 : (isHovered ? 1 : (isOccupied ? 0.6 : 0))
           border.color: isActive
-            ? Theme.primary
-            : Theme.withAlpha(Theme.tertiary, isOccupied ? 0.42 : 0)
+            ? Theme.withAlpha(Theme.primary, 0.92)
+            : (isHovered
+              ? Theme.withAlpha(Theme.primary, 0.48)
+              : Theme.withAlpha(Theme.tertiary, isOccupied ? 0.28 : 0))
           opacity: isActive ? 1.0 : (isOccupied ? 0.88 : 0.58)
 
           Behavior on width {
             NumberAnimation {
-              duration: 180
+              duration: 150
               easing.type: Easing.OutCubic
             }
           }
           Behavior on color {
             ColorAnimation {
-              duration: 180
+              duration: 150
               easing.type: Easing.OutCubic
             }
+          }
+          Behavior on border.color {
+            ColorAnimation { duration: 150 }
           }
           Behavior on opacity {
             NumberAnimation {
-              duration: 180
+              duration: 150
               easing.type: Easing.OutCubic
             }
-          }
-
-          Rectangle {
-            anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: isActive ? 17 : 8
-            height: 2
-            radius: 1
-            color: isActive ? Theme.primary : Theme.tertiary
-            opacity: isActive ? 1 : (isOccupied ? 0.72 : 0)
           }
 
           Text {
             anchors.centerIn: parent
             anchors.verticalCenterOffset: -1
             text: String(modelData).padStart(2, "0")
-            color: isActive ? Theme.primary : Theme.withAlpha(Theme.surfaceText, 0.9)
+            color: isActive ? Theme.primary : Theme.withAlpha(Theme.surfaceText, isOccupied ? 0.96 : 0.76)
             font.family: Theme.monoFontFamily
-            font.pixelSize: Theme.fontSizeSmall
+            font.pixelSize: Math.max(10, Theme.fontSizeSmall - 1)
             font.bold: isActive || isOccupied
+            font.letterSpacing: isActive ? 0.35 : 0
             opacity: isActive ? 1.0 : 0.95
           }
 
@@ -572,16 +571,24 @@ BasePill {
             anchors.bottom: parent.bottom
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottomMargin: 3
-            width: isActive ? 9 : 4
+            width: isActive ? 11 : (isOccupied ? 6 : 3)
             height: 2
             radius: 1
             color: isActive ? Theme.primary : Theme.tertiary
-            opacity: isActive || isOccupied ? 0.9 : 0
+            opacity: isActive ? 1.0 : (isOccupied ? 0.72 : (isHovered ? 0.42 : 0))
+            Behavior on width {
+              NumberAnimation { duration: 140; easing.type: Easing.OutCubic }
+            }
+            Behavior on opacity {
+              NumberAnimation { duration: 140 }
+            }
           }
 
           MouseArea {
+            id: workspaceMouseArea
             z: 1
             anchors.fill: parent
+            hoverEnabled: true
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             preventStealing: true
             cursorShape: Qt.PointingHandCursor
