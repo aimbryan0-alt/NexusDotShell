@@ -1,4 +1,4 @@
-# Copilot instructions for MyQuickshell
+# Copilot instructions for NexusDotShell
 
 ## Build, run, and validation
 
@@ -43,7 +43,7 @@ The important architecture constraint is to keep compositor-specific logic and s
   `AGENTS.md`; use it as the source of truth for consistent theme spacing and
   popup anchor coordinates.
 - For Hyprland work, follow the Lua API and strict live-session safety
-  requirements in `AGENTS.md` and `~/dotfiles/agent-guidance/`. Do not use
+  requirements in the repository-root `AGENTS.md`. Do not use
   deprecated pre-Lua syntax or probe the live compositor by default. A direct
   user request for a specific live query/probe authorizes that scoped
   read-only operation; do not ask again or expand it to unrelated probes.
@@ -76,5 +76,5 @@ The important architecture constraint is to keep compositor-specific logic and s
 
 ## Relevant repo notes
 
-- README.md is the best source for the project shape and runtime requirements. It describes MyQuickshell as a self-contained Quickshell shell for Wayland compositors and notes the `hyprctl`/layer-shell dependency.
-- The project is built around a DMS/omarchy-inspired architecture but is intentionally self-contained. The implementation details doc explains the intended design and is useful when adding new modules or matching existing conventions.
+- README.md is the best source for the project shape and runtime requirements. It describes NexusDotShell as a self-contained Quickshell shell for Wayland compositors and notes the `hyprctl`/layer-shell dependency.
+- The project is intentionally self-contained. Use the architecture and conventions documented in this file, the root `AGENTS.md`, and `README.md` when adding modules or matching existing behavior.
