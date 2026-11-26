@@ -1,7 +1,5 @@
 .quickshell/
 *.qslog
-file:*
-*.txt
 /nob
 /nob.old
 /tools/gpu-probe/build/
@@ -21,4 +19,3 @@ file:*
 *~
 
 # Arquivo acidental local na raiz
-/cd
