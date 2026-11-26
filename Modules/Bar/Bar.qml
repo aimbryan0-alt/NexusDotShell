@@ -50,6 +50,36 @@ Item {
 
     property var targetScreen: null
 
+    Connections {
+      target: Hyprland
+
+      function onRawEvent(event) {
+        if (event.name === "fullscreen"
+            || event.name === "workspace"
+            || event.name === "activespecial"
+            || event.name === "activespecialv2") {
+          Hyprland.refreshWorkspaces()
+          Hyprland.refreshMonitors()
+        }
+      }
+    }
+
+    readonly property var hyprlandMonitor: Hyprland.monitorFor(dockWindow.screen)
+    readonly property var specialWorkspace: dockWindow.hyprlandMonitor?.lastIpcObject?.specialWorkspace
+    readonly property var specialWorkspaceState: {
+      const monitor = dockWindow.hyprlandMonitor
+      const special = dockWindow.specialWorkspace
+      if (!monitor || !special || special.id === 0)
+        return null
+      return (Hyprland.workspaces?.values || []).find(workspace =>
+        workspace.name === special.name
+          && workspace.monitor?.name === monitor.name) || null
+    }
+    readonly property bool specialWorkspaceFullscreen:
+      !!dockWindow.specialWorkspaceState?.hasFullscreen
+    readonly property bool regularWorkspaceFullscreen:
+      !!dockWindow.hyprlandMonitor?.activeWorkspace?.hasFullscreen
+
     screen: targetScreen
     anchors {
       bottom: true
@@ -57,7 +87,9 @@ Item {
       right: true
     }
     visible: typeof SettingsData !== "undefined" && SettingsData.showDock
-    implicitHeight: 88
+      && !dockWindow.specialWorkspaceFullscreen
+      && !dockWindow.regularWorkspaceFullscreen
+    implicitHeight: dockContent.shouldShow ? 88 : 8
     color: "transparent"
     surfaceFormat.opaque: false
     exclusionMode: ExclusionMode.Ignore
@@ -65,6 +97,7 @@ Item {
     WlrLayershell.layer: WlrLayer.Overlay
 
     Dock {
+      id: dockContent
       anchors.fill: parent
       screen: dockWindow.screen
     }
@@ -74,6 +107,20 @@ Item {
     id: barWindow
 
     property real contextMenuX: 0
+
+    Connections {
+      target: Hyprland
+
+      function onRawEvent(event) {
+        if (event.name === "fullscreen"
+            || event.name === "workspace"
+            || event.name === "activespecial"
+            || event.name === "activespecialv2") {
+          Hyprland.refreshWorkspaces()
+          Hyprland.refreshMonitors()
+        }
+      }
+    }
     readonly property bool backgroundEnabled: root.barTransparency !== 0
     readonly property var hyprlandMonitor: Hyprland.monitorFor(barWindow.screen)
     readonly property var specialWorkspace: barWindow.hyprlandMonitor?.lastIpcObject?.specialWorkspace
@@ -109,8 +156,7 @@ Item {
     }
 
     visible: !barWindow.specialWorkspaceFullscreen
-      && (!barWindow.regularWorkspaceFullscreen
-        || barWindow.specialWorkspaceOverFullscreen)
+      && !barWindow.regularWorkspaceFullscreen
     implicitHeight: Theme.barHeight + Theme.space2() * 2
     color: "transparent"
     surfaceFormat.opaque: false

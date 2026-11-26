@@ -1,4 +1,5 @@
 import QtQuick
+import Qt5Compat.GraphicalEffects
 import qs.Common
 import qs.Modules.Bar.Widgets
 import qs.Services
@@ -44,24 +45,46 @@ BasePill {
       anchors.verticalCenter: parent.verticalCenter
 
       Rectangle {
+        width: 34
+        height: 34
+        radius: width / 2
+        anchors.verticalCenter: parent.verticalCenter
+        color: Theme.withAlpha(Theme.primary, 0.10)
+        border.width: 1
+        border.color: Theme.withAlpha(Theme.primary, 0.28)
+      }
+
+      Rectangle {
         width: 28
         height: 28
-        radius: 7
+        radius: width / 2
         clip: true
         color: Theme.withAlpha(Theme.primary, 0.12)
         border.width: 1
         border.color: Theme.withAlpha(Theme.primary, 0.38)
         anchors.verticalCenter: parent.verticalCenter
 
-        Image {
+        OpacityMask {
           anchors.fill: parent
-          source: root.currentImage
-          fillMode: Image.PreserveAspectCrop
-          asynchronous: true
-          cache: true
-          smooth: true
-          mipmap: true
-          visible: status === Image.Ready
+          visible: root.currentImage !== ""
+          cached: true
+
+          source: Image {
+            anchors.fill: parent
+            source: root.currentImage
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            cache: true
+            smooth: true
+            mipmap: true
+          }
+
+          maskSource: Rectangle {
+            width: 28
+            height: 28
+            radius: 14
+            color: "white"
+          }
         }
 
         DmsIcon {

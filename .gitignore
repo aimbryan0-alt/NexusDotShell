@@ -7,3 +7,18 @@ file:*
 /tools/gpu-probe/build/
 /tools/system-stats/build/
 /build/
+
+# Backups locais de configuração e desenvolvimento
+*.bak
+*.bak.*
+*.bak-*
+*.backup
+*.backup.*
+
+# Arquivos temporários e logs
+*.log
+*.tmp
+*~
+
+# Arquivo acidental local na raiz
+/cd

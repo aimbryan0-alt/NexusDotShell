@@ -1,5 +1,6 @@
 import QtCore
 import QtQuick
+import Qt5Compat.GraphicalEffects 6.0
 import QtQuick.Controls
 import QtQuick.Dialogs
 import Quickshell
@@ -2086,6 +2087,7 @@ PanelWindow {
           anchors.fill: parent
           anchors.margins: Theme.spaceXS
           radius: 16
+          clip: true
           color: parent.parent.selectedInStack
             ? Theme.withAlpha(Theme.primary, 0.14)
             : Theme.withAlpha(
@@ -2094,6 +2096,26 @@ PanelWindow {
             )
           border.width: parent.parent.selectedInStack ? 1 : 0
           border.color: Theme.primary
+
+
+
+          Rectangle {
+            anchors.fill: parent
+            z: 0
+            color: Theme.withAlpha(Theme.widgetBaseBackgroundColor, 0.38)
+          }
+
+          Rectangle {
+            width: 86
+            height: 86
+            radius: width / 2
+            anchors.top: parent.top
+            anchors.topMargin: 0
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: Theme.withAlpha(Theme.primary, 0.10)
+            border.width: 1
+            border.color: Theme.withAlpha(Theme.primary, 0.35)
+          }
 
           Rectangle {
             id: wallpaperThumbCircle
@@ -2110,23 +2132,35 @@ PanelWindow {
               : Theme.withAlpha(Theme.outlineVariant, 0.75)
             clip: true
 
-            Image {
+            OpacityMask {
               anchors.fill: parent
-              source: parent.parent.parent.previewActivated
-                && WallpaperService.typeForSource(parent.parent.parent.modelData) === "image"
-                ? parent.parent.parent.modelData
-                : ""
-              fillMode: Image.PreserveAspectCrop
-              sourceSize: Qt.size(128, 128)
-              asynchronous: true
-              cache: false
-              opacity: status === Image.Ready ? 1 : 0
+              cached: true
 
-              Behavior on opacity {
-                NumberAnimation {
-                  duration: 110
-                  easing.type: Theme.standardEasing
+              source: Image {
+                anchors.fill: parent
+                source: wallpaperThumbCircle.parent.parent.previewActivated
+                  && WallpaperService.typeForSource(wallpaperThumbCircle.parent.parent.modelData) === "image"
+                  ? wallpaperThumbCircle.parent.parent.modelData
+                  : ""
+                fillMode: Image.PreserveAspectCrop
+                sourceSize: Qt.size(128, 128)
+                asynchronous: true
+                cache: false
+                opacity: status === Image.Ready ? 1 : 0
+
+                Behavior on opacity {
+                  NumberAnimation {
+                    duration: 110
+                    easing.type: Theme.standardEasing
+                  }
                 }
+              }
+
+              maskSource: Rectangle {
+                width: 76
+                height: 76
+                radius: 38
+                color: "white"
               }
             }
 

@@ -67,7 +67,7 @@ BasePill {
   property int popupY: 0
   property bool pillHovered: false
   property real displayedPosition: root.player ? root.player.position : 0
-  property var visualizerLevels: [0.35, 0.7, 0.5, 0.85, 0.4]
+  readonly property var visualizerLevels: CavaVisualizerService.levels
 
   Component.onCompleted: root.updateLyricsPlayer()
   onPlayerChanged: {
