@@ -146,7 +146,7 @@ static bool install_desktop_entry(void) {
   }
 
   const char *applications = nob_temp_sprintf("%s/applications", data_home);
-  const char *desktop_path = nob_temp_sprintf("%s/com.myquickshell.shell.desktop", applications);
+  const char *desktop_path = nob_temp_sprintf("%s/com.nexusdotshell.shell.desktop", applications);
   if (!ensure_directories(applications))
     return false;
 
@@ -155,7 +155,7 @@ static bool install_desktop_entry(void) {
       "[Desktop Entry]\n"
       "Version=1.0\n"
       "Type=Application\n"
-      "Name=MyQuickshell\n"
+      "Name=NexusDotShell\n"
       "Comment=Wayland desktop shell\n"
       "Exec=quickshell -p \"%s\"\n"
       "Path=%s\n"
@@ -222,7 +222,7 @@ static bool stop_shell(void) {
   }
   fclose(file);
   if (ok && stopped == 0)
-    nob_log(NOB_INFO, "no MyQuickshell instance is running");
+    nob_log(NOB_INFO, "no NexusDotShell instance is running");
   return ok;
 }
 
