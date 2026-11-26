@@ -266,6 +266,10 @@ Copyright (C) 2026 mmj2023
 
 ![NexusDotShell desktop bar showcase](assets/Mybar_showcase.png)
 
+More NexusDotShell screenshots are coming soon. The showcase will be expanded
+with additional views of the Agenda, Command Center, Launcher, System Monitor,
+and Wallpaper Manager as updated images are ready.
+
 ## Structure
 
 - `shell.qml` - entry point
