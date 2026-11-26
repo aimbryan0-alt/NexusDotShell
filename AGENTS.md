@@ -1,121 +1,95 @@
-# Shared agent instructions for MyQuickshell
+# Shared agent instructions for NexusDotShell
 
-Personal workspace behavior and live-Hyprland safety requirements are
-versioned in `~/dotfiles/agent-guidance/AGENTS.md`. Read that file and its
-`myquickshell-bar-and-notes` skill before changing bar layering, special
-workspaces, fullscreen behavior, or Notes. Hide the bar per monitor for
-ordinary fullscreen windows. When a special workspace is visible over a
-fullscreen regular workspace on the same monitor, show the bar above the
-fullscreen content; hide it if a window on the special workspace is
-fullscreen. Documented, low-risk
-read-only `hyprctl` queries may be run when useful after verifying their
-syntax offline. Ask before any state-changing live action or any query/action
-whose risk or effect is uncertain, including reloads, dispatches, runtime Lua
-evaluation, and tests that affect windows or focus. If the current prompt
-explicitly requests a particular live query or probe, that authorizes the
-scoped read-only operation; do not ask again or extend it to unrelated probes.
+These instructions are self-contained and apply to every contributor and coding
+agent working in this repository.
 
-Hyprland on this host uses Lua-based configuration and control APIs. Do not
-apply old dispatcher/config syntax from older versions; find the current
-version's Lua API and signatures from offline documentation/source because
-they may change. Do not probe APIs or enumerate/introspect C-backed objects
-against the live compositor unless the current prompt explicitly requests that
-specific probe; this kind of exploration has crashed Hyprland. Prefer offline
-research, but use safe, documented read-only queries when runtime evidence is
-needed. Ask before higher-risk or uncertain actions unless the current prompt
-explicitly requests that specific read-only probe.
+## Hyprland and live-session safety
 
-All AI coding agents working in this repository must follow these shared UI
-theming and spacing rules, in addition to any tool-specific instructions.
+- Prefer offline documentation and source inspection when investigating
+  Hyprland's Lua API. Do not use deprecated dispatcher/config syntax from older
+  Hyprland versions.
+- Do not run state-changing live compositor actions, reloads, dispatches,
+  runtime Lua evaluation, or tests that affect windows/focus without explicit
+  user authorization.
+- Avoid probing or enumerating C-backed objects against a live compositor;
+  undocumented introspection can destabilize Hyprland. Use documented,
+  read-only queries only when needed and when their syntax is known.
+- A direct user request for a specific live query or probe authorizes only that
+  scoped operation; do not extend it to unrelated probes.
+- Preserve the bar's per-monitor fullscreen behavior: hide it for ordinary
+  fullscreen windows. If a special workspace is visible over a fullscreen
+  regular workspace on the same monitor, show the bar above the fullscreen
+  content; hide it if a window on the special workspace is fullscreen.
 
 ## Theming and spacing
 
 - Use `Common/Theme.qml` tokens for colors, typography, and design spacing.
   Do not introduce hard-coded colors or pixel gaps where a theme token applies.
-- Use `Theme.cornerRadius` for rounded-rectangle surfaces, `Theme.hoverRadius`
-  for compact hover highlights, and `Theme.pillRadius` for pill/circular icon
-  targets. Avoid one-off numeric corner radii on interactive highlights so
-  their shape stays consistent.
+- Use `Theme.cornerRadius` for rounded-rectangle surfaces,
+  `Theme.hoverRadius` for compact hover highlights, and
+  `Theme.pillRadius` for pill/circular icon targets. Avoid one-off numeric
+  corner radii on interactive highlights.
 - Use the same theme token for the same visual relationship throughout the
-  shell. In particular, the standard gap between a bar and a popup, and between
-  a popup and its directly nested popup, is `Theme.spaceXS` (4 px). Do not mix
-  raw offsets such as `4` or `8` with theme spacing for these relationships.
+  shell. The standard gap between a bar and a popup, and between a popup and
+  its directly nested popup, is `Theme.spaceXS` (4 px).
 - Keep hover highlights and their hit areas inside the visible bounds of their
-  owning pill or button. Do not use negative anchor margins to enlarge them
-  beyond the pill; add internal padding within the control instead. Match
-  sibling controls' highlight color, opacity, corner treatment, and the
-  weather button's content-based vertical inset (`Theme.hoverVerticalInset`).
-  Segmented bar-pill highlights should use this same vertical inset.
+  owning pill or button. Do not use negative anchor margins to enlarge them;
+  add internal padding within the control instead.
 - Respect popup anchor coordinates: `anchor.rect` is relative to
   `anchor.window`. When a popup is anchored to another popup, calculate its
   position in that popup's local coordinates and include its height when
-  placing it below. Do not reuse bar-relative coordinates as popup-relative
-  coordinates.
-- When matching gaps, compare the visible edge-to-edge distance, not just the
-  anchor origin. Include popup borders, margins, and implicit dimensions in the
-  calculation.
+  placing it below.
+- When matching gaps, compare visible edge-to-edge distance, including popup
+  borders, margins, and implicit dimensions.
 - Before changing spacing, inspect nearby widgets for the established token
-  and anchoring pattern. Afterward, lint the changed QML and review every
-  affected popup placement so equivalent gaps remain equivalent.
+  and anchoring pattern. Afterward, lint changed QML and review affected popup
+  placements.
 
 ## Qt Quick Controls styling
 
-Never ship an unstyled `ComboBox`, `Popup`, or other Qt Quick Control: Qt's
-default control style does not match the shell theme. For every such control:
+Never ship an unstyled `ComboBox`, `Popup`, or other Qt Quick Control. Define
+`contentItem`, `indicator`, `background`, `popup`, and `delegate`
+explicitly where applicable, using `Common/Theme.qml` tokens only.
 
-- Always define `contentItem`, `indicator`, `background`, `popup`, and
-  `delegate` explicitly, using `Common/Theme.qml` tokens only (no default
-  style colors or hard-coded hex).
-- In popup item delegates, keep the label's text color constant
-  (`Theme.surfaceText`); highlight state is conveyed by the background pill
-  (`Theme.withAlpha(Theme.primary, 0.2)` + `Theme.hoverRadius`) alone. Do not
-  switch the label to `Theme.primaryText`/`Theme.primary` on hover — this
-  creates low-contrast, washed-out text.
-- Popup `ListView`s must set `highlightFollowsCurrentItem: false` when
-  `currentIndex` is bound to the delegate highlight; otherwise hover can
-  trigger unintended auto-scrolling.
+- In popup item delegates, keep label text color constant
+  (`Theme.surfaceText`); convey selection/hover through the background pill.
+- Popup `ListView` instances must set
+  `highlightFollowsCurrentItem: false` when `currentIndex` is bound to the
+  delegate highlight, to avoid unintended auto-scrolling.
 
 ## Project conventions
 
-- Follow `.github/copilot-instructions.md` for the project architecture,
-  build, validation, and QML conventions. This file is the shared source for
-  cross-agent UI theming and popup-spacing behavior.
-- Whenever you add or change a runtime/build dependency, document whether it is
-  required or optional, what feature uses it, and its fallback behavior in
-  `README.md`. Keep this rule for all AI agents and contributors.
-- Keep UI widgets declarative and put compositor/system integration in
-  `Services/`.
-
-## GitHub tooling
-
-- A GitHub MCP server is configured (`tools.github.*` in OpenCode Code Mode).
-  Use it for anything about remote repository state, instead of
-  approximating with the GitHub website or plain `git`: issues, pull requests,
-  releases and tags, code search across GitHub, file contents on a branch or
-  PR, commit/PR history, labels, and for creating branches, commits, PRs,
-  review comments, or requesting Copilot reviews.
-- Keep plain `git` for local operations (status, diff, staging, local
-  branching) and for pushing/pulling; use the API-shaped tools for
-  GitHub-hosted resources that git cannot reach.
-- Copilot CLI users in this repo additionally rely on its builtin github
-  tooling; keep the two from colliding: do not push branches or open PRs with
-  both tools for the same change.
+- Keep widgets declarative and put compositor/system integration and external
+  process handling in `Services/`.
+- Use `Common/Theme.qml` and the existing singleton architecture rather than
+  introducing duplicate global state.
+- Follow `.github/copilot-instructions.md` for architecture, build, validation,
+  and QML conventions.
+- Whenever a runtime/build dependency is added or changed, document in
+  `README.md` whether it is required or optional, which feature uses it, and
+  its fallback behavior.
+- Preserve upstream attribution and the repository's GPL-3.0 license when
+  modifying or redistributing derived code.
 
 ## Notes editor backend authority
 
 - When the optional headless Neovim backend is available, it is the sole source
   of truth for Notes buffer text, active document, cursor/mode, selections,
-  command-line state, and syntax highlights. `NotesService` document/session
-  data is a persistence mirror updated from accepted Neovim snapshots.
+  command-line state, and syntax highlights. `NotesService` data is a
+  persistence mirror updated from accepted Neovim snapshots.
 - Route editing keys and buffer-selection requests through the bridge. Only an
   explicit tab click or document lifecycle action may request a Neovim buffer
-  selection; do not select buffers as a side effect of processing backend
-  snapshots or changing the mirrored current index.
+  selection.
 - Do not overwrite an existing Neovim buffer with mirrored QML text when
   selecting it. Seed a buffer from persisted text only when creating/mapping a
   new document buffer. Save from a fresh backend snapshot.
 - The Qt Quick text editor is an editable fallback only while Neovim is
   unavailable. While Neovim is active, render its snapshots read-only and do
   not maintain a second editable copy or text-rendering overlay.
-- Use `qmllint -I . <changed-files>` for focused QML validation and
-  `git diff --check` for whitespace validation.
+
+## Validation
+
+- Use `qmllint -I . <changed-files>` for focused QML validation.
+- Run `./nob lint` for project-wide QML lint when the build driver is available.
+- Run `bash -n <changed-scripts>` for shell-script syntax checks.
+- Run `git diff --check` before committing.
