@@ -461,3 +461,31 @@ and Antigravity. AI-generated changes are reviewed and validated by the project
 maintainer.
 
 </details>
+
+## Release Notes
+
+### Current development snapshot
+
+#### Desktop and visual improvements
+- Updated the project identity and desktop-entry branding to **NexusDotShell**.
+- Improved fullscreen visibility behavior for the bar and dock on Hyprland.
+- Connected the music widget's audio-level visualization to the CAVA service.
+- Improved circular wallpaper thumbnails and wallpaper-layer presentation.
+
+#### Installation and integration
+- Separated dependency installation from desktop configuration.
+- Documented the Arch Linux dependency installer and the `auto-config.sh` setup flow.
+- Added documented setup and removal paths for Hyprland Lua and traditional
+  `hyprland.conf` autostart integration.
+- Updated the screenshot shortcut documentation to `SUPER + ALT + S`.
+
+#### Repository maintenance
+- Updated the README and contributor instructions to use NexusDotShell branding.
+- Made the repository's agent guidance self-contained.
+- Corrected overly broad `.gitignore` patterns so unrelated local text files
+  are not unintentionally ignored.
+
+> This section records changes present in the repository history. It is not a
+> claim that every supported compositor, optional integration, or installation
+> path has been tested on every system. See [Runtime dependencies](#runtime-dependencies)
+> and [Installation](#installation-arch-linux-and-derivatives) for requirements.
