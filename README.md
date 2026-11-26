@@ -103,8 +103,9 @@ by this first iteration.
 
 - **Required:** Quickshell 0.3.1 or newer with Qt 6 (including the
   `quickshell` and `qs` command-line tools), `matugen` for wallpaper-driven
-  color generation, and a Wayland compositor
-  supporting `wlr-layer-shell`.
+  color generation, `cava` for the music visualizer, and a Wayland compositor
+  supporting `wlr-layer-shell`. The Arch dependency installer also installs
+  the C build tools and Qt modules used by the shell.
 - **System statistics and GPU telemetry:** Bash runs the telemetry probes. The
   CPU and memory probe prefers its compiled C helper and falls back to the
   shell/awk collector. The DRM fdinfo scanner prefers its compiled C helper;
@@ -241,13 +242,13 @@ by this first iteration.
     including buffer navigation. Input and state snapshots use separate
     Neovim RPC connections so pending multi-key commands do not block later
     keystrokes. Neovim's own UI is not rendered.
-  - MyQuickshell does not vendor Neovim, Python, or `pynvim`. If Neovim, Python,
+  - NexusDotShell does not vendor Neovim, Python, or `pynvim`. If Neovim, Python,
     `pynvim`, or backend startup is unavailable, the Notes overlay falls back
     to the built-in Qt Quick `TextArea` editor.
 - **Notes file chooser (optional):** Qt tries Zenity with
   `GTK_USE_PORTAL=1` first so GTK requests the desktop's default file chooser
   through `xdg-desktop-portal` when available. If that fails or is unavailable,
-  MyQuickshell tries Zenity's GTK chooser directly, then falls back to Qt Quick's
+  NexusDotShell tries Zenity's GTK chooser directly, then falls back to Qt Quick's
   `FileDialog`. Install `zenity` to enable the first two chooser options; a
   portal service and a desktop-specific portal backend (such as KDE's) are
   optional and let the portal select the desktop's preferred picker.
@@ -274,33 +275,61 @@ Copyright (C) 2026 mmj2023
 - `Modules/Bar/Widgets/` - reusable bar widgets, quick settings, launcher, and system monitor
 - `Modules/Dock/` - floating application dock
 
-## Install and Hyprland Lua integration
+## Installation (Arch Linux and derivatives)
 
-On a Hyprland setup using the native Lua configuration API, run the guided
-installer from the repository directory:
+NexusDotShell uses two separate steps so dependency installation and desktop
+configuration remain independent.
+
+### 1. Install dependencies
+
+Run this from the cloned repository:
 
 ```sh
 bash install.sh
 ```
 
-The installer verifies the required commands, builds the native telemetry
-helpers, installs the desktop entry, and installs a short `nexus` launcher in
-`~/.local/bin`. It then asks before modifying the detected
-`~/.config/hypr/hyprland.lua` configuration. It creates a timestamped backup
-before adding the autostart and screenshot binding. It does not install system
-packages or run privileged commands.
+This is a convenience wrapper for `install-dependencies.sh`. It checks for
+Arch Linux's `pacman`, asks before installing packages, and installs the
+project's main dependencies. The package operation uses `pacman -Syu`, which
+updates the system as well as installing the packages; review the prompt before
+continuing. Optional feature packages and ASUS-specific tools are offered
+separately. This step requires `sudo`.
 
-After installation, launch the shell manually with:
+To inspect or run the dependency installer directly:
 
 ```sh
-nexus
+bash install-dependencies.sh
 ```
 
-The Hyprland Lua integration starts NexusDotShell on the `hyprland.start`
-event and binds `SUPER + SHIFT + S` to a terminal-free full-output screenshot.
-Captures are saved under `~/Pictures/Nexus-Showcase/`. The screenshot shortcut
-requires `hyprshot`; on Arch Linux it may be installed with an AUR helper,
-for example `yay -S hyprshot`.
+### 2. Configure NexusDotShell
+
+After the required packages are installed, run:
+
+```sh
+./auto-config.sh
+```
+
+The configuration script:
+
+- checks the required commands;
+- compiles the native CPU/memory and GPU helpers;
+- installs the NexusDotShell desktop-entry file;
+- creates `~/.local/bin/nexus` as a launcher for this checkout, preserving an
+  existing file or link as a timestamped backup rather than overwriting it;
+- offers to add automatic startup to a detected Hyprland Lua or traditional
+  configuration. It creates a timestamped backup before editing.
+
+The configuration script does not install packages or use `sudo`. If
+`~/.local/bin` is not already in your `PATH`, add it before using the
+`nexus` command.
+
+### Hyprland integration
+
+For the native Lua configuration, the integration starts NexusDotShell on the
+`hyprland.start` event and binds `SUPER + ALT + S` to a terminal-free
+full-output screenshot. Captures are saved under
+`~/Pictures/Nexus-Showcase/`. The screenshot shortcut requires `hyprshot`;
+it is optional and may need to be installed separately from an AUR helper.
 
 To enable or remove only the Lua integration:
 
@@ -309,11 +338,22 @@ bash scripts/enable-hyprland-lua.sh
 bash scripts/disable-hyprland-lua.sh
 ```
 
-The removal helper deletes only the marked NexusDotShell block and creates a
-backup first. The startup wrapper checks whether this project is already
-running before launching another instance. The older
-`enable-hyprland-autostart.sh` and `disable-hyprland-autostart.sh` helpers
-remain available for traditional `hyprland.conf` configurations.
+For traditional `hyprland.conf` configurations:
+
+```sh
+bash scripts/enable-hyprland-autostart.sh
+bash scripts/disable-hyprland-autostart.sh
+```
+
+The removal helpers remove only the marked NexusDotShell block and create a
+backup first. The startup wrapper checks whether this checkout is already
+running before launching another instance.
+
+If you prefer not to configure automatic startup, launch manually with:
+
+```sh
+nexus
+```
 
 ## Running
 
