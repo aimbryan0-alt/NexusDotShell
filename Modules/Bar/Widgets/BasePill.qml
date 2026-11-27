@@ -11,8 +11,8 @@ Item {
   id: root
 
   property QtObject screen: null
-  property real widgetThickness: Theme.widgetThickness * 0.95
-  property real barThickness: Theme.barThickness * 0.95
+  property real widgetThickness: Theme.widgetThickness * 0.90
+  property real barThickness: Theme.barThickness * 0.91
   property real barSpacing: 0
   property bool vertical: false
   property color backgroundTint: "transparent"
@@ -23,7 +23,7 @@ Item {
   signal wheel(var wheelEvent)
 
   readonly property real dpr: root.screen ? Theme.screenScaleOf(root.screen) : 1
-  readonly property real horizontalPadding: Theme.snap(Math.max(5, widgetThickness * 0.15), dpr)
+  readonly property real horizontalPadding: Theme.snap(Math.max(4, widgetThickness * 0.13), dpr)
   readonly property bool isMouseHovered: mouseArea.containsMouse
 
   readonly property real visualWidth: vertical
@@ -53,12 +53,14 @@ Item {
     Rectangle {
       id: background
       anchors.fill: parent
-      radius: Math.min(height / 2, Theme.cornerRadius + 4)
+      radius: height / 2
       color: {
-        const raw = typeof SettingsData !== "undefined" ? SettingsData.barWidgetTransparency : 0.65
-        const isHovered = root.isMouseHovered
-        const transparency = isHovered ? Math.max(0.3, raw) : raw
-        const base = isHovered ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor
+        const raw = typeof SettingsData !== "undefined"
+          ? SettingsData.barWidgetTransparency : 0.65
+        const transparency = Math.max(0.52, Math.min(0.76, raw))
+        const base = root.isMouseHovered
+          ? Theme.blend(Theme.widgetBaseBackgroundColor, Theme.primary, 0.18)
+          : Theme.blend(Theme.nestedSurface, Theme.surfaceBright, 0.06)
         const tintAmount = root.backgroundTint.a
         const tintedBase = tintAmount > 0
           ? Theme.blend(base, root.backgroundTint, tintAmount)
@@ -68,7 +70,7 @@ Item {
       border.width: 1
       border.color: Theme.withAlpha(
         root.isMouseHovered ? Theme.primary : Theme.outlineVariant,
-        root.isMouseHovered ? 0.48 : 0.16
+        root.isMouseHovered ? 0.72 : 0.30
       )
 
       Behavior on color {
@@ -79,39 +81,48 @@ Item {
       }
     }
 
-    // Quiet macOS-like glass pill; the Nexus accent appears on interaction.
+    // Soft glass reflection: a subtle highlight across the upper surface.
     Rectangle {
-      anchors.top: background.top
-      anchors.horizontalCenter: background.horizontalCenter
-      width: Math.max(0, background.width - 20)
-      height: 1
-      radius: 1
-      color: Theme.primary
-      opacity: root.isMouseHovered ? 0.68 : 0.05
+      anchors.fill: background
+      radius: background.radius
+      gradient: Gradient {
+        GradientStop {
+          position: 0.0
+          color: Theme.withAlpha(Theme.surfaceBright, 0.16)
+        }
+        GradientStop {
+          position: 0.48
+          color: Theme.withAlpha(Theme.surfaceBright, 0.035)
+        }
+        GradientStop {
+          position: 1.0
+          color: "transparent"
+        }
+      }
     }
 
+    // Material HUD status accent: compact, restrained and interaction-aware.
     Rectangle {
-      anchors.top: background.top
-      anchors.right: background.right
-      anchors.rightMargin: 12
-      width: 7
-      height: 2
-      radius: 1
-      color: Theme.tertiary
-      opacity: root.isMouseHovered ? 0.82 : 0
-    }
-
-    // A second, restrained accent anchors the pill without adding polling.
-    Rectangle {
-      anchors.bottom: background.bottom
-      anchors.horizontalCenter: background.horizontalCenter
-      width: Math.min(background.width - 24, Math.max(18, background.width * 0.24))
-      height: 1
-      radius: 1
+      anchors.left: background.left
+      anchors.leftMargin: 7
+      anchors.verticalCenter: background.verticalCenter
+      width: 3
+      height: root.isMouseHovered ? 18 : 10
+      radius: 2
       color: Theme.primary
-      opacity: root.isMouseHovered ? 0.58 : 0.06
+      opacity: root.isMouseHovered ? 0.78 : 0.24
+
+      Behavior on height {
+        NumberAnimation {
+          duration: 150
+          easing.type: Easing.OutCubic
+        }
+      }
       Behavior on opacity {
-        NumberAnimation { duration: 140 }
+        NumberAnimation { duration: 150 }
+      }
+      Behavior on color {
+        ColorAnimation { duration: 150 }
       }
     }
 

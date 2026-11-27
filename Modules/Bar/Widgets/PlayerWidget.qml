@@ -20,7 +20,7 @@ BasePill {
   backgroundTint: root.artworkPaletteReady
     ? Theme.withAlpha(root.sampledArtworkColor, 0.1)
     : "transparent"
-  readonly property real controlSize: Math.round(root.textSize() * 1.65)
+  readonly property real controlSize: Math.round(root.textSize() * 1.55)
   readonly property color playerPillAccentColor: root.artworkPaletteReady
     ? Theme.blend(Theme.primary, root.sampledArtworkColor, 0.22)
     : Theme.primary
@@ -69,10 +69,34 @@ BasePill {
   property real displayedPosition: root.player ? root.player.position : 0
   readonly property var visualizerLevels: CavaVisualizerService.levels
 
-  Component.onCompleted: root.updateLyricsPlayer()
+  function syncVisualizerActivity() {
+    CavaVisualizerService.setConsumerPlaying(
+      root,
+      !!root.player && root.player.isPlaying
+    )
+  }
+
+  Component.onCompleted: {
+    root.updateLyricsPlayer()
+    root.syncVisualizerActivity()
+  }
+
+  Component.onDestruction: {
+    CavaVisualizerService.setConsumerPlaying(root, false)
+  }
+
   onPlayerChanged: {
     root.updateLyricsPlayer()
     root.displayedPosition = root.player ? root.player.position : 0
+    root.syncVisualizerActivity()
+  }
+
+  Connections {
+    target: root.player
+
+    function onIsPlayingChanged() {
+      root.syncVisualizerActivity()
+    }
   }
   onBaseArtworkUrlChanged: root.artworkFallbackLevel = 0
   onLyricsAvailableChanged: {
@@ -326,9 +350,9 @@ BasePill {
             spacing: Theme.spaceXS
 
             Repeater {
-              model: root.lyricsAvailable
-                ? [{ label: "Artwork", lyrics: false }, { label: "Lyrics", lyrics: true }]
-                : [{ label: "Artwork", lyrics: false }]
+              model: root.hasMedia && !root.isWallpaperPlayer(root.player)
+                ? [{ label: "PLAYER", lyrics: false }, { label: "LETRAS", lyrics: true }]
+                : [{ label: "PLAYER", lyrics: false }]
 
               delegate: Item {
                 required property var modelData
@@ -1081,14 +1105,11 @@ BasePill {
         }
       }
 
-      Column {
+      Row {
         id: playerContent
         visible: root.hasMedia
-        width: Math.max(
-          Math.min(220, Math.max(trackLabelMetrics.advanceWidth, 3 * root.controlSize + 6)),
-          3 * root.controlSize + 6 + 2 * (34 + Theme.spaceXS)
-        )
-        spacing: 0
+        width: 252
+        spacing: Theme.spaceS
         anchors.horizontalCenter: parent.horizontalCenter
 
         MouseArea {
@@ -1102,16 +1123,17 @@ BasePill {
         }
 
         Item {
+          id: controlsGroup
           implicitWidth: controls.implicitWidth
             + 2 * (visualizer.width + Theme.spaceXS)
           implicitHeight: root.controlSize
           width: implicitWidth
-          anchors.horizontalCenter: parent.horizontalCenter
+          anchors.verticalCenter: parent.verticalCenter
 
           Item {
             id: visualizer
             visible: root.player && root.player.isPlaying
-            width: 34
+            width: 28
             height: root.controlSize
             clip: true
             anchors.right: controls.left
@@ -1218,38 +1240,55 @@ BasePill {
           }
         }
 
-        Row {
-          width: parent.width
-          spacing: Theme.spaceXS
-          anchors.horizontalCenter: parent.horizontalCenter
-
-          Rectangle {
-            width: 3
-            height: 9
-            radius: 2
-            anchors.verticalCenter: parent.verticalCenter
-            color: root.playerPillAccentColor
-            opacity: root.player && root.player.isPlaying ? 1 : 0.42
-          }
+        Column {
+          width: parent.width - controlsGroup.width - parent.spacing
+          spacing: 2
+          anchors.verticalCenter: parent.verticalCenter
 
           Text {
-            width: parent.width - 3 - Theme.spaceXS
-            text: root.trackText()
+            width: parent.width
+            text: root.player ? (root.player.trackTitle || "Unknown track") : ""
             color: Theme.widgetTextColor
             font.family: Theme.monoFontFamily
-            font.pixelSize: root.textSize() * 0.8
-            font.weight: Font.Medium
-            font.letterSpacing: 0.15
+            font.pixelSize: root.textSize() * 0.78
+            font.weight: Font.DemiBold
+            font.letterSpacing: 0.1
             elide: Text.ElideRight
-            horizontalAlignment: Text.AlignLeft
-            // Keep track information readable at rest; hover reveals full emphasis.
-            opacity: root.pillHovered ? 1 : 0.82
+            maximumLineCount: 1
+            opacity: root.pillHovered ? 1 : 0.92
 
             Behavior on opacity {
               NumberAnimation {
                 duration: Theme.shortDuration
                 easing.type: Easing.OutCubic
               }
+            }
+          }
+
+          Row {
+            width: parent.width
+            spacing: 5
+
+            Rectangle {
+              width: 3
+              height: 8
+              radius: 2
+              anchors.verticalCenter: parent.verticalCenter
+              color: root.playerPillAccentColor
+              opacity: root.player && root.player.isPlaying ? 1 : 0.42
+            }
+
+            Text {
+              width: parent.width - 8
+              text: root.player && root.player.trackArtist
+                ? root.player.trackArtist : "Unknown artist"
+              color: Theme.widgetInactiveIconColor
+              font.family: Theme.monoFontFamily
+              font.pixelSize: root.textSize() * 0.66
+              font.weight: Font.Medium
+              font.letterSpacing: 0.2
+              elide: Text.ElideRight
+              maximumLineCount: 1
             }
           }
         }

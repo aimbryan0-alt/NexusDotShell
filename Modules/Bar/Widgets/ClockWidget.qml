@@ -67,6 +67,7 @@ BasePill {
             font.family: Theme.monoFontFamily
             font.pixelSize: root.textSize()
             font.bold: true
+            font.letterSpacing: 0.35
             Behavior on color {
               ColorAnimation { duration: 160; easing.type: Easing.OutCubic }
             }
@@ -97,7 +98,12 @@ BasePill {
               anchors.centerIn: parent
               name: "wallpaper"
               size: root.iconSize(-3)
-              color: Theme.widgetIconColor
+              color: wallpaperButtonMouse.containsMouse
+                ? Theme.primary
+                : Theme.widgetInactiveIconColor
+              Behavior on color {
+                ColorAnimation { duration: 140; easing.type: Easing.OutCubic }
+              }
             }
 
             MouseArea {
@@ -125,9 +131,9 @@ BasePill {
 
           Text {
             text: ClockService.weekdayString
-            color: Theme.widgetInactiveIconColor
+            color: Theme.withAlpha(Theme.primary, 0.76)
             font.family: Theme.monoFontFamily
-            font.pixelSize: Math.round(root.textSize() * 0.76)
+            font.pixelSize: Math.round(root.textSize() * 0.74)
           }
         }
       }
@@ -183,23 +189,32 @@ BasePill {
       Item {
         id: weatherClickArea
         anchors.verticalCenter: parent.verticalCenter
-        width: weatherRow.implicitWidth
-          + (privacyIndicator.visible ? Theme.spaceXXS : Theme.spaceXS * 2)
-        height: weatherRow.implicitHeight + Theme.hoverVerticalInset * 2
+        width: weatherRow.implicitWidth + Theme.spaceS * 2
+        height: weatherRow.implicitHeight + Theme.spaceS
 
         Rectangle {
           anchors.fill: parent
-          radius: Theme.hoverRadius
-          color: weatherMa.containsMouse ? Theme.withAlpha(Theme.primary, 0.12) : "transparent"
+          radius: height / 2
+          color: weatherMa.containsMouse
+            ? Theme.withAlpha(Theme.primary, 0.14)
+            : Theme.withAlpha(Theme.nestedSurface, 0.58)
+          border.width: 1
+          border.color: Theme.withAlpha(
+            weatherMa.containsMouse ? Theme.primary : Theme.outlineVariant,
+            weatherMa.containsMouse ? 0.48 : 0.24
+          )
           Behavior on color {
-            ColorAnimation { duration: 140; easing.type: Easing.OutCubic }
+            ColorAnimation { duration: 150; easing.type: Easing.OutCubic }
+          }
+          Behavior on border.color {
+            ColorAnimation { duration: 150; easing.type: Easing.OutCubic }
           }
         }
 
         Row {
           id: weatherRow
           anchors.centerIn: parent
-          spacing: 3
+          spacing: 4
 
           DmsIcon {
             anchors.verticalCenter: parent.verticalCenter

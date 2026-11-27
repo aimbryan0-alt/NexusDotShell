@@ -285,6 +285,51 @@ function migrateToVersion(obj, targetVersion) {
         settings.barCenterWidgets = centerForNexus;
         settings.barRightWidgets = rightForNexus;
     }
+    if (currentVersion < 17) {
+        // Move the media pill after the focused window and remove the
+        // network throughput pill without touching network services.
+        var leftForLayout = Array.isArray(settings.barLeftWidgets)
+            ? settings.barLeftWidgets.slice()
+            : Util.cloneDef(SpecModule.SPEC["barLeftWidgets"].def);
+        var centerForLayout = Array.isArray(settings.barCenterWidgets)
+            ? settings.barCenterWidgets.slice()
+            : Util.cloneDef(SpecModule.SPEC["barCenterWidgets"].def);
+        var rightForLayout = Array.isArray(settings.barRightWidgets)
+            ? settings.barRightWidgets.slice()
+            : Util.cloneDef(SpecModule.SPEC["barRightWidgets"].def);
+
+        var playerEntry = null;
+        var layoutLists = [leftForLayout, centerForLayout, rightForLayout];
+
+        layoutLists.forEach(function(list) {
+            for (var i = list.length - 1; i >= 0; i--) {
+                var widget = list[i];
+                if (!widget) continue;
+
+                if (widget.id === "networkMonitor") {
+                    list.splice(i, 1);
+                } else if (widget.id === "player") {
+                    if (!playerEntry) playerEntry = widget;
+                    list.splice(i, 1);
+                }
+            }
+        });
+
+        if (!playerEntry) playerEntry = { id: "player", enabled: true };
+
+        var focusedIndex = leftForLayout.findIndex(function(widget) {
+            return widget && widget.id === "focusedWindow";
+        });
+        leftForLayout.splice(
+            focusedIndex >= 0 ? focusedIndex + 1 : leftForLayout.length,
+            0,
+            playerEntry
+        );
+
+        settings.barLeftWidgets = leftForLayout;
+        settings.barCenterWidgets = centerForLayout;
+        settings.barRightWidgets = rightForLayout;
+    }
     settings.configVersion = targetVersion;
     return settings;
 }

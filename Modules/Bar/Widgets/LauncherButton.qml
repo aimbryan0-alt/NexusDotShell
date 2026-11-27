@@ -26,36 +26,48 @@ BasePill {
 
   content: Component {
     Item {
-      implicitWidth: 28
-      implicitHeight: 22
+      implicitWidth: 30
+      implicitHeight: 26
 
       Rectangle {
         id: nexusMark
         anchors.centerIn: parent
-        width: 22
-        height: 22
-        radius: 7
-        color: Theme.withAlpha(Theme.primary, 0.13)
+        width: 26
+        height: 26
+        radius: 9
+        color: Theme.withAlpha(Theme.primaryContainer, 0.72)
         border.width: 1
-        border.color: Theme.withAlpha(Theme.primary, 0.72)
+        border.color: Theme.withAlpha(Theme.primary, 0.88)
+
+        Rectangle {
+          anchors.fill: parent
+          anchors.margins: 2
+          radius: 7
+          color: "transparent"
+          border.width: 1
+          border.color: Theme.withAlpha(Theme.surfaceBright, 0.30)
+        }
 
         Text {
           anchors.centerIn: parent
-          text: "N"
+          text: "結"
           color: Theme.primary
-          font.family: Theme.monoFontFamily
-          font.pixelSize: 15
-          font.weight: Font.Black
-          font.letterSpacing: -1
+          font.family: "Noto Sans CJK JP"
+          font.pixelSize: 16
+          font.weight: Font.DemiBold
         }
 
         Rectangle {
           anchors.right: parent.right
           anchors.top: parent.top
-          width: 4
-          height: 4
-          radius: 1
-          color: Theme.primary
+          anchors.rightMargin: 2
+          anchors.topMargin: 2
+          width: 5
+          height: 5
+          radius: 2.5
+          color: Theme.tertiary
+          border.width: 1
+          border.color: Theme.primaryContainer
         }
       }
     }

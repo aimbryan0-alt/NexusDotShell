@@ -14,7 +14,7 @@ import "Settings/SpecUtil.js" as Util
 Singleton {
   id: root
 
-  readonly property int settingsConfigVersion: 16
+  readonly property int settingsConfigVersion: 17
   readonly property string _configDir: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/myquickshell"
   readonly property string settingsPath: _configDir + "/settings.json"
 
@@ -70,7 +70,7 @@ Singleton {
   property var barCenterWidgets: Util.cloneDef(Spec.SPEC["barCenterWidgets"].def)
   property var barRightWidgets: Util.cloneDef(Spec.SPEC["barRightWidgets"].def)
   property int barTransparency: 0
-  property bool barBlurEnabled: false
+  property bool barBlurEnabled: true
   property real barWidgetTransparency: 0.65
   property string wallpaperSource: "#000000"
   property string wallpaperType: "color"

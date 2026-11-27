@@ -57,6 +57,7 @@ var SPEC = {
 
     // ---- bar layout --------------------------------------------------------
     barLeftWidgets: {
+        // Navigation and frequently used applications.
         def: [
             { id: "launcherButton", enabled: true },
             { id: "submap", enabled: true },
@@ -67,15 +68,16 @@ var SPEC = {
         ]
     },
     barCenterWidgets: {
-        // Nexus Center is placed last in the right-side lane.
-        def: []
+        // Nexus Core gets its own centered floating surface.
+        def: [
+            { id: "controlCenterButton", enabled: true }
+        ]
     },
     barRightWidgets: {
-        // Right side: complete system core, notes, notifications, wallpaper and clock.
-        // Media follows the focused-window widget on the left side.
+        // Compact information and system controls.
         def: [
+            { id: "clock", enabled: true },
             { id: "systemTray", enabled: true },
-            { id: "networkMonitor", enabled: true },
             { id: "cpuUsage", enabled: true },
             { id: "cpuTemperature", enabled: true },
             { id: "memUsage", enabled: true },
@@ -83,13 +85,11 @@ var SPEC = {
             { id: "battery", enabled: true },
             { id: "notepadButton", enabled: true },
             { id: "notificationButton", enabled: true },
-            { id: "wallpaperCarousel", enabled: true },
-            { id: "clock", enabled: true },
-            { id: "controlCenterButton", enabled: true }
+            { id: "wallpaperCarousel", enabled: true }
         ]
     },
     barTransparency: { def: 0 },
-    barBlurEnabled: { def: false },
+    barBlurEnabled: { def: true },
     barWidgetTransparency: { def: 0.65, coerce: percentToUnit },
     wallpaperSource: { def: "#000000" },
     wallpaperType: { def: "color" },

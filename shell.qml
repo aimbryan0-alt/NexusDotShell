@@ -1,3 +1,4 @@
+//@ pragma IconTheme MacTahoe-dark
 //@ pragma UseQApplication
 //@ pragma AppId com.myquickshell.shell
 

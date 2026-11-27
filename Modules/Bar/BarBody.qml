@@ -3,19 +3,20 @@ import QtQuick.Layouts
 import qs.Common
 import qs.Modules.Bar.Widgets
 
-// Balanced Nexus bar: launcher and window controls with media on the left,
-// adaptive Nexus Center in the middle, and system HUD widgets on the right.
+// Nexus Material HUD — three independent floating lanes.
 Item {
   id: root
 
   property QtObject screen: null
   property QtObject barWindow: null
 
-  readonly property int spacing: Math.max(2,
-    typeof SettingsData !== "undefined" ? SettingsData.barSpacing : 3)
-  readonly property int innerPadding: Math.max(6,
-    typeof SettingsData !== "undefined" ? SettingsData.barInnerPadding : 8)
-  readonly property int laneGap: Math.max(8, root.spacing + 4)
+  readonly property int spacing: Math.max(6,
+    typeof SettingsData !== "undefined" ? SettingsData.barSpacing : 6)
+  readonly property int innerPadding: Math.max(8,
+    typeof SettingsData !== "undefined" ? SettingsData.barInnerPadding : 10)
+  readonly property int laneGap: Math.max(14, root.spacing + 8)
+  readonly property bool backgroundEnabled:
+    typeof SettingsData !== "undefined" && SettingsData.barTransparency !== 0
 
   Component { id: launcherButtonComp; LauncherButton {} }
   Component { id: submapComp; SubmapWidget {} }
@@ -61,7 +62,11 @@ Item {
   }
 
   function hasEnabledWidget(id) {
-    const lists = [SettingsData.barLeftWidgets, SettingsData.barCenterWidgets, SettingsData.barRightWidgets]
+    const lists = [
+      SettingsData.barLeftWidgets,
+      SettingsData.barCenterWidgets,
+      SettingsData.barRightWidgets
+    ]
     for (let listIndex = 0; listIndex < lists.length; listIndex++) {
       const list = lists[listIndex] || []
       for (let widgetIndex = 0; widgetIndex < list.length; widgetIndex++) {
@@ -76,29 +81,39 @@ Item {
   property var _created: []
 
   function fillRow(list, hostRow) {
-    if (!list) return
-    const groupCpuMemory = root.hasEnabledWidget("cpuUsage") && root.hasEnabledWidget("memUsage")
+    if (!list)
+      return
+
+    const groupCpuMemory =
+      root.hasEnabledWidget("cpuUsage") && root.hasEnabledWidget("memUsage")
+
     for (var i = 0; i < list.length; i++) {
       var entry = list[i]
-      if (!entry || entry.enabled !== true) continue
-      if (groupCpuMemory && entry.id === "memUsage") continue
+      if (!entry || entry.enabled !== true)
+        continue
+
+      // Omitir o título da janela ativa da barra.
+      if (entry.id === "focusedWindow")
+        continue
+      if (groupCpuMemory && entry.id === "memUsage")
+        continue
+
       var comp = root.registryFor(entry.id)
       if (comp && comp.status === Component.Error)
         console.error("MQBAR component error for", entry.id, ":", comp.errorString())
-      if (comp === null) {
-        console.info("MQBAR skip (no comp):", entry.id)
+      if (comp === null)
         continue
-      }
-      // Keep widgets in the lane configured by SettingsData.
-      var targetRow = hostRow
+
       var initProps = {
         "screen": root.screen,
         "parentScreen": root.screen,
         "barWindow": root.barWindow
       }
+
       if (groupCpuMemory && entry.id === "cpuUsage")
         initProps["groupedMemory"] = true
-      var obj = comp.createObject(targetRow, initProps)
+
+      var obj = comp.createObject(hostRow, initProps)
       if (obj) {
         if (entry.id === "focusedWindow") {
           const titleWidget = obj
@@ -116,6 +131,7 @@ Item {
   function rebuild() {
     for (var i = 0; i < root._created.length; i++)
       root._created[i].destroy()
+
     root._created = []
     root.fillRow(SettingsData.barLeftWidgets, leftRow)
     root.fillRow(SettingsData.barCenterWidgets, centerRow)
@@ -125,15 +141,22 @@ Item {
   function titleSpaceFor(titleWidget) {
     var usedWidth = 0
     var count = 0
+
     for (var i = 0; i < leftRow.children.length; i++) {
       var child = leftRow.children[i]
-      if (child === titleWidget) break
-      if (!child.visible) continue
-      if (count > 0) usedWidth += root.spacing
+      if (child === titleWidget)
+        break
+      if (!child.visible)
+        continue
+      if (count > 0)
+        usedWidth += root.spacing
       usedWidth += child.width
       count++
     }
-    if (count > 0) usedWidth += root.spacing
+
+    if (count > 0)
+      usedWidth += root.spacing
+
     return Math.max(0, Math.min(190,
       centerRow.x - root.laneGap - leftRow.x - usedWidth))
   }
@@ -142,23 +165,118 @@ Item {
 
   Connections {
     target: SettingsData
-    function onSettingsApplied() { root.rebuild() }
+    function onSettingsApplied() {
+      root.rebuild()
+    }
+  }
+
+  // LEFT LANE — launcher, workspaces and contextual widgets.
+  Rectangle {
+    id: leftSurface
+    x: leftRow.x - 7
+    anchors.verticalCenter: parent.verticalCenter
+    width: leftRow.width + 14
+    height: Math.min(root.height - 4, Theme.widgetThickness + 6)
+    radius: 22
+    visible: leftRow.children.length > 0
+    color: Theme.withAlpha(Theme.nestedSurface,
+      root.backgroundEnabled ? 0.68 : 0.54)
+    border.width: 1
+    border.color: Theme.withAlpha(Theme.outlineVariant, 0.30)
+
+    Rectangle {
+      anchors.left: parent.left
+      anchors.leftMargin: 7
+      anchors.verticalCenter: parent.verticalCenter
+      width: 2
+      height: 13
+      radius: 1
+      color: Theme.primary
+      opacity: 0.8
+    }
+  }
+
+  // CENTER LANE — the visual anchor of the HUD.
+  Rectangle {
+    id: centerSurface
+    x: centerRow.x - 8
+    anchors.verticalCenter: parent.verticalCenter
+    width: centerRow.width + 16
+    height: Math.min(root.height - 4, Theme.widgetThickness + 6)
+    radius: 22
+    visible: centerRow.visible && centerRow.children.length > 0
+    color: Theme.withAlpha(Theme.nestedSurface,
+      root.backgroundEnabled ? 0.72 : 0.58)
+    border.width: 1
+    border.color: Theme.withAlpha(Theme.outlineVariant, 0.38)
+
+    Rectangle {
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      width: Math.min(42, parent.width * 0.3)
+      height: 2
+      radius: 1
+      color: Theme.primary
+      opacity: 0.9
+    }
+
+    Rectangle {
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.bottom: parent.bottom
+      width: 18
+      height: 2
+      radius: 1
+      color: Theme.outlineVariant
+      opacity: 0.35
+    }
+  }
+
+  // RIGHT LANE — system status and controls.
+  Rectangle {
+    id: rightSurface
+    x: rightRow.x - 7
+    anchors.verticalCenter: parent.verticalCenter
+    width: rightRow.width + 14
+    height: Math.min(root.height - 4, Theme.widgetThickness + 6)
+    radius: 22
+    visible: rightRow.children.length > 0
+    color: Theme.withAlpha(Theme.nestedSurface,
+      root.backgroundEnabled ? 0.68 : 0.54)
+    border.width: 1
+    border.color: Theme.withAlpha(Theme.outlineVariant, 0.30)
+
+    Rectangle {
+      anchors.right: parent.right
+      anchors.rightMargin: 7
+      anchors.verticalCenter: parent.verticalCenter
+      width: 2
+      height: 13
+      radius: 1
+      color: Theme.tertiary
+      opacity: 0.8
+    }
   }
 
   Row {
     id: leftRow
     x: root.innerPadding
+    width: implicitWidth
+    height: implicitHeight
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
   }
 
-  // The center remains visually centered when space permits, but yields a
-  // little to the side lanes instead of covering or clipping their widgets.
   Row {
     id: centerRow
-    x: Math.max(leftRow.x + leftRow.width + root.laneGap,
-      Math.min((root.width - width) / 2,
-        rightRow.x - root.laneGap - width))
+    width: implicitWidth
+    height: implicitHeight
+    x: Math.max(
+      leftRow.x + leftRow.width + root.laneGap,
+      Math.min(
+        (root.width - width) / 2,
+        rightRow.x - root.laneGap - width
+      )
+    )
     anchors.verticalCenter: parent.verticalCenter
     spacing: root.spacing
     visible: x + width <= rightRow.x - root.laneGap
@@ -169,6 +287,8 @@ Item {
     anchors.right: parent.right
     anchors.rightMargin: root.innerPadding
     anchors.verticalCenter: parent.verticalCenter
+    width: implicitWidth
+    height: implicitHeight
     spacing: root.spacing
   }
 }

@@ -690,15 +690,29 @@ PopupWindow {
                             Rectangle {
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: parent.width
-                                height: 8
-                                radius: 4
+                                height: 10
+                                radius: 3
                                 color: Theme.surfaceContainerHighest
+                                clip: true
 
                                 Rectangle {
                                     width: parent.width * root.progressForYear()
                                     height: parent.height
                                     radius: parent.radius
                                     color: Theme.primary
+                                }
+
+                                Repeater {
+                                    model: 15
+                                    delegate: Rectangle {
+                                        required property int index
+                                        x: parent.width * (index + 1) / 16
+                                        width: 1
+                                        height: parent.height
+                                        color: Theme.withAlpha(
+                                            Theme.widgetBaseBackgroundColor, 0.78
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -744,15 +758,29 @@ PopupWindow {
                             Rectangle {
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: parent.width
-                                height: 8
-                                radius: 4
+                                height: 10
+                                radius: 3
                                 color: Theme.surfaceContainerHighest
+                                clip: true
 
                                 Rectangle {
                                     width: parent.width * Math.min(1, root.progressForLife())
                                     height: parent.height
                                     radius: parent.radius
                                     color: Theme.tertiary
+                                }
+
+                                Repeater {
+                                    model: 15
+                                    delegate: Rectangle {
+                                        required property int index
+                                        x: parent.width * (index + 1) / 16
+                                        width: 1
+                                        height: parent.height
+                                        color: Theme.withAlpha(
+                                            Theme.widgetBaseBackgroundColor, 0.78
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -915,9 +943,11 @@ PopupWindow {
                         Text {
                             width: parent.width - 70
                             height: parent.height
-                            text: qsTr("NEXUS · AGENDA")
+                            text: qsTr("NEXUS // AGENDA")
                             color: Theme.widgetTextColor
-                            font.pixelSize: 15
+                            font.family: Theme.monoFontFamily
+                            font.pixelSize: 14
+                            font.letterSpacing: 1.0
                             font.weight: Font.DemiBold
                             verticalAlignment: Text.AlignVCenter
                             elide: Text.ElideRight
@@ -1243,21 +1273,74 @@ PopupWindow {
                             }
 
                             Text {
-                                text: root.pomodoroMode
-                                color: Theme.widgetInactiveIconColor
-                                font.pixelSize: 11
+                                text: root.pomodoroMode.toUpperCase()
+                                    + (root.pomodoroRunning ? " // ACTIVE" : " // READY")
+                                color: root.pomodoroRunning
+                                    ? Theme.primary : Theme.widgetInactiveIconColor
+                                font.family: Theme.monoFontFamily
+                                font.pixelSize: 9
+                                font.weight: Font.DemiBold
                             }
 
                         }
 
-                        Text {
+                        Column {
+                            id: pomodoroHudTimer
                             width: 72
-                            height: parent.height
-                            text: root.formatPomodoroTime()
-                            color: Theme.widgetTextColor
-                            font.family: Theme.monoFontFamily
-                            font.pixelSize: 25
-                            verticalAlignment: Text.AlignVCenter
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 5
+
+                            readonly property real progress: {
+                                const duration = (
+                                    root.pomodoroMode === "Work"
+                                    ? SettingsData.pomodoroWorkMinutes
+                                    : SettingsData.pomodoroBreakMinutes
+                                ) * 60;
+                                return duration > 0
+                                    ? Math.max(0, Math.min(1, root.pomodoroRemaining / duration))
+                                    : 0;
+                            }
+
+                            Text {
+                                width: parent.width
+                                height: 31
+                                text: root.formatPomodoroTime()
+                                color: root.pomodoroMode === "Work"
+                                    ? Theme.primary : Theme.tertiary
+                                font.family: Theme.monoFontFamily
+                                font.pixelSize: 25
+                                font.weight: Font.DemiBold
+                                verticalAlignment: Text.AlignVCenter
+                            }
+
+                            Rectangle {
+                                width: parent.width
+                                height: 5
+                                radius: 2
+                                color: Theme.surfaceContainerHighest
+                                clip: true
+
+                                Rectangle {
+                                    width: parent.width * pomodoroHudTimer.progress
+                                    height: parent.height
+                                    radius: parent.radius
+                                    color: root.pomodoroMode === "Work"
+                                        ? Theme.primary : Theme.tertiary
+                                }
+
+                                Repeater {
+                                    model: 11
+                                    delegate: Rectangle {
+                                        required property int index
+                                        x: parent.width * (index + 1) / 12
+                                        width: 1
+                                        height: parent.height
+                                        color: Theme.withAlpha(
+                                            Theme.widgetBaseBackgroundColor, 0.78
+                                        )
+                                    }
+                                }
+                            }
                         }
 
                         Column {

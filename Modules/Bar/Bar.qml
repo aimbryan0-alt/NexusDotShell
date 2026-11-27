@@ -175,67 +175,7 @@ Item {
       height: barWindow.height
     }
 
-    // Rounded HUD chassis keeps the original bar layout while giving it
-    // a compact cyberpunk frame. All accents are static to avoid extra work.
-    Rectangle {
-      id: hudFrame
-      anchors.fill: parent
-      anchors.leftMargin: 8
-      anchors.rightMargin: 8
-      anchors.topMargin: 2
-      anchors.bottomMargin: 2
-      radius: 13
-      color: Theme.withAlpha(
-        Theme.surfaceContainerLowest,
-        barWindow.backgroundEnabled ? 0.94 : 0.24
-      )
-      border.width: 1
-      border.color: Theme.withAlpha(Theme.primary, barWindow.backgroundEnabled ? 0.48 : 0.24)
-
-      Rectangle {
-        anchors.left: parent.left
-        anchors.leftMargin: 17
-        anchors.top: parent.top
-        width: 62
-        height: 2
-        radius: 1
-        color: Theme.primary
-        opacity: 0.9
-      }
-
-      Rectangle {
-        anchors.right: parent.right
-        anchors.rightMargin: 18
-        anchors.bottom: parent.bottom
-        width: 38
-        height: 2
-        radius: 1
-        color: Theme.tertiary
-        opacity: 0.78
-      }
-
-      Rectangle {
-        anchors.left: parent.left
-        anchors.leftMargin: 5
-        anchors.verticalCenter: parent.verticalCenter
-        width: 2
-        height: 9
-        radius: 1
-        color: Theme.primary
-        opacity: 0.8
-      }
-
-      Rectangle {
-        anchors.right: parent.right
-        anchors.rightMargin: 5
-        anchors.verticalCenter: parent.verticalCenter
-        width: 2
-        height: 9
-        radius: 1
-        color: Theme.tertiary
-        opacity: 0.8
-      }
-    }
+    // Floating HUD lanes are rendered by BarBody; keep the panel transparent.
 
     MouseArea {
       anchors.fill: parent

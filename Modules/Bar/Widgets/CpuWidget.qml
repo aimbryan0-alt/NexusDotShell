@@ -1993,11 +1993,22 @@ BasePill {
     Rectangle {
       anchors.fill: parent
       focus: true
-      radius: Theme.cornerRadius
+      radius: 26
       color: Theme.withAlpha(Theme.widgetBaseBackgroundColor,
         typeof SettingsData !== "undefined" ? SettingsData.popupTransparency : 0.65)
       border.width: 1
-      border.color: Theme.withAlpha(Theme.primary, 0.34)
+      border.color: Theme.withAlpha(Theme.primary, 0.42)
+
+      // Subtle HUD accent on the upper edge.
+      Rectangle {
+        x: 24
+        y: 0
+        width: 96
+        height: 3
+        radius: 2
+        color: Theme.primary
+        opacity: 0.88
+      }
 
       Column {
         anchors.fill: parent

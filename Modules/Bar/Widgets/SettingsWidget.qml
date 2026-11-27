@@ -641,28 +641,30 @@ BasePill {
                   anchors.margins: 7
                   spacing: 3
 
-                  Row {
+                  RowLayout {
                     width: parent.width
+                    spacing: 6
 
                     DmsIcon {
-                      anchors.verticalCenter: parent.verticalCenter
+                      Layout.alignment: Qt.AlignVCenter
                       name: modelData.icon
                       size: 11
                       color: modelData.tint
                     }
 
                     Text {
+                      Layout.fillWidth: true
+                      Layout.minimumWidth: 0
                       text: modelData.label
+                      elide: Text.ElideRight
                       color: Theme.widgetInactiveIconColor
                       font.family: Theme.monoFontFamily
                       font.pixelSize: Math.max(8, Theme.fontSizeSmall - 3)
                       font.weight: Font.DemiBold
                     }
 
-                    Item { width: 1; height: 1 }
-
                     Text {
-                      anchors.right: parent.right
+                      Layout.alignment: Qt.AlignVCenter
                       text: modelData.value
                       color: modelData.tint
                       font.family: Theme.monoFontFamily
